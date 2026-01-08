@@ -1,22 +1,13 @@
-entrypoint = "main.py"
-modules = ["python-3.11", "nodejs-20"]
+entrypoint = "package.json"
+modules = ["nodejs-20"]
 
 [nix]
-channel = "stable-25_05"
-packages = ["p7zip", "unrar-free", "unzip"]
-
-[unitTest]
-language = "python3"
-
-[gitHubImport]
-requiredFiles = [".replit", "replit.nix"]
+channel = "stable-24_05"
 
 [deployment]
-run = ["python3", "main.py"]
-deploymentTarget = "cloudrun"
-
-[agent]
-expertMode = true
+build = ["npm", "run", "build"]
+deploymentTarget = "static"
+publicDir = "dist"
 
 [workflows]
 runButton = "Project"
@@ -45,3 +36,6 @@ outputType = "webview"
 [[ports]]
 localPort = 5000
 externalPort = 80
+
+[agent]
+expertMode = true
