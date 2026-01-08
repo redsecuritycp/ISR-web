@@ -66,7 +66,7 @@
                         <ResetPassword></ResetPassword>
                     </v-list-item>
                     <v-list-item v-if="isAdmin">
-                        <v-btn block outlined rounded text @click="goTo('/ManageUsers')">Administrar usuaros</v-btn>
+                        <v-btn block outlined rounded text @click="goTo('/manageUsers')">Administrar usuarios</v-btn>
                     </v-list-item>
                     <v-list-item>
                         <v-btn block outlined rounded text @click="logout()">Cerrar sesion</v-btn>
