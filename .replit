@@ -1,9 +1,9 @@
 entrypoint = "main.py"
-modules = ["python-3.11"]
+modules = ["python-3.11", "nodejs-20"]
 
 [nix]
 channel = "stable-25_05"
-packages = ["p7zip", "unrar-free"]
+packages = ["p7zip", "unrar-free", "unzip"]
 
 [unitTest]
 language = "python3"
