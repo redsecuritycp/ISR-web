@@ -7,12 +7,27 @@
                     v-on:keyup.enter="buscarProducto()"></v-text-field>
             </div>
             <v-divider color="grey"></v-divider>
-            <ul class="menu  mt-1">
-                <li v-for="(item, i) in filtrarCategorias(this.$store.state.itemsCategorias)" :key="item.id"
-                    @click="buscarProductosPorCategoria(item.id)">
-                    <a href="#">{{ item.categoria }} </a>
-                </li>
-            </ul>
+            <v-list dense nav class="mt-1 pa-0">
+              <v-list-item
+                v-for="(item, i) in filtrarCategorias($store.state.itemsCategorias)"
+                :key="item.id"
+                @click="buscarProductosPorCategoria(item.id)"
+                :class="{ 'categoria-activa': $store.state.idCategoria === item.id }"
+                class="categoria-item"
+              >
+                <v-list-item-icon class="mr-3 my-auto">
+                  <v-icon color="white" size="20">{{ getIcono(item.categoria) }}</v-icon>
+                </v-list-item-icon>
+                <v-list-item-content>
+                  <v-list-item-title 
+                    class="white--text text-uppercase" 
+                    style="font-size: 0.85rem;"
+                  >
+                    {{ item.categoria }}
+                  </v-list-item-title>
+                </v-list-item-content>
+              </v-list-item>
+            </v-list>
         </v-navigation-drawer>
     </div>
 </template>
@@ -90,6 +105,33 @@ export default {
             this.$router.push(ruta).catch(() => { });
         },
 
+        getIcono(categoria) {
+          const iconos = {
+            'OFERTA': 'mdi-tag-multiple',
+            'ACCESORIOS': 'mdi-puzzle',
+            'ALARMAS': 'mdi-bell-ring',
+            'ALMACENAMIENTO': 'mdi-harddisk',
+            'BATERIAS Y PILAS': 'mdi-battery-high',
+            'CABLES': 'mdi-cable-data',
+            'CAMARAS ANALOGAS': 'mdi-camera',
+            'CAMARAS IP': 'mdi-cctv',
+            'CERCO ELECTRICO': 'mdi-flash-alert',
+            'CONECTIVIDAD': 'mdi-wifi',
+            'CONTROL DE ACCESO / ASISTENCIA': 'mdi-card-account-details',
+            'FERRETERIA': 'mdi-tools',
+            'FUENTES - UPS': 'mdi-power-plug',
+            'GENERAL': 'mdi-package-variant',
+            'GESTION & LICENCIAS': 'mdi-license',
+            'GRABADORES': 'mdi-video-box',
+            'INCENDIO': 'mdi-fire',
+            'LICENCIAS': 'mdi-key',
+            'OUTLET': 'mdi-sale',
+            'PORTERIA': 'mdi-door',
+            'SOLUCIONES': 'mdi-lightbulb'
+          };
+          return iconos[categoria.toUpperCase()] || 'mdi-folder';
+        },
+
         // Obtener todas la categorias.
         async getSucursales() {
             const url = this.$store.state.urlService + "/sucursales/conssucursales";
@@ -108,3 +150,28 @@ export default {
 
 }
 </script>
+
+<style scoped>
+.categoria-item {
+  min-height: 40px;
+  margin: 2px 8px;
+  border-radius: 8px;
+  transition: all 0.2s ease;
+}
+
+.categoria-item:hover {
+  background-color: rgba(255, 255, 255, 0.15) !important;
+}
+
+.categoria-activa {
+  background-color: #0288D1 !important;
+}
+
+.categoria-activa:hover {
+  background-color: #0277BD !important;
+}
+
+.v-list-item__icon {
+  margin-right: 12px !important;
+}
+</style>
