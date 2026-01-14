@@ -16,7 +16,9 @@
                 class="categoria-item"
               >
                 <v-list-item-icon class="mr-3 my-auto">
-                  <v-icon color="white" size="20">{{ getIcono(item.categoria) }}</v-icon>
+                  <v-icon color="white" size="20">
+                    {{ getIcono(item.categoria) }}
+                  </v-icon>
                 </v-list-item-icon>
                 <v-list-item-content>
                   <v-list-item-title 
@@ -105,6 +107,16 @@ export default {
             this.$router.push(ruta).catch(() => { });
         },
 
+        // Obtener todas la categorias.
+        async getSucursales() {
+            const url = this.$store.state.urlService + "/sucursales/conssucursales";
+            const result = await (await fetch(url)).json();
+            this.itemsSucursales = [];
+            result.forEach(element => { this.itemsSucursales.push({ id: element.id, sucursal: element.sucursal }) });
+            this.itemsSucursales.push({ id: 0, sucursal: "TODAS" });
+            this.$store.state.itemsSucursales = this.itemsSucursales;
+        },
+
         getIcono(categoria) {
           const iconos = {
             'OFERTA': 'mdi-tag-multiple',
@@ -131,16 +143,6 @@ export default {
           };
           return iconos[categoria.toUpperCase()] || 'mdi-folder';
         },
-
-        // Obtener todas la categorias.
-        async getSucursales() {
-            const url = this.$store.state.urlService + "/sucursales/conssucursales";
-            const result = await (await fetch(url)).json();
-            this.itemsSucursales = [];
-            result.forEach(element => { this.itemsSucursales.push({ id: element.id, sucursal: element.sucursal }) });
-            this.itemsSucursales.push({ id: 0, sucursal: "TODAS" });
-            this.$store.state.itemsSucursales = this.itemsSucursales;
-        },
     },
 
     mounted() {
@@ -154,8 +156,8 @@ export default {
 <style scoped>
 .categoria-item {
   min-height: 40px;
+  border-radius: 4px;
   margin: 2px 8px;
-  border-radius: 8px;
   transition: all 0.2s ease;
 }
 
@@ -164,14 +166,16 @@ export default {
 }
 
 .categoria-activa {
-  background-color: #0288D1 !important;
+  background-color: rgba(33, 150, 243, 0.4) !important;
+  border-left: 3px solid #2196F3;
 }
 
 .categoria-activa:hover {
-  background-color: #0277BD !important;
+  background-color: rgba(33, 150, 243, 0.5) !important;
 }
 
-.v-list-item__icon {
-  margin-right: 12px !important;
+.v-list-item__title {
+  font-weight: 500;
+  letter-spacing: 0.3px;
 }
 </style>
