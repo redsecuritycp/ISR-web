@@ -191,6 +191,18 @@
 
                     </v-card-text>
 
+                    <v-card-actions v-if="$store.state.usuario != ''" class="pa-2">
+                        <v-btn 
+                            x-small 
+                            color="primary" 
+                            block
+                            @click="agregarAlPresupuesto(item)"
+                        >
+                            <v-icon left x-small>mdi-plus</v-icon>
+                            Agregar al presupuesto
+                        </v-btn>
+                    </v-card-actions>
+
                 </v-card>
 
             </v-flex>
@@ -201,6 +213,25 @@
         <v-alert v-model="showNoProducts" border="top" color="red lighten-2" dark class="mt-4 text-center">
             Lo lamentamos, no hay productos para esta selección.
         </v-alert>
+
+        <v-snackbar 
+            v-model="snackbar" 
+            :timeout="2000" 
+            color="success"
+            top
+            right
+        >
+            {{ snackbarText }}
+            <template v-slot:action="{ attrs }">
+                <v-btn 
+                    text 
+                    v-bind="attrs" 
+                    @click="snackbar = false"
+                >
+                    Cerrar
+                </v-btn>
+            </template>
+        </v-snackbar>
 
     </v-container>
 </template>
@@ -230,8 +261,11 @@ export default {
         selectedMarca: 0,
         itemsProductos: [],
         itemsMarcas: [],
+        itemsMarcasTemp: [],
         selectedSucursal: 0,
-        chkVerSoloOfertas: false
+        chkVerSoloOfertas: false,
+        snackbar: false,
+        snackbarText: ''
     }),
 
     created() {
@@ -420,29 +454,15 @@ export default {
 
         async buscarProductos() {
             this.overlay = true;
-            
-            let resultado = null;
-            
-            const variaciones = this.generarVariaciones(this.searchData);
-            
-            if (variaciones.length === 0) {
-                resultado = await this.ejecutarBusqueda('');
-            } else {
-                for (const variacion of variaciones) {
-                    resultado = await this.ejecutarBusqueda(variacion);
-                    if (resultado.producto && 
-                        resultado.producto.length > 0) {
-                        break;
-                    }
-                }
-                
-                if (!resultado.producto || 
-                    resultado.producto.length === 0) {
-                    resultado = await this.ejecutarBusqueda(
-                        this.searchData.trim()
-                    );
-                }
-            }
+            const url = this.$store.state.urlService + 
+                "/Productos/ConsProductos?Producto=" + 
+                this.searchData.trim() +
+                "&CategoriaId=" + this.selectedCategoria + 
+                "&MarcaId=" + this.selectedMarca + 
+                "&OrdenId=" + this.selectedOrder + 
+                "&SucursalId=" + this.selectedSucursal + 
+                "&Oferta=" + this.chkVerSoloOfertas;
+            const resultado = await (await fetch(url)).json();
             
             this.itemsProductos = [];
             resultado.producto.forEach(element => {
@@ -474,6 +494,7 @@ export default {
             });
             this.$store.commit('setItemsProductos', this.itemsProductos);
 
+            // Marcas.
             if (this.selectedMarca == 0) {
                 this.itemsMarcas = [];
                 resultado.marca.forEach(element => {
@@ -542,6 +563,23 @@ export default {
                 console.log(err);
             };
             this.overlay = false;
+        },
+
+        agregarAlPresupuesto(item) {
+            this.$store.commit('addItemPresupuesto', {
+                id: item.id,
+                codigoInterno: item.codigoInterno,
+                producto: item.producto,
+                marca: item.marca,
+                categoria: item.categoria,
+                netoUSD: item.netoUSD,
+                netoARS: item.netoARS,
+                precioUSD: item.precioUSD,
+                precioARS: item.precioARS,
+                imagen: item.imagen
+            });
+            this.snackbarText = `${item.producto} agregado al presupuesto`;
+            this.snackbar = true;
         },
     },
 

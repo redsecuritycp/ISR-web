@@ -38,7 +38,8 @@ app.get('/api/cliente/:usuarioId', (req, res) => {
   const clientes = readJSON(CLIENTES_FILE);
   const cliente = clientes[usuarioId] || { 
     logo: '', 
-    vendedorId: null 
+    vendedorId: null,
+    sucursalId: 2
   };
   res.json(cliente);
 });
@@ -68,6 +69,25 @@ app.post('/api/cliente/:usuarioId/vendedor', (req, res) => {
     clientes[usuarioId] = { logo: '', vendedorId: null };
   }
   clientes[usuarioId].vendedorId = vendedorId;
+  writeJSON(CLIENTES_FILE, clientes);
+  
+  res.json({ success: true });
+});
+
+// POST /api/cliente/:usuarioId/sucursal - Guardar sucursal
+app.post('/api/cliente/:usuarioId/sucursal', (req, res) => {
+  const { usuarioId } = req.params;
+  const { sucursalId } = req.body;
+  
+  const clientes = readJSON(CLIENTES_FILE);
+  if (!clientes[usuarioId]) {
+    clientes[usuarioId] = { 
+      logo: '', 
+      vendedorId: null, 
+      sucursalId: 2 
+    };
+  }
+  clientes[usuarioId].sucursalId = sucursalId;
   writeJSON(CLIENTES_FILE, clientes);
   
   res.json({ success: true });

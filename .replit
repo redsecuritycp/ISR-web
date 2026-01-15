@@ -1,26 +1,17 @@
-entrypoint = "main.py"
-modules = ["python-3.11"]
+run = "npm run serve"
+entrypoint = "src/main.js"
+modules = ["nodejs-20"]
 
 [nix]
-channel = "stable-25_05"
-
-[unitTest]
-language = "python3"
-
-[gitHubImport]
-requiredFiles = [".replit", "replit.nix"]
+channel = "stable-24_05"
 
 [deployment]
-run = ["python3", "main.py"]
-deploymentTarget = "cloudrun"
-
-[agent]
-expertMode = true
+run = ["sh", "-c", "npm run serve"]
 
 [[ports]]
-localPort = 3001
+localPort = 5000
 externalPort = 80
 
 [[ports]]
-localPort = 5001
+localPort = 5002
 externalPort = 3000

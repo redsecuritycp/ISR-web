@@ -5,10 +5,38 @@
         <!-- Menú lateral izquierdo -->
         <v-app-bar-nav-icon @click="showNavLeft()"></v-app-bar-nav-icon>
 
-        <!-- Logo -->
-        <div class="d-flex align-center pointer" @click="goTo('/')">
-            <v-img alt="Vuetify Name" src="@/assets/img/IDSRLogo.svg" width="50" />
-            <v-img alt="Vuetify Name" src="@/assets/img/IDSRTexto.svg" width="90" />
+        <!-- Logo IDSR - Click selecciona sucursal Rosario -->
+        <div 
+            class="d-flex align-center pointer" 
+            @click="cambiarSucursal(2)"
+            :class="{ 'logo-activo': sucursalSeleccionada === 2 }"
+            title="Insumos de Seguridad Rosario"
+        >
+            <v-img 
+                alt="IDSR Logo" 
+                src="@/assets/img/IDSRLogo.svg" 
+                width="50" 
+            />
+            <v-img 
+                alt="IDSR Texto" 
+                src="@/assets/img/IDSRTexto.svg" 
+                width="90" 
+            />
+        </div>
+
+        <!-- Logo ISENOA - Click selecciona sucursal ISENOA -->
+        <div
+            class="pointer ml-6 d-flex align-center"
+            @click="cambiarSucursal(1)"
+            :class="{ 'logo-activo': sucursalSeleccionada === 1 }"
+            title="ISENOA"
+        >
+            <v-img 
+                alt="ISENOA" 
+                src="@/assets/img/logo_isenoa.png" 
+                width="150"
+                contain
+            />
         </div>
 
         <v-spacer></v-spacer>
@@ -39,6 +67,25 @@
 
             </v-menu>
         </div>
+
+        <!-- Acceso al Presupuestador -->
+        <v-btn 
+          small
+          color="primary"
+          class="mr-3" 
+          v-if="$store.state.usuario != ''" 
+          @click="goTo('/presupuestador')"
+        >
+          <v-icon left small>mdi-cart-outline</v-icon>
+          Presupuestador
+          <v-chip 
+            v-if="cantItemsPresupuesto > 0"
+            x-small
+            color="white"
+            text-color="primary"
+            class="ml-2 font-weight-bold"
+          >{{ cantItemsPresupuesto }}</v-chip>
+        </v-btn>
 
         <!-- Valor del dólar oficial -->
         <div class="pe-4" v-if="$store.state.usuario != ''">Dólar oficial: <b>{{ dolar }}</b></div>
@@ -98,7 +145,8 @@ export default {
     name: 'NavBarComponent',
 
     data: () => ({
-        dolar: "    "
+        dolar: "    ",
+        sucursalSeleccionada: 2
     }),
 
     methods: {
@@ -155,17 +203,60 @@ export default {
             catch (error) {
                 console.error("Error al obtener el valor del dólar:", error.message);
             }
+        },
+
+        async cambiarSucursal(sucursalId) {
+            this.$store.state.idSucursal = sucursalId;
+            this.sucursalSeleccionada = sucursalId;
+            
+            // Refrescar productos
+            bus.$emit('mostrarProductos');
+            
+            const usuarioId = this.$store.state.usuarioId;
+            if (usuarioId && usuarioId !== 0) {
+                try {
+                    await fetch(`/api/cliente/${usuarioId}/sucursal`, {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ sucursalId })
+                    });
+                } catch (error) {
+                    console.error('Error guardando sucursal:', error);
+                }
+            }
+        },
+
+        async cargarSucursalGuardada() {
+            const usuarioId = this.$store.state.usuarioId;
+            if (!usuarioId || usuarioId === 0) return;
+            
+            try {
+                const response = await fetch(`/api/cliente/${usuarioId}`);
+                const data = await response.json();
+                if (data.sucursalId) {
+                    this.sucursalSeleccionada = data.sucursalId;
+                    this.$store.state.idSucursal = data.sucursalId;
+                }
+            } catch (error) {
+                console.error('Error cargando sucursal:', error);
+            }
         }
     },
 
     mounted() {
         this.consUsersPR();
         this.GetDolar();
+        this.cargarSucursalGuardada();
     },
 
     computed: {
         isAdmin() {
             return this.$store.state.adminUser;
+        },
+        cantItemsPresupuesto() {
+            return this.$store.state.itemsPresupuesto 
+              ? this.$store.state.itemsPresupuesto.length 
+              : 0;
         }
     },
 
@@ -173,3 +264,23 @@ export default {
 }
 
 </script>
+
+<style scoped>
+.logo-activo {
+    opacity: 1;
+    border-bottom: 3px solid #1976D2;
+    padding-bottom: 4px;
+}
+
+.pointer {
+    transition: opacity 0.2s ease;
+}
+
+.pointer:not(.logo-activo) {
+    opacity: 0.7;
+}
+
+.pointer:hover {
+    opacity: 1;
+}
+</style>

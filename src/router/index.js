@@ -5,6 +5,7 @@ import Productos from "../views/Productos.vue";
 import ManageUsers from "../views/ManageUsers.vue";
 import PoliticaPrivacidad from "@/views/PoliticaPrivacidad.vue";
 import TerminosCondiciones from "@/views/TerminosCondiciones.vue";
+import Presupuestador from "@/views/Presupuestador.vue";
 
 Vue.use(VueRouter);
 
@@ -33,6 +34,11 @@ const routes = [
     path: "/terminos",
     name: "terminos",
     component: TerminosCondiciones,
+  },
+  {
+    path: "/presupuestador",
+    name: "presupuestador",
+    component: Presupuestador,
   },
 ];
 
