@@ -1,14 +1,18 @@
-run = "bash start.sh"
-entrypoint = "src/main.js"
+entrypoint = "main.py"
+modules = ["python-3.11"]
 
 [nix]
-channel = "stable-24_05"
+channel = "stable-25_05"
 
-[nix.packages]
-nodejs = "nodejs_20"
+[unitTest]
+language = "python3"
 
-[env]
-PATH = "/home/runner/$REPL_SLUG/.config/npm/node_global/bin:/home/runner/$REPL_SLUG/node_modules/.bin:./node_modules/.bin:/nix/store/nodejs_20/bin:$PATH"
+[gitHubImport]
+requiredFiles = [".replit", "replit.nix"]
 
 [deployment]
-run = ["sh", "-c", "bash start.sh"]
+run = ["python3", "main.py"]
+deploymentTarget = "cloudrun"
+
+[agent]
+expertMode = true
