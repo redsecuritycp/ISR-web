@@ -118,30 +118,31 @@ export default {
         },
 
         getIcono(categoria) {
-          const iconos = {
-            'OFERTA': 'mdi-tag-multiple',
-            'ACCESORIOS': 'mdi-puzzle',
-            'ALARMAS': 'mdi-bell-ring',
-            'ALMACENAMIENTO': 'mdi-harddisk',
-            'BATERIAS Y PILAS': 'mdi-battery-high',
-            'CABLES': 'mdi-cable-data',
-            'CAMARAS ANALOGAS': 'mdi-camera',
-            'CAMARAS IP': 'mdi-cctv',
-            'CERCO ELECTRICO': 'mdi-flash-alert',
-            'CONECTIVIDAD': 'mdi-wifi',
-            'CONTROL DE ACCESO / ASISTENCIA': 'mdi-card-account-details',
-            'FERRETERIA': 'mdi-tools',
-            'FUENTES - UPS': 'mdi-power-plug',
-            'GENERAL': 'mdi-package-variant',
-            'GESTION & LICENCIAS': 'mdi-license',
-            'GRABADORES': 'mdi-video-box',
-            'INCENDIO': 'mdi-fire',
-            'LICENCIAS': 'mdi-key',
-            'OUTLET': 'mdi-sale',
-            'PORTERIA': 'mdi-door',
-            'SOLUCIONES': 'mdi-lightbulb'
-          };
-          return iconos[categoria.toUpperCase()] || 'mdi-folder';
+            const iconos = {
+                'OFERTA': 'mdi-tag-multiple',
+                'ACCESORIOS': 'mdi-puzzle',
+                'ALARMAS': 'mdi-bell-ring',
+                'ALMACENAMIENTO': 'mdi-harddisk',
+                'BATERIAS Y PILAS': 'mdi-battery-high',
+                'CABLES': 'mdi-cable-data',
+                'CAMARAS ANALOGAS': 'mdi-camera',
+                'CAMARAS IP': 'mdi-cctv',
+                'CERCO ELECTRICO': 'mdi-flash-alert',
+                'CONECTIVIDAD': 'mdi-wifi',
+                'CONTROL DE ACCESO / ASISTENCIA': 'mdi-card-account-details',
+                'FERRETERIA': 'mdi-tools',
+                'FUENTES - UPS': 'mdi-power-plug',
+                'GENERAL': 'mdi-package-variant',
+                'GESTION & LICENCIAS': 'mdi-license',
+                'GRABADORES': 'mdi-video-box',
+                'INCENDIO': 'mdi-fire',
+                'LICENCIAS': 'mdi-key',
+                'OUTLET': 'mdi-sale',
+                'PORTERIA': 'mdi-door',
+                'SOLUCIONES': 'mdi-lightbulb'
+            };
+            const key = categoria ? categoria.toUpperCase() : '';
+            return iconos[key] || 'mdi-folder';
         },
     },
 

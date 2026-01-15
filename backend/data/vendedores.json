@@ -1,0 +1,7 @@
+[
+  { "id": 1, "nombre": "Marito Polaco", "email": "test@test.com" },
+  { "id": 2, "nombre": "Luciano B.", "email": "test@test.com" },
+  { "id": 3, "nombre": "Facundo Galeano", "email": "test@test.com" },
+  { "id": 4, "nombre": "Maximiliano", "email": "test@test.com" },
+  { "id": 5, "nombre": "Estefania", "email": "test@test.com" }
+]
