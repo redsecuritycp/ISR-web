@@ -1,49 +1,14 @@
-entrypoint = "package.json"
-modules = ["nodejs-20"]
+run = "bash start.sh"
+entrypoint = "src/main.js"
 
 [nix]
 channel = "stable-24_05"
 
+[nix.packages]
+nodejs = "nodejs_20"
+
+[env]
+PATH = "/home/runner/$REPL_SLUG/.config/npm/node_global/bin:/home/runner/$REPL_SLUG/node_modules/.bin:./node_modules/.bin:/nix/store/nodejs_20/bin:$PATH"
+
 [deployment]
-build = ["npm", "run", "build"]
-deploymentTarget = "static"
-publicDir = "dist"
-
-[workflows]
-runButton = "Project"
-
-[[workflows.workflow]]
-name = "Project"
-mode = "parallel"
-author = "agent"
-
-[[workflows.workflow.tasks]]
-task = "workflow.run"
-args = "IDSR Web"
-
-[[workflows.workflow]]
-name = "IDSR Web"
-author = "agent"
-
-[[workflows.workflow.tasks]]
-task = "shell.exec"
-args = "npm run serve"
-waitForPort = 5000
-
-[workflows.workflow.metadata]
-outputType = "webview"
-
-[[ports]]
-localPort = 5000
-externalPort = 80
-
-[[ports]]
-localPort = 5001
-externalPort = 3000
-
-[[ports]]
-localPort = 5002
-externalPort = 3001
-
-[agent]
-expertMode = true
+run = ["sh", "-c", "bash start.sh"]
