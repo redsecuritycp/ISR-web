@@ -27,12 +27,29 @@
             <v-icon left>mdi-account</v-icon>
             Datos del Cliente
           </v-card-title>
-          
+
+          <v-text-field
+            v-model="nombreCliente"
+            label="Nombre del cliente / Empresa"
+            outlined
+            dense
+            prepend-inner-icon="mdi-domain"
+            placeholder="Ej: Seguridad Total SRL"
+            class="mb-3"
+          ></v-text-field>
+
           <div class="mb-4">
             <label class="subtitle-2">Logo de tu empresa</label>
             <div class="d-flex align-center mt-2">
-              <v-avatar size="80" class="mr-4" color="grey lighten-3">
-                <v-img v-if="logoPreview" :src="logoPreview"></v-img>
+              <v-avatar 
+                size="80" 
+                class="mr-4" 
+                color="grey lighten-3"
+              >
+                <v-img 
+                  v-if="logoPreview" 
+                  :src="logoPreview"
+                ></v-img>
                 <v-icon v-else size="40">mdi-image-plus</v-icon>
               </v-avatar>
               <div>
@@ -85,6 +102,16 @@
             dense
             prepend-inner-icon="mdi-percent"
           ></v-select>
+
+          <v-textarea
+            v-model="observaciones"
+            label="Observaciones"
+            outlined
+            dense
+            rows="3"
+            prepend-inner-icon="mdi-note-text"
+            placeholder="Notas adicionales para el presupuesto..."
+          ></v-textarea>
         </v-card>
       </v-col>
 
@@ -165,7 +192,7 @@
             </v-btn>
           </v-card-title>
           <v-divider></v-divider>
-          
+
           <v-card-text v-if="itemsManoObra.length === 0">
             <v-alert type="info" text dense>
               No hay servicios agregados. 
@@ -229,7 +256,7 @@
             </v-btn>
           </v-card-title>
           <v-divider></v-divider>
-          
+
           <v-card-text v-if="itemsPresupuesto.length === 0">
             <v-alert type="info" text>
               No hay productos en el presupuesto. 
@@ -358,13 +385,14 @@ import autoTable from 'jspdf-autotable';
 
 export default {
   name: 'PresupuestadorView',
-  
+
   data() {
     return {
+      nombreCliente: localStorage.getItem('nombreCliente') || '',
+      observaciones: localStorage.getItem('observaciones') || '',
       logoPreview: '',
       vendedorSeleccionado: null,
       vendedores: [],
-      colorCliente: localStorage.getItem('colorCliente') || '#1976D2',
       ivaSeleccionado: 21,
       opcionesIva: [
         { texto: '21%', valor: 21 },
@@ -416,6 +444,15 @@ export default {
     }
   },
 
+  watch: {
+    nombreCliente(val) {
+      localStorage.setItem('nombreCliente', val);
+    },
+    observaciones(val) {
+      localStorage.setItem('observaciones', val);
+    }
+  },
+
   async mounted() {
     await this.cargarVendedores();
     await this.cargarDatosCliente();
@@ -450,7 +487,7 @@ export default {
     async cargarDatosCliente() {
       const usuarioId = this.$store.state.usuarioId;
       if (!usuarioId || usuarioId === 0) return;
-      
+
       try {
         const response = await fetch(`/api/cliente/${usuarioId}`);
         const data = await response.json();
@@ -473,65 +510,8 @@ export default {
       reader.onload = async (e) => {
         this.logoPreview = e.target.result;
         await this.guardarLogo(e.target.result);
-        this.extraerColorDominante(e.target.result);
       };
       reader.readAsDataURL(file);
-    },
-
-    extraerColorDominante(imageSrc) {
-      const img = new Image();
-      img.crossOrigin = 'Anonymous';
-      img.onload = () => {
-        const canvas = document.createElement('canvas');
-        const ctx = canvas.getContext('2d');
-        const size = 50;
-        canvas.width = size;
-        canvas.height = size;
-        
-        ctx.drawImage(img, 0, 0, size, size);
-        const imageData = ctx.getImageData(0, 0, size, size).data;
-        
-        let r = 0, g = 0, b = 0, count = 0;
-        
-        for (let i = 0; i < imageData.length; i += 4) {
-          const red = imageData[i];
-          const green = imageData[i + 1];
-          const blue = imageData[i + 2];
-          const alpha = imageData[i + 3];
-          
-          if (alpha < 128) continue;
-          
-          const brightness = (red + green + blue) / 3;
-          if (brightness > 240 || brightness < 15) continue;
-          
-          r += red;
-          g += green;
-          b += blue;
-          count++;
-        }
-        
-        if (count > 0) {
-          r = Math.round(r / count);
-          g = Math.round(g / count);
-          b = Math.round(b / count);
-          
-          const brightness = (r + g + b) / 3;
-          
-          if (brightness < 60) {
-            this.colorCliente = '#37474F';
-          } else if (brightness > 200) {
-            this.colorCliente = '#1976D2';
-          } else {
-            const toHex = (c) => c.toString(16).padStart(2, '0');
-            this.colorCliente = `#${toHex(r)}${toHex(g)}${toHex(b)}`;
-          }
-        } else {
-          this.colorCliente = '#1976D2';
-        }
-        
-        localStorage.setItem('colorCliente', this.colorCliente);
-      };
-      img.src = imageSrc;
     },
 
     async guardarLogo(logoBase64) {
@@ -552,8 +532,6 @@ export default {
     async eliminarLogo() {
       this.logoPreview = '';
       await this.guardarLogo('');
-      this.colorCliente = '#1976D2';
-      localStorage.setItem('colorCliente', this.colorCliente);
     },
 
     actualizarCantidad(item) {
@@ -569,7 +547,7 @@ export default {
     },
 
     limpiarPresupuesto() {
-      if (confirm('¿Seguro que querés limpiar todo?')) {
+      if (confirm('¿Seguro que querés limpiar todo el presupuesto?')) {
         this.$store.commit('clearPresupuesto');
         this.itemsManoObra = [];
         this.guardarManoObra();
@@ -586,23 +564,21 @@ export default {
     agregarManoObra() {
       const precioUSD = parseFloat(this.nuevaManoObra.precioUSD);
       const precioARS = precioUSD * this.cotizacionDolar;
-      
+
       this.itemsManoObra.push({
         id: Date.now(),
         descripcion: this.nuevaManoObra.descripcion,
         precioUSD: precioUSD,
         precioARS: precioARS
       });
-      
+
       this.guardarManoObra();
       this.nuevaManoObra = { descripcion: '', precioUSD: null };
       this.mostrarDialogManoObra = false;
     },
 
     eliminarManoObra(id) {
-      this.itemsManoObra = this.itemsManoObra.filter(
-        i => i.id !== id
-      );
+      this.itemsManoObra = this.itemsManoObra.filter(i => i.id !== id);
       this.guardarManoObra();
     },
 
@@ -624,156 +600,294 @@ export default {
       }
     },
 
+    formatearNumero(numero) {
+      return parseFloat(numero).toLocaleString('es-AR', {
+        minimumFractionDigits: 2,
+        maximumFractionDigits: 2
+      });
+    },
+
     generarPDF() {
       const doc = new jsPDF();
       const fechaHoy = new Date().toLocaleDateString('es-AR');
-      
-      // Título
-      doc.setFontSize(20);
-      doc.setTextColor(25, 118, 210);
-      doc.text('PRESUPUESTO', 105, 20, { align: 'center' });
-      
-      // Fecha
-      doc.setFontSize(10);
-      doc.setTextColor(100);
-      doc.text(`Fecha: ${fechaHoy}`, 195, 15, { align: 'right' });
-      
-      // Línea separadora
-      doc.setDrawColor(25, 118, 210);
-      doc.setLineWidth(0.5);
-      doc.line(15, 25, 195, 25);
-      
-      // Info sucursal
-      doc.setFontSize(12);
-      doc.setTextColor(0);
-      const sucursal = this.$store.state.idSucursal === 1 
-        ? 'ISENOA - Tucumán' 
-        : 'Insumos de Seguridad Rosario';
-      doc.text(sucursal, 15, 35);
-      
-      // Vendedor
-      if (this.vendedorSeleccionado) {
-        const vendedor = this.vendedores.find(
-          v => v.id === this.vendedorSeleccionado
-        );
-        if (vendedor) {
-          doc.setFontSize(10);
-          doc.text(`Vendedor: ${vendedor.nombre}`, 15, 42);
+      const pageWidth = doc.internal.pageSize.getWidth();
+
+      // Colores NEGRO y DORADO
+      const negro = [25, 25, 25];
+      const dorado = [184, 157, 102];
+      const doradoClaro = [212, 192, 150];
+      const grisMuyClaro = [250, 250, 250];
+      const grisTexto = [80, 80, 80];
+
+      // === HEADER NEGRO ===
+      doc.setFillColor(negro[0], negro[1], negro[2]);
+      doc.rect(0, 0, pageWidth, 45, 'F');
+
+      // Línea dorada decorativa
+      doc.setDrawColor(dorado[0], dorado[1], dorado[2]);
+      doc.setLineWidth(1.5);
+      doc.line(0, 45, pageWidth, 45);
+
+      let xContenido = 15;
+
+      // Logo del cliente (si hay)
+      if (this.logoPreview && this.logoPreview.length > 100) {
+        try {
+          let formato = 'JPEG';
+          if (this.logoPreview.indexOf('image/png') > -1) {
+            formato = 'PNG';
+          }
+          doc.addImage(this.logoPreview, formato, 12, 7, 30, 30);
+          xContenido = 48;
+        } catch (e) {
+          console.log('Error logo:', e);
         }
       }
-      
-      let yPos = 52;
-      
-      // Tabla de productos
+
+      // Nombre cliente
+      const titulo = this.nombreCliente || 'PRESUPUESTO';
+      doc.setTextColor(255, 255, 255);
+      doc.setFontSize(22);
+      doc.setFont('helvetica', 'bold');
+      doc.text(titulo.toUpperCase(), xContenido, 22);
+
+      // Línea dorada bajo el nombre
+      doc.setDrawColor(dorado[0], dorado[1], dorado[2]);
+      doc.setLineWidth(0.8);
+      doc.line(xContenido, 26, xContenido + 60, 26);
+
+      // Fecha elegante a la derecha
+      doc.setFillColor(dorado[0], dorado[1], dorado[2]);
+      doc.roundedRect(pageWidth - 50, 12, 40, 18, 2, 2, 'F');
+      doc.setTextColor(negro[0], negro[1], negro[2]);
+      doc.setFontSize(9);
+      doc.setFont('helvetica', 'bold');
+      doc.text('FECHA', pageWidth - 30, 20, { align: 'center' });
+      doc.setFontSize(11);
+      doc.text(fechaHoy, pageWidth - 30, 27, { align: 'center' });
+
+      let yPos = 58;
+
+      // === PRODUCTOS ===
       if (this.itemsPresupuesto.length > 0) {
-        doc.setFontSize(12);
-        doc.setTextColor(25, 118, 210);
-        doc.text('Productos', 15, yPos);
-        yPos += 5;
-        
-        const productosData = this.itemsPresupuesto.map(item => [
-          item.producto.substring(0, 40),
-          item.marca,
-          item.cantidad,
-          `$ ${parseFloat(item.netoUSD).toFixed(2)}`,
-          `$ ${(parseFloat(item.netoUSD) * item.cantidad).toFixed(2)}`
-        ]);
-        
+        // Título con línea dorada
+        doc.setFontSize(11);
+        doc.setTextColor(dorado[0], dorado[1], dorado[2]);
+        doc.setFont('helvetica', 'bold');
+        doc.text('DETALLE DE PRODUCTOS', 15, yPos);
+        doc.setDrawColor(dorado[0], dorado[1], dorado[2]);
+        doc.setLineWidth(0.5);
+        doc.line(15, yPos + 2, 70, yPos + 2);
+        yPos += 6;
+
+        const productosData = this.itemsPresupuesto.map(item => {
+          let nombre = item.producto.replace(/\*\*/g, '');
+          if (nombre.length > 42) {
+            nombre = nombre.substring(0, 42) + '...';
+          }
+          return [
+            nombre,
+            item.marca,
+            item.cantidad.toString(),
+            '$ ' + parseFloat(item.netoUSD).toFixed(2),
+            '$ ' + (parseFloat(item.netoUSD) * item.cantidad).toFixed(2)
+          ];
+        });
+
         autoTable(doc, {
           startY: yPos,
-          head: [['Producto', 'Marca', 'Cant.', 'USD Unit.', 'USD Total']],
+          head: [['Producto', 'Marca', 'Cant.', 'Unitario', 'Total']],
           body: productosData,
-          theme: 'striped',
-          headStyles: { 
-            fillColor: [25, 118, 210],
-            fontSize: 9
+          theme: 'plain',
+          headStyles: {
+            fillColor: negro,
+            textColor: [255, 255, 255],
+            fontSize: 9,
+            fontStyle: 'bold',
+            cellPadding: 4
           },
-          bodyStyles: { fontSize: 8 },
+          bodyStyles: {
+            fontSize: 9,
+            cellPadding: 4,
+            textColor: grisTexto,
+            lineColor: [230, 230, 230],
+            lineWidth: 0.1
+          },
           columnStyles: {
-            0: { cellWidth: 70 },
-            1: { cellWidth: 30 },
-            2: { cellWidth: 20, halign: 'center' },
-            3: { cellWidth: 30, halign: 'right' },
-            4: { cellWidth: 30, halign: 'right' }
-          }
+            0: { cellWidth: 68 },
+            1: { cellWidth: 28, halign: 'center' },
+            2: { cellWidth: 16, halign: 'center' },
+            3: { cellWidth: 28, halign: 'right' },
+            4: { 
+              cellWidth: 30, 
+              halign: 'right', 
+              fontStyle: 'bold',
+              textColor: negro
+            }
+          },
+          alternateRowStyles: {
+            fillColor: grisMuyClaro
+          },
+          margin: { left: 15, right: 15 }
         });
-        
+
         yPos = doc.lastAutoTable.finalY + 10;
       }
-      
-      // Tabla de mano de obra
+
+      // === SERVICIOS ===
       if (this.itemsManoObra.length > 0) {
-        doc.setFontSize(12);
-        doc.setTextColor(25, 118, 210);
-        doc.text('Mano de Obra / Servicios', 15, yPos);
-        yPos += 5;
-        
-        const manoObraData = this.itemsManoObra.map(item => [
-          item.descripcion,
-          `$ ${parseFloat(item.precioUSD).toFixed(2)}`
-        ]);
-        
+        doc.setFontSize(11);
+        doc.setTextColor(dorado[0], dorado[1], dorado[2]);
+        doc.setFont('helvetica', 'bold');
+        doc.text('SERVICIOS ADICIONALES', 15, yPos);
+        doc.setDrawColor(dorado[0], dorado[1], dorado[2]);
+        doc.setLineWidth(0.5);
+        doc.line(15, yPos + 2, 65, yPos + 2);
+        yPos += 6;
+
+        const manoObraData = this.itemsManoObra.map(item => {
+          return [
+            item.descripcion,
+            '$ ' + parseFloat(item.precioUSD).toFixed(2)
+          ];
+        });
+
         autoTable(doc, {
           startY: yPos,
-          head: [['Descripción', 'USD']],
+          head: [['Descripción', 'Precio USD']],
           body: manoObraData,
-          theme: 'striped',
-          headStyles: { 
-            fillColor: [76, 175, 80],
-            fontSize: 9
+          theme: 'plain',
+          headStyles: {
+            fillColor: negro,
+            textColor: [255, 255, 255],
+            fontSize: 9,
+            fontStyle: 'bold',
+            cellPadding: 4
           },
-          bodyStyles: { fontSize: 8 },
+          bodyStyles: {
+            fontSize: 9,
+            cellPadding: 4,
+            textColor: grisTexto
+          },
           columnStyles: {
             0: { cellWidth: 140 },
-            1: { cellWidth: 40, halign: 'right' }
-          }
+            1: { 
+              cellWidth: 30, 
+              halign: 'right', 
+              fontStyle: 'bold',
+              textColor: negro
+            }
+          },
+          alternateRowStyles: {
+            fillColor: grisMuyClaro
+          },
+          margin: { left: 15, right: 15 }
         });
-        
+
         yPos = doc.lastAutoTable.finalY + 10;
       }
-      
-      // Totales
-      yPos += 5;
-      doc.setDrawColor(200);
-      doc.line(120, yPos, 195, yPos);
-      yPos += 8;
-      
+
+      // === OBSERVACIONES ===
+      if (this.observaciones && this.observaciones.trim().length > 0) {
+        yPos += 3;
+
+        doc.setFontSize(9);
+        doc.setTextColor(dorado[0], dorado[1], dorado[2]);
+        doc.setFont('helvetica', 'bold');
+        doc.text('OBSERVACIONES', 15, yPos);
+
+        doc.setDrawColor(doradoClaro[0], doradoClaro[1], doradoClaro[2]);
+        doc.setLineWidth(0.3);
+
+        const obsLines = doc.splitTextToSize(this.observaciones, 120);
+
+        yPos += 5;
+        doc.setFont('helvetica', 'normal');
+        doc.setTextColor(grisTexto[0], grisTexto[1], grisTexto[2]);
+        doc.setFontSize(9);
+        doc.text(obsLines, 15, yPos);
+
+        yPos += obsLines.length * 5 + 8;
+      }
+
+      // === CUADRO DE TOTALES NEGRO CON DORADO ===
+      const totY = Math.max(yPos + 5, 190);
+      const boxX = pageWidth - 75;
+      const boxW = 60;
+
+      // Fondo negro
+      doc.setFillColor(negro[0], negro[1], negro[2]);
+      doc.roundedRect(boxX, totY, boxW, 50, 3, 3, 'F');
+
+      // Borde dorado
+      doc.setDrawColor(dorado[0], dorado[1], dorado[2]);
+      doc.setLineWidth(1);
+      doc.roundedRect(boxX, totY, boxW, 50, 3, 3, 'S');
+
+      let tY = totY + 12;
+      doc.setFontSize(9);
+      doc.setTextColor(doradoClaro[0], doradoClaro[1], doradoClaro[2]);
+      doc.setFont('helvetica', 'normal');
+
+      doc.text('Subtotal:', boxX + 5, tY);
+      doc.text('$ ' + this.subtotalUSD, boxX + boxW - 5, tY, 
+        { align: 'right' });
+
+      tY += 8;
+      doc.text('IVA ' + this.ivaSeleccionado + '%:', boxX + 5, tY);
+      doc.text('$ ' + this.ivaUSD, boxX + boxW - 5, tY, 
+        { align: 'right' });
+
+      // Línea dorada
+      tY += 6;
+      doc.setDrawColor(dorado[0], dorado[1], dorado[2]);
+      doc.setLineWidth(0.5);
+      doc.line(boxX + 5, tY, boxX + boxW - 5, tY);
+
+      // Total USD grande
+      tY += 10;
       doc.setFontSize(10);
-      doc.setTextColor(0);
-      doc.text('Subtotal USD:', 120, yPos);
-      doc.text(`$ ${this.subtotalUSD}`, 195, yPos, { align: 'right' });
-      
-      yPos += 7;
-      doc.text(`IVA (${this.ivaSeleccionado}%):`, 120, yPos);
-      doc.text(`$ ${this.ivaUSD}`, 195, yPos, { align: 'right' });
-      
-      yPos += 2;
-      doc.setDrawColor(25, 118, 210);
-      doc.line(120, yPos, 195, yPos);
-      
-      yPos += 8;
-      doc.setFontSize(12);
-      doc.setTextColor(25, 118, 210);
-      doc.text('TOTAL USD:', 120, yPos);
+      doc.setTextColor(dorado[0], dorado[1], dorado[2]);
+      doc.setFont('helvetica', 'bold');
+      doc.text('TOTAL USD', boxX + 5, tY);
       doc.setFontSize(14);
-      doc.text(`$ ${this.totalUSD}`, 195, yPos, { align: 'right' });
-      
-      yPos += 8;
-      doc.setFontSize(11);
-      doc.setTextColor(100);
-      doc.text('Total ARS:', 120, yPos);
-      doc.text(`$ ${this.totalARS}`, 195, yPos, { align: 'right' });
-      
-      // Footer
+      doc.setTextColor(255, 255, 255);
+      doc.text('$ ' + this.totalUSD, boxX + boxW - 5, tY, 
+        { align: 'right' });
+
+      // Total ARS
+      tY += 9;
       doc.setFontSize(8);
-      doc.setTextColor(150);
+      doc.setTextColor(doradoClaro[0], doradoClaro[1], doradoClaro[2]);
+      doc.setFont('helvetica', 'normal');
+      doc.text('ARS $ ' + this.formatearNumero(this.totalARS), 
+        boxX + boxW - 5, tY, { align: 'right' });
+
+      // === FOOTER ===
+      doc.setFillColor(negro[0], negro[1], negro[2]);
+      doc.rect(0, 282, pageWidth, 15, 'F');
+
+      doc.setFontSize(8);
+      doc.setTextColor(doradoClaro[0], doradoClaro[1], doradoClaro[2]);
+      doc.setFont('helvetica', 'normal');
       doc.text(
-        'Presupuesto válido por 7 días. Precios sujetos a cambio.',
-        105, 285, { align: 'center' }
+        'Presupuesto válido por 7 días  |  Precios sujetos a modificación sin previo aviso',
+        pageWidth / 2,
+        289,
+        { align: 'center' }
       );
-      
-      // Descargar
-      doc.save(`presupuesto_${fechaHoy.replace(/\//g, '-')}.pdf`);
+
+      // === GUARDAR ===
+      let nombreArchivo = 'presupuesto_' + 
+        fechaHoy.replace(/\//g, '-') + '.pdf';
+      if (this.nombreCliente && this.nombreCliente.length > 0) {
+        const nombreLimpio = this.nombreCliente
+          .replace(/[^a-zA-Z0-9\s]/g, '')
+          .replace(/\s+/g, '_');
+        nombreArchivo = 'presupuesto_' + nombreLimpio + '_' + 
+          fechaHoy.replace(/\//g, '-') + '.pdf';
+      }
+      doc.save(nombreArchivo);
     }
   }
 }
