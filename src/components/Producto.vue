@@ -256,7 +256,7 @@ export default {
             { text: "SIN STOCK", value: 6 }
         ],
         searchData: '',
-        selectedOrder: 3,
+        selectedOrder: 5,
         selectedCategoria: 0,
         selectedMarca: 0,
         itemsProductos: [],
