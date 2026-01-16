@@ -3,7 +3,7 @@
         <v-row justify="center" class="text-center">
             <v-col cols="12">
                 <v-img 
-                    :src="require('../assets/img/IDSRLogo.svg')" 
+                    :src="logoSucursal" 
                     class="mx-auto mb-4" 
                     contain 
                     max-height="160"
@@ -16,7 +16,7 @@
                     class="text-h4 text-md-h3 font-weight-bold 
                            primary--text mb-8"
                 >
-                    Insumos de Seguridad Rosario
+                    {{ nombreSucursal }}
                 </h1>
             </v-col>
         </v-row>
@@ -42,13 +42,16 @@
                             Ubicación
                         </h3>
                         <p class="text-body-1 mb-1">
-                            Omar Carrasco 2773
+                            {{ datosSucursal.direccion }}
                         </p>
-                        <p class="text-body-2 grey--text mb-1">
-                            (ex Richieri)
+                        <p 
+                            v-if="datosSucursal.direccion2"
+                            class="text-body-2 grey--text mb-1"
+                        >
+                            {{ datosSucursal.direccion2 }}
                         </p>
                         <p class="text-body-1 mb-1">
-                            Rosario, Santa Fe
+                            {{ datosSucursal.ciudad }}
                         </p>
                         <p class="text-body-1 mb-3">
                             República Argentina
@@ -59,7 +62,7 @@
                             class="font-weight-medium"
                         >
                             <v-icon small left>mdi-mailbox</v-icon>
-                            CP: S2000QDP
+                            CP: {{ datosSucursal.cp }}
                         </v-chip>
                     </v-card-text>
                 </v-card>
@@ -85,7 +88,7 @@
                             Horario de Atención
                         </h3>
                         <p class="text-body-1 mb-4">
-                            Lunes a Viernes
+                            {{ datosSucursal.diasAtencion }}
                         </p>
                         <v-chip 
                             color="success" 
@@ -93,10 +96,10 @@
                             class="font-weight-bold px-4"
                         >
                             <v-icon small left>mdi-clock</v-icon>
-                            08:00 - 17:00 hs
+                            {{ datosSucursal.horario }}
                         </v-chip>
                         <p class="text-body-2 grey--text mt-4 mb-0">
-                            Sábados, Domingos y Feriados: Cerrado
+                            {{ datosSucursal.diasCerrado }}
                         </p>
                     </v-card-text>
                 </v-card>
@@ -123,49 +126,28 @@
                         </h3>
                         <div class="phone-list">
                             <a 
-                                href="tel:+5493417479394" 
+                                v-for="(tel, idx) in datosSucursal.telefonos"
+                                :key="idx"
+                                :href="getWhatsAppLink(tel.numero)"
+                                target="_blank"
                                 class="phone-item"
                             >
-                                <v-icon color="info" small class="mr-2">
-                                    mdi-phone
+                                <v-icon 
+                                    color="green darken-1" 
+                                    small 
+                                    class="mr-2"
+                                >
+                                    mdi-whatsapp
                                 </v-icon>
-                                +54 9 3417 47-9394
-                            </a>
-                            <a 
-                                href="tel:+5493413566461" 
-                                class="phone-item"
-                            >
-                                <v-icon color="info" small class="mr-2">
-                                    mdi-phone
-                                </v-icon>
-                                +54 9 341 356-6461
-                            </a>
-                            <a 
-                                href="tel:+5493413389611" 
-                                class="phone-item"
-                            >
-                                <v-icon color="info" small class="mr-2">
-                                    mdi-phone
-                                </v-icon>
-                                +54 9 341 338-9611
-                            </a>
-                            <a 
-                                href="tel:+5493415520646" 
-                                class="phone-item"
-                            >
-                                <v-icon color="info" small class="mr-2">
-                                    mdi-phone
-                                </v-icon>
-                                +54 9 341 552-0646
-                            </a>
-                            <a 
-                                href="tel:+5493417544843" 
-                                class="phone-item"
-                            >
-                                <v-icon color="info" small class="mr-2">
-                                    mdi-phone
-                                </v-icon>
-                                +54 9 341 754-4843
+                                <span class="phone-text">
+                                    {{ tel.display }}
+                                </span>
+                                <span 
+                                    v-if="tel.nombre"
+                                    class="phone-name"
+                                >
+                                    {{ tel.nombre }}
+                                </span>
                             </a>
                         </div>
                     </v-card-text>
@@ -178,7 +160,99 @@
 <script>
 export default {
     name: 'HomeComponent',
-    data: () => ({}),
+    
+    data: () => ({
+        sucursales: {
+            2: {
+                nombre: 'Insumos de Seguridad Rosario',
+                logo: require('../assets/img/IDSRLogo.svg'),
+                direccion: 'Omar Carrasco 2773',
+                direccion2: '(ex Richieri)',
+                ciudad: 'Rosario, Santa Fe',
+                cp: 'S2000QDP',
+                diasAtencion: 'Lunes a Viernes',
+                horario: '08:00 - 17:00 hs',
+                diasCerrado: 'Sábados, Domingos y Feriados: Cerrado',
+                telefonos: [
+                    { 
+                        numero: '5493417077180', 
+                        display: '+54 9 3417 07-7180',
+                        nombre: 'Agustina'
+                    },
+                    { 
+                        numero: '5493417479394', 
+                        display: '+54 9 3417 47-9394',
+                        nombre: ''
+                    },
+                    { 
+                        numero: '5493413566461', 
+                        display: '+54 9 341 356-6461',
+                        nombre: ''
+                    },
+                    { 
+                        numero: '5493413389611', 
+                        display: '+54 9 341 338-9611',
+                        nombre: ''
+                    },
+                    { 
+                        numero: '5493415520646', 
+                        display: '+54 9 341 552-0646',
+                        nombre: ''
+                    },
+                    { 
+                        numero: '5493417544843', 
+                        display: '+54 9 341 754-4843',
+                        nombre: ''
+                    }
+                ]
+            },
+            1: {
+                nombre: 'ISENOA',
+                logo: require('../assets/img/logo_isenoa.png'),
+                direccion: 'Consultar dirección',
+                direccion2: '',
+                ciudad: 'Tucumán',
+                cp: '4000',
+                diasAtencion: 'Lunes a Viernes',
+                horario: '08:00 - 17:00 hs',
+                diasCerrado: 'Sábados, Domingos y Feriados: Cerrado',
+                telefonos: [
+                    { 
+                        numero: '5493813387990', 
+                        display: '+54 9 3813 38-7990',
+                        nombre: 'Ventas'
+                    },
+                    { 
+                        numero: '5493816073997', 
+                        display: '+54 9 3816 07-3997',
+                        nombre: 'Milesi German'
+                    }
+                ]
+            }
+        }
+    }),
+
+    computed: {
+        sucursalActual() {
+            return this.$store.state.idSucursal || 2;
+        },
+        datosSucursal() {
+            return this.sucursales[this.sucursalActual] 
+                || this.sucursales[2];
+        },
+        nombreSucursal() {
+            return this.datosSucursal.nombre;
+        },
+        logoSucursal() {
+            return this.datosSucursal.logo;
+        }
+    },
+
+    methods: {
+        getWhatsAppLink(numero) {
+            return `https://wa.me/${numero}`;
+        }
+    }
 }
 </script>
 
@@ -203,6 +277,7 @@ export default {
     display: flex;
     align-items: center;
     justify-content: center;
+    flex-wrap: wrap;
     padding: 10px 16px;
     text-decoration: none;
     color: #37474F;
@@ -210,11 +285,23 @@ export default {
     border-radius: 10px;
     font-weight: 500;
     transition: all 0.2s ease;
+    gap: 4px;
 }
 
 .phone-item:hover {
-    background: #E3F2FD;
-    color: #1976D2;
+    background: #E8F5E9;
+    color: #2E7D32;
     transform: scale(1.02);
+}
+
+.phone-text {
+    font-weight: 600;
+}
+
+.phone-name {
+    font-size: 0.85em;
+    color: #666;
+    width: 100%;
+    text-align: center;
 }
 </style>
