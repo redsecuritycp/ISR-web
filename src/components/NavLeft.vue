@@ -97,7 +97,7 @@ export default {
         mostrarProductos() {
             this.$store.state.textSearch = this.producto.trim();
             this.$store.state.idMarca = 0;
-            this.$store.state.idOrden = 5;
+            this.$store.state.idOrden = 2;
             this.producto = '';
             bus.$emit('mostrarProductos');
             this.goTo('/Productos');

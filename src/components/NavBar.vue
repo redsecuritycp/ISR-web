@@ -1,6 +1,6 @@
 <template>
 
-    <v-app-bar app flat>
+    <v-app-bar app>
 
         <!-- Menú lateral izquierdo -->
         <v-app-bar-nav-icon @click="showNavLeft()"></v-app-bar-nav-icon>
@@ -38,18 +38,6 @@
                 contain
             />
         </div>
-
-        <v-btn
-          color="primary"
-          rounded
-          elevation="2"
-          @click="$router.push('/')"
-          class="mx-4 px-5"
-          height="42"
-        >
-          <v-icon left size="24">mdi-home-circle</v-icon>
-          <span class="font-weight-bold" style="font-size: 15px;">INICIO</span>
-        </v-btn>
 
         <v-spacer></v-spacer>
 

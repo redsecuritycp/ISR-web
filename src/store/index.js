@@ -25,7 +25,7 @@ export default new Vuex.Store({
     idMarca: 0,
     itemsCategorias: [],
     idCategoria: 0,
-    idOrden: 5,
+    idOrden: 0,
     textSearch: "",
     cantUsersPR: 0,
     mensaje: "",

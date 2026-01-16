@@ -256,7 +256,7 @@ export default {
             { text: "SIN STOCK", value: 6 }
         ],
         searchData: '',
-        selectedOrder: 5,
+        selectedOrder: 3,
         selectedCategoria: 0,
         selectedMarca: 0,
         itemsProductos: [],
@@ -272,7 +272,7 @@ export default {
         this.searchData = this.$store.state.textSearch;
         this.selectedCategoria = this.$store.state.idCategoria;
         this.selectedMarca = this.$store.state.idMarca;
-        this.selectedOrder = this.$store.state.idOrden;
+        this.selectedOrder = 5;
         this.selectedSucursal = this.$store.state.idSucursal;
         // Bus de evento que permite ser llamado desde otro componente.
         bus.$on('mostrarProductos', () => this.mostrarProductos());

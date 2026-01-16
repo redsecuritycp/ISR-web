@@ -1,66 +1,7 @@
 [
-  { 
-    "id": 1, 
-    "nombre": "Marito Polaco", 
-    "email": "test@test.com",
-    "telefono": "",
-    "foto": "",
-    "sucursalId": 2
-  },
-  { 
-    "id": 2, 
-    "nombre": "Luciano B.", 
-    "email": "test@test.com",
-    "telefono": "",
-    "foto": "",
-    "sucursalId": 2
-  },
-  { 
-    "id": 3, 
-    "nombre": "Facundo Galeano", 
-    "email": "test@test.com",
-    "telefono": "",
-    "foto": "",
-    "sucursalId": 2
-  },
-  { 
-    "id": 4, 
-    "nombre": "Maximiliano", 
-    "email": "test@test.com",
-    "telefono": "",
-    "foto": "",
-    "sucursalId": 2
-  },
-  { 
-    "id": 5, 
-    "nombre": "Estefania", 
-    "email": "test@test.com",
-    "telefono": "",
-    "foto": "",
-    "sucursalId": 2
-  },
-  { 
-    "id": 6, 
-    "nombre": "Agustina", 
-    "email": "test@test.com",
-    "telefono": "5493417077180",
-    "foto": "",
-    "sucursalId": 2
-  },
-  { 
-    "id": 7, 
-    "nombre": "Ventas ISENOA", 
-    "email": "test@test.com",
-    "telefono": "5493813387990",
-    "foto": "",
-    "sucursalId": 1
-  },
-  { 
-    "id": 8, 
-    "nombre": "Milesi German", 
-    "email": "test@test.com",
-    "telefono": "5493816073997",
-    "foto": "",
-    "sucursalId": 1
-  }
+  { "id": 1, "nombre": "Marito Polaco", "email": "test@test.com" },
+  { "id": 2, "nombre": "Luciano B.", "email": "test@test.com" },
+  { "id": 3, "nombre": "Facundo Galeano", "email": "test@test.com" },
+  { "id": 4, "nombre": "Maximiliano", "email": "test@test.com" },
+  { "id": 5, "nombre": "Estefania", "email": "test@test.com" }
 ]
