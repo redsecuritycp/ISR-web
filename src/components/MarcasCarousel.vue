@@ -94,7 +94,7 @@ export default {
 
 .logos-scroll {
   display: flex;
-  gap: 24px;
+  gap: 40px;
   animation: scroll-logos 25s linear infinite;
   width: max-content;
   align-items: center;
@@ -107,25 +107,24 @@ export default {
 .logo-item {
   flex-shrink: 0;
   cursor: pointer;
-  padding: 8px 12px;
-  background: white;
+  padding: 8px 16px;
+  background: transparent;
   border-radius: 8px;
   transition: all 0.3s ease;
   display: flex;
   align-items: center;
   justify-content: center;
-  height: 60px;
-  min-width: 100px;
+  height: 80px;
+  min-width: 120px;
 }
 
 .logo-item:hover {
-  transform: scale(1.1);
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  transform: scale(1.15);
 }
 
 .logo-img {
-  max-height: 45px;
-  max-width: 90px;
+  max-height: 70px;
+  max-width: 140px;
   width: auto;
   height: auto;
   object-fit: contain;
@@ -142,18 +141,18 @@ export default {
 
 @media (max-width: 600px) {
   .logo-item {
-    height: 50px;
-    min-width: 80px;
-    padding: 6px 10px;
+    height: 60px;
+    min-width: 100px;
+    padding: 6px 12px;
   }
   
   .logo-img {
-    max-height: 35px;
-    max-width: 70px;
+    max-height: 50px;
+    max-width: 100px;
   }
   
   .logos-scroll {
-    gap: 16px;
+    gap: 24px;
   }
 }
 </style>
