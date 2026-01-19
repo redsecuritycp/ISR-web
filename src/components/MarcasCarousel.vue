@@ -1,5 +1,5 @@
 <template>
-  <div class="marcas-carousel-container">
+  <div class="logos-carousel-container">
     <v-sheet 
       color="grey lighten-4" 
       class="py-3 px-2"
@@ -12,22 +12,20 @@
         MARCAS DESTACADAS
       </h4>
       
-      <div class="marcas-scroll-wrapper">
-        <div class="marcas-scroll">
+      <div class="logos-scroll-wrapper">
+        <div class="logos-scroll">
           <div 
             v-for="(marca, index) in marcasDoble" 
             :key="index"
-            class="marca-item"
+            class="logo-item"
             @click="buscarPorMarca(marca.nombre)"
+            :title="marca.nombre"
           >
-            <v-chip
-              :color="marca.color"
-              :text-color="marca.textColor"
-              class="marca-chip font-weight-bold"
-              style="cursor: pointer;"
-            >
-              {{ marca.nombre }}
-            </v-chip>
+            <img 
+              :src="marca.logo" 
+              :alt="marca.nombre"
+              class="logo-img"
+            />
           </div>
         </div>
       </div>
@@ -44,76 +42,23 @@ export default {
   data() {
     return {
       marcas: [
-        { 
-          nombre: 'HIKVISION', 
-          color: '#E53935', 
-          textColor: 'white' 
-        },
-        { 
-          nombre: 'DAHUA', 
-          color: '#1565C0', 
-          textColor: 'white' 
-        },
-        { 
-          nombre: 'AJAX', 
-          color: '#212121', 
-          textColor: 'white' 
-        },
-        { 
-          nombre: 'UBIQUITI', 
-          color: '#0559C9', 
-          textColor: 'white' 
-        },
-        { 
-          nombre: 'TP-LINK', 
-          color: '#4CAF50', 
-          textColor: 'white' 
-        },
-        { 
-          nombre: 'ZKTECO', 
-          color: '#00897B', 
-          textColor: 'white' 
-        },
-        { 
-          nombre: 'MIKROTIK', 
-          color: '#37474F', 
-          textColor: 'white' 
-        },
-        { 
-          nombre: 'EZVIZ', 
-          color: '#FF6F00', 
-          textColor: 'white' 
-        },
-        { 
-          nombre: 'HONEYWELL', 
-          color: '#D32F2F', 
-          textColor: 'white' 
-        },
-        { 
-          nombre: 'BOSCH', 
-          color: '#C62828', 
-          textColor: 'white' 
-        },
-        { 
-          nombre: 'DSC', 
-          color: '#1976D2', 
-          textColor: 'white' 
-        },
-        { 
-          nombre: 'PARADOX', 
-          color: '#6A1B9A', 
-          textColor: 'white' 
-        },
-        { 
-          nombre: 'EPCOM', 
-          color: '#F57C00', 
-          textColor: 'white' 
-        },
-        { 
-          nombre: 'ALEAN', 
-          color: '#2E7D32', 
-          textColor: 'white' 
-        }
+        { nombre: 'HIKVISION', logo: '/logos/hikvision.png' },
+        { nombre: 'AJAX', logo: '/logos/ajax.png' },
+        { nombre: 'REYEE', logo: '/logos/reyee.png' },
+        { nombre: 'RUIJIE', logo: '/logos/ruijie.png' },
+        { nombre: 'DAHUA', logo: '/logos/dahua.png' },
+        { nombre: 'ALEAN', logo: '/logos/alean.png' },
+        { nombre: 'INTELBRAS', logo: '/logos/intelbras.png' },
+        { nombre: 'CYGNUS', logo: '/logos/cygnus.png' },
+        { nombre: 'DSC', logo: '/logos/dsc.png' },
+        { nombre: 'ZKTECO', logo: '/logos/zkteco.png' },
+        { nombre: 'EZVIZ', logo: '/logos/ezviz.png' },
+        { nombre: 'IMOU', logo: '/logos/imou.png' },
+        { nombre: 'UBIQUITI', logo: '/logos/ubiquiti.png' },
+        { nombre: 'HONEYWELL', logo: '/logos/honeywell.png' },
+        { nombre: 'BOSCH', logo: '/logos/bosch.png' },
+        { nombre: 'PARADOX', logo: '/logos/paradox.png' },
+        { nombre: 'EPCOM', logo: '/logos/epcom.png' }
       ]
     }
   },
@@ -137,44 +82,56 @@ export default {
 </script>
 
 <style scoped>
-.marcas-carousel-container {
+.logos-carousel-container {
   margin: 8px 0;
   overflow: hidden;
 }
 
-.marcas-scroll-wrapper {
+.logos-scroll-wrapper {
   overflow: hidden;
   width: 100%;
 }
 
-.marcas-scroll {
+.logos-scroll {
   display: flex;
-  gap: 12px;
-  animation: scroll-marcas 20s linear infinite;
+  gap: 24px;
+  animation: scroll-logos 25s linear infinite;
   width: max-content;
+  align-items: center;
 }
 
-.marcas-scroll:hover {
+.logos-scroll:hover {
   animation-play-state: paused;
 }
 
-.marca-item {
+.logo-item {
   flex-shrink: 0;
-}
-
-.marca-chip {
-  font-size: 0.85rem !important;
-  height: 32px !important;
-  padding: 0 16px !important;
+  cursor: pointer;
+  padding: 8px 12px;
+  background: white;
+  border-radius: 8px;
   transition: all 0.3s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 60px;
+  min-width: 100px;
 }
 
-.marca-chip:hover {
+.logo-item:hover {
   transform: scale(1.1);
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.25);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
 }
 
-@keyframes scroll-marcas {
+.logo-img {
+  max-height: 45px;
+  max-width: 90px;
+  width: auto;
+  height: auto;
+  object-fit: contain;
+}
+
+@keyframes scroll-logos {
   0% {
     transform: translateX(0);
   }
@@ -184,10 +141,19 @@ export default {
 }
 
 @media (max-width: 600px) {
-  .marca-chip {
-    font-size: 0.75rem !important;
-    height: 28px !important;
-    padding: 0 12px !important;
+  .logo-item {
+    height: 50px;
+    min-width: 80px;
+    padding: 6px 10px;
+  }
+  
+  .logo-img {
+    max-height: 35px;
+    max-width: 70px;
+  }
+  
+  .logos-scroll {
+    gap: 16px;
   }
 }
 </style>

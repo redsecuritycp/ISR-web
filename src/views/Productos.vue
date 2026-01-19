@@ -1,20 +1,13 @@
 <template>
-    <div>
-        <Producto></Producto>
-    </div>
+  <Producto />
 </template>
 
 <script>
-
-import Producto from "../components/Producto.vue"
+import Producto from '@/components/Producto.vue';
 
 export default {
-    name: 'ProductosView',
+  name: 'ProductosView',
 
-    data: () => ({
-    }),
-
-    components: { Producto }
-
+  components: { Producto }
 }
 </script>
