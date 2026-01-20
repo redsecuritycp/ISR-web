@@ -337,7 +337,7 @@ export default {
   data() {
     return {
       logoPreview: '',
-      nombreClienteFinal: '',
+      nombreClienteFinal: localStorage.getItem('nombreClienteFinal') || '',
       vendedorSeleccionado: null,
       vendedores: [],
       ivaSeleccionado: 21,
@@ -539,23 +539,20 @@ export default {
 
         // Logo del cliente
         let xTexto = 20;
-        if (this.logoPreview && this.logoPreview.length > 100) {
+        if (this.logoPreview && this.logoPreview.length > 50) {
           try {
-            // Fondo blanco para logo
             doc.setFillColor(255, 255, 255);
             doc.roundedRect(12, 8, 38, 38, 3, 3, 'F');
-
-            let formato = 'JPEG';
-            if (this.logoPreview.includes('data:image/png')) {
-              formato = 'PNG';
-            } else if (this.logoPreview.includes('data:image/gif')) {
-              formato = 'GIF';
-            }
-            doc.addImage(this.logoPreview, formato, 14, 10, 34, 34);
+            doc.addImage(this.logoPreview, 'JPEG', 14, 10, 34, 34);
             xTexto = 58;
-          } catch (e) {
-            console.log('Error agregando logo al PDF:', e);
-            xTexto = 20;
+          } catch (e1) {
+            try {
+              doc.addImage(this.logoPreview, 'PNG', 14, 10, 34, 34);
+              xTexto = 58;
+            } catch (e2) {
+              console.error('Error logo:', e2);
+              xTexto = 20;
+            }
           }
         }
 
@@ -582,20 +579,6 @@ export default {
         doc.text(fechaHoy, pageWidth - 27.5, 35, { align: 'center' });
 
         let yPos = 70;
-
-        // Vendedor
-        if (this.vendedorSeleccionado) {
-          const vendedor = this.vendedores.find(
-            v => v.id === this.vendedorSeleccionado
-          );
-          if (vendedor) {
-            doc.setTextColor(100, 100, 100);
-            doc.setFontSize(10);
-            doc.setFont('helvetica', 'normal');
-            doc.text(`Vendedor: ${vendedor.nombre}`, 15, yPos);
-            yPos += 15;
-          }
-        }
 
         // === TABLA DE PRODUCTOS ===
         if (this.itemsPresupuesto.length > 0) {
@@ -817,6 +800,12 @@ export default {
       } finally {
         this.generandoPDF = false;
       }
+    }
+  },
+
+  watch: {
+    nombreClienteFinal(val) {
+      localStorage.setItem('nombreClienteFinal', val || '');
     }
   }
 }
