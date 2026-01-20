@@ -176,6 +176,26 @@
                             {{ item.categoria }}
                           </p>
 
+                          <!-- Barras de stock -->
+                          <div class="d-flex align-center mt-1">
+                            <span style="font-size: 0.7rem; color: #666; margin-right: 4px;">Stock:</span>
+                            <div class="d-flex">
+                              <div 
+                                v-for="n in 4" 
+                                :key="n"
+                                :style="{
+                                  width: '6px',
+                                  height: '14px',
+                                  marginRight: '2px',
+                                  borderRadius: '2px',
+                                  backgroundColor: n <= calcularBarrasStock(item.stockTotal).barras 
+                                    ? calcularBarrasStock(item.stockTotal).color 
+                                    : '#e0e0e0'
+                                }"
+                              ></div>
+                            </div>
+                          </div>
+
                           <div v-if="$store.state.usuario != ''" class="mt-2 pt-2" 
                                style="border-top: 1px solid #eee;">
                               <p class="mb-0 font-weight-medium" 
@@ -492,6 +512,14 @@ export default {
                     disponible: element.disponible
                 });
             });
+            // Ordenar: primero los que tienen stock > 0
+            if (this.selectedOrder === 5) {
+              this.itemsProductos.sort((a, b) => {
+                if (a.stockTotal > 0 && b.stockTotal <= 0) return -1;
+                if (a.stockTotal <= 0 && b.stockTotal > 0) return 1;
+                return b.stockTotal - a.stockTotal;
+              });
+            }
             this.$store.commit('setItemsProductos', this.itemsProductos);
 
             // Marcas.
@@ -565,6 +593,16 @@ export default {
             this.overlay = false;
         },
 
+        calcularBarrasStock(stockTotal) {
+          if (!stockTotal || stockTotal <= 0) return { barras: 0, color: '#ef5350' };
+          const porcentaje = (stockTotal / this.maxStockVisible) * 100;
+          
+          if (porcentaje <= 25) return { barras: 1, color: '#ef5350' };
+          if (porcentaje <= 50) return { barras: 2, color: '#ffa726' };
+          if (porcentaje <= 75) return { barras: 3, color: '#66bb6a' };
+          return { barras: 4, color: '#43a047' };
+        },
+
         agregarAlPresupuesto(item) {
             this.$store.commit('addItemPresupuesto', {
                 id: item.id,
@@ -590,6 +628,15 @@ export default {
                 this.selectedMarca = 0;
             }
         }
+    },
+
+    computed: {
+      maxStockVisible() {
+        const productos = this.$store.state.itemsProductos;
+        if (!productos || productos.length === 0) return 1;
+        const max = Math.max(...productos.map(p => p.stockTotal || 0));
+        return max > 0 ? max : 1;
+      }
     },
 
     components: { Loading }
