@@ -2,24 +2,14 @@
   <v-container>
     <v-row>
       <v-col cols="12">
-        <div class="d-flex align-center mb-4">
-          <v-btn
-            color="primary"
-            outlined
-            class="mr-4"
-            @click="$router.push('/')"
-          >
-            <v-icon left>mdi-arrow-left</v-icon>
-            VOLVER AL INICIO
-          </v-btn>
-          <h1 class="text-h4 ma-0">
-            <v-icon left>mdi-file-document-outline</v-icon>
-            Presupuestador
-          </h1>
-        </div>
+        <h1 class="text-h4 mb-4">
+          <v-icon left>mdi-file-document-outline</v-icon>
+          Presupuestador
+        </h1>
       </v-col>
     </v-row>
 
+    <!-- Datos del cliente -->
     <v-row>
       <v-col cols="12" md="6">
         <v-card class="pa-4 mb-4">
@@ -27,20 +17,10 @@
             <v-icon left>mdi-account</v-icon>
             Datos del Cliente
           </v-card-title>
-
-          <v-text-field
-            v-model="nombreCliente"
-            label="Nombre del cliente / Empresa"
-            outlined
-            dense
-            prepend-inner-icon="mdi-domain"
-            placeholder="Ej: Seguridad Total SRL"
-            class="mb-3"
-            disabled
-          ></v-text-field>
-
+          
+          <!-- Logo -->
           <div class="mb-4">
-            <label class="subtitle-2">Logo de la empresa</label>
+            <label class="subtitle-2">Logo de tu empresa</label>
             <div class="d-flex align-center mt-2">
               <v-avatar size="80" class="mr-4" color="grey lighten-3">
                 <v-img v-if="logoPreview" :src="logoPreview"></v-img>
@@ -75,6 +55,7 @@
             </div>
           </div>
 
+          <!-- Vendedor -->
           <v-select
             v-model="vendedorSeleccionado"
             :items="vendedores"
@@ -86,30 +67,10 @@
             prepend-inner-icon="mdi-account-tie"
             @change="guardarVendedor"
           ></v-select>
-
-          <v-select
-            v-model="ivaSeleccionado"
-            :items="opcionesIva"
-            item-text="texto"
-            item-value="valor"
-            label="Alícuota IVA"
-            outlined
-            dense
-            prepend-inner-icon="mdi-percent"
-          ></v-select>
-
-          <v-textarea
-            v-model="observaciones"
-            label="Observaciones"
-            outlined
-            dense
-            rows="3"
-            prepend-inner-icon="mdi-note-text"
-            placeholder="Notas adicionales para el presupuesto..."
-          ></v-textarea>
         </v-card>
       </v-col>
 
+      <!-- Resumen -->
       <v-col cols="12" md="6">
         <v-card class="pa-4 mb-4">
           <v-card-title class="pa-0 mb-3">
@@ -121,36 +82,21 @@
             <strong>{{ itemsPresupuesto.length }}</strong>
           </div>
           <div class="d-flex justify-space-between mb-2">
-            <span>Mano de obra:</span>
-            <strong>{{ itemsManoObra.length }}</strong>
-          </div>
-          <v-divider class="my-2"></v-divider>
-          <div class="d-flex justify-space-between mb-2">
-            <span>Subtotal USD:</span>
-            <strong>$ {{ subtotalUSD }}</strong>
-          </div>
-          <div class="d-flex justify-space-between mb-2">
-            <span>IVA ({{ ivaSeleccionado }}%):</span>
-            <strong>$ {{ ivaUSD }}</strong>
-          </div>
-          <v-divider class="my-2"></v-divider>
-          <div class="d-flex justify-space-between mb-2">
             <span>Total USD:</span>
-            <strong class="green--text text-h6">
+            <strong class="green--text">
               $ {{ totalUSD }}
             </strong>
           </div>
           <div class="d-flex justify-space-between mb-4">
             <span>Total ARS:</span>
-            <strong class="blue--text text-h6">
+            <strong class="blue--text">
               $ {{ totalARS }}
             </strong>
           </div>
           <v-btn 
             block 
             color="success" 
-            :disabled="itemsPresupuesto.length === 0 
-              && itemsManoObra.length === 0"
+            :disabled="itemsPresupuesto.length === 0"
             @click="generarPDF"
             class="mb-2"
           >
@@ -170,68 +116,7 @@
       </v-col>
     </v-row>
 
-    <v-row>
-      <v-col cols="12">
-        <v-card class="mb-4">
-          <v-card-title>
-            <v-icon left>mdi-account-hard-hat</v-icon>
-            Mano de Obra / Servicios
-            <v-spacer></v-spacer>
-            <v-btn 
-              small 
-              color="primary"
-              @click="mostrarDialogManoObra = true"
-            >
-              <v-icon left small>mdi-plus</v-icon>
-              Agregar
-            </v-btn>
-          </v-card-title>
-          <v-divider></v-divider>
-
-          <v-card-text v-if="itemsManoObra.length === 0">
-            <v-alert type="info" text dense>
-              No hay servicios agregados. 
-              Usá el botón "Agregar" para incluir mano de obra.
-            </v-alert>
-          </v-card-text>
-
-          <v-simple-table v-else>
-            <template v-slot:default>
-              <thead>
-                <tr>
-                  <th>Descripción</th>
-                  <th class="text-right">USD</th>
-                  <th class="text-right">ARS</th>
-                  <th class="text-center">Acciones</th>
-                </tr>
-              </thead>
-              <tbody>
-                <tr v-for="item in itemsManoObra" :key="item.id">
-                  <td>{{ item.descripcion }}</td>
-                  <td class="text-right">
-                    $ {{ parseFloat(item.precioUSD).toFixed(2) }}
-                  </td>
-                  <td class="text-right">
-                    $ {{ parseFloat(item.precioARS).toFixed(2) }}
-                  </td>
-                  <td class="text-center">
-                    <v-btn 
-                      icon 
-                      small 
-                      color="error"
-                      @click="eliminarManoObra(item.id)"
-                    >
-                      <v-icon small>mdi-delete</v-icon>
-                    </v-btn>
-                  </td>
-                </tr>
-              </tbody>
-            </template>
-          </v-simple-table>
-        </v-card>
-      </v-col>
-    </v-row>
-
+    <!-- Lista de productos -->
     <v-row>
       <v-col cols="12">
         <v-card>
@@ -251,7 +136,7 @@
             </v-btn>
           </v-card-title>
           <v-divider></v-divider>
-
+          
           <v-card-text v-if="itemsPresupuesto.length === 0">
             <v-alert type="info" text>
               No hay productos en el presupuesto. 
@@ -321,86 +206,18 @@
         </v-card>
       </v-col>
     </v-row>
-
-    <v-dialog v-model="mostrarDialogManoObra" max-width="500">
-      <v-card>
-        <v-card-title>
-          <v-icon left>mdi-account-hard-hat</v-icon>
-          Agregar Mano de Obra
-        </v-card-title>
-        <v-divider></v-divider>
-        <v-card-text class="pt-4">
-          <v-text-field
-            v-model="nuevaManoObra.descripcion"
-            label="Descripción del servicio"
-            outlined
-            dense
-            placeholder="Ej: Instalación de cámaras"
-          ></v-text-field>
-          <v-text-field
-            v-model.number="nuevaManoObra.precioUSD"
-            label="Precio USD"
-            type="number"
-            min="0"
-            step="0.01"
-            outlined
-            dense
-            prefix="$"
-          ></v-text-field>
-          <p class="text-caption grey--text">
-            El precio en ARS se calculará automáticamente.
-          </p>
-        </v-card-text>
-        <v-divider></v-divider>
-        <v-card-actions>
-          <v-spacer></v-spacer>
-          <v-btn 
-            text 
-            @click="mostrarDialogManoObra = false"
-          >
-            Cancelar
-          </v-btn>
-          <v-btn 
-            color="primary" 
-            @click="agregarManoObra"
-            :disabled="!nuevaManoObra.descripcion 
-              || !nuevaManoObra.precioUSD"
-          >
-            Agregar
-          </v-btn>
-        </v-card-actions>
-      </v-card>
-    </v-dialog>
   </v-container>
 </template>
 
 <script>
-import jsPDF from 'jspdf';
-import autoTable from 'jspdf-autotable';
-
 export default {
   name: 'PresupuestadorView',
-
+  
   data() {
     return {
-      nombreCliente: '',
       logoPreview: '',
       vendedorSeleccionado: null,
-      vendedores: [],
-      ivaSeleccionado: 21,
-      opcionesIva: [
-        { texto: '21%', valor: 21 },
-        { texto: '10.5%', valor: 10.5 },
-        { texto: 'Exento (0%)', valor: 0 }
-      ],
-      observaciones: localStorage.getItem('observaciones') || '',
-      itemsManoObra: [],
-      mostrarDialogManoObra: false,
-      nuevaManoObra: {
-        descripcion: '',
-        precioUSD: null
-      },
-      cotizacionDolar: 1470
+      vendedores: []
     }
   },
 
@@ -408,68 +225,28 @@ export default {
     itemsPresupuesto() {
       return this.$store.state.itemsPresupuesto;
     },
-    subtotalProductosUSD() {
+    totalUSD() {
       return this.itemsPresupuesto
         .reduce((sum, item) => {
           return sum + (parseFloat(item.netoUSD) * item.cantidad);
-        }, 0);
-    },
-    subtotalManoObraUSD() {
-      return this.itemsManoObra
-        .reduce((sum, item) => {
-          return sum + parseFloat(item.precioUSD);
-        }, 0);
-    },
-    subtotalUSD() {
-      return (this.subtotalProductosUSD + this.subtotalManoObraUSD)
+        }, 0)
         .toFixed(2);
-    },
-    ivaUSD() {
-      const subtotal = parseFloat(this.subtotalUSD);
-      return (subtotal * this.ivaSeleccionado / 100).toFixed(2);
-    },
-    totalUSD() {
-      const subtotal = parseFloat(this.subtotalUSD);
-      const iva = parseFloat(this.ivaUSD);
-      return (subtotal + iva).toFixed(2);
     },
     totalARS() {
-      return (parseFloat(this.totalUSD) * this.cotizacionDolar)
+      return this.itemsPresupuesto
+        .reduce((sum, item) => {
+          return sum + (parseFloat(item.netoARS) * item.cantidad);
+        }, 0)
         .toFixed(2);
-    }
-  },
-
-  watch: {
-    observaciones(val) {
-      localStorage.setItem('observaciones', val);
     }
   },
 
   async mounted() {
-    // Obtener nombre del cliente desde el store
-    this.nombreCliente = this.$store.state.usuario || '';
-
     await this.cargarVendedores();
     await this.cargarDatosCliente();
-    await this.obtenerCotizacionDolar();
-    this.cargarManoObraGuardada();
   },
 
   methods: {
-    async obtenerCotizacionDolar() {
-      try {
-        const res = await fetch(
-          'https://dolarapi.com/v1/dolares/oficial'
-        );
-        const data = await res.json();
-        if (data && data.venta) {
-          this.cotizacionDolar = data.venta;
-        }
-      } catch (error) {
-        console.error('Error obteniendo dólar:', error);
-      }
-    },
-
     async cargarVendedores() {
       try {
         const response = await fetch('/api/vendedores');
@@ -482,7 +259,7 @@ export default {
     async cargarDatosCliente() {
       const usuarioId = this.$store.state.usuarioId;
       if (!usuarioId || usuarioId === 0) return;
-
+      
       try {
         const response = await fetch(`/api/cliente/${usuarioId}`);
         const data = await response.json();
@@ -559,12 +336,8 @@ export default {
     },
 
     limpiarPresupuesto() {
-      if (confirm(
-        '¿Seguro que querés limpiar todo el presupuesto?'
-      )) {
+      if (confirm('¿Seguro que querés limpiar todo el presupuesto?')) {
         this.$store.commit('clearPresupuesto');
-        this.itemsManoObra = [];
-        this.guardarManoObra();
       }
     },
 
@@ -575,305 +348,158 @@ export default {
       return (precio * item.cantidad).toFixed(2);
     },
 
-    agregarManoObra() {
-      const precioUSD = parseFloat(this.nuevaManoObra.precioUSD);
-      const precioARS = precioUSD * this.cotizacionDolar;
-
-      this.itemsManoObra.push({
-        id: Date.now(),
-        descripcion: this.nuevaManoObra.descripcion,
-        precioUSD: precioUSD,
-        precioARS: precioARS
-      });
-
-      this.guardarManoObra();
-      this.nuevaManoObra = { descripcion: '', precioUSD: null };
-      this.mostrarDialogManoObra = false;
-    },
-
-    eliminarManoObra(id) {
-      this.itemsManoObra = this.itemsManoObra.filter(
-        i => i.id !== id
-      );
-      this.guardarManoObra();
-    },
-
-    guardarManoObra() {
-      localStorage.setItem(
-        'itemsManoObra', 
-        JSON.stringify(this.itemsManoObra)
-      );
-    },
-
-    cargarManoObraGuardada() {
-      const guardado = localStorage.getItem('itemsManoObra');
-      if (guardado) {
-        try {
-          this.itemsManoObra = JSON.parse(guardado);
-        } catch (error) {
-          console.error('Error cargando mano de obra:', error);
-        }
-      }
-    },
-
     async generarPDF() {
       const doc = new jsPDF();
       const fechaHoy = new Date().toLocaleDateString('es-AR');
-      const pageWidth = doc.internal.pageSize.getWidth();
-
-      // Colores NEGRO y DORADO
-      const negro = [25, 25, 25];
-      const dorado = [184, 157, 102];
-      const doradoClaro = [212, 192, 150];
-      const grisTexto = [80, 80, 80];
-
-      // === HEADER NEGRO ===
-      doc.setFillColor(negro[0], negro[1], negro[2]);
-      doc.rect(0, 0, pageWidth, 45, 'F');
-
-      // Línea dorada decorativa
-      doc.setDrawColor(dorado[0], dorado[1], dorado[2]);
-      doc.setLineWidth(1.5);
-      doc.line(0, 45, pageWidth, 45);
-
-      let xContenido = 15;
-
-      // Logo del cliente (si hay)
-      if (this.logoPreview && this.logoPreview.length > 100) {
-        try {
-          let formato = 'JPEG';
-          if (this.logoPreview.indexOf('image/png') > -1) {
-            formato = 'PNG';
-          }
-          doc.addImage(this.logoPreview, formato, 12, 7, 30, 30);
-          xContenido = 48;
-        } catch (e) {
-          console.log('Error logo:', e);
+      
+      // Título
+      doc.setFontSize(20);
+      doc.setTextColor(25, 118, 210);
+      doc.text('PRESUPUESTO', 105, 20, { align: 'center' });
+      
+      // Fecha
+      doc.setFontSize(10);
+      doc.setTextColor(100);
+      doc.text(`Fecha: ${fechaHoy}`, 195, 15, { align: 'right' });
+      
+      // Línea separadora
+      doc.setDrawColor(25, 118, 210);
+      doc.setLineWidth(0.5);
+      doc.line(15, 25, 195, 25);
+      
+      // Info sucursal
+      doc.setFontSize(12);
+      doc.setTextColor(0);
+      const sucursal = this.$store.state.idSucursal === 1 
+        ? 'ISENOA - Tucumán' 
+        : 'Insumos de Seguridad Rosario';
+      doc.text(sucursal, 15, 35);
+      
+      // Vendedor
+      if (this.vendedorSeleccionado) {
+        const vendedor = this.vendedores.find(
+          v => v.id === this.vendedorSeleccionado
+        );
+        if (vendedor) {
+          doc.setFontSize(10);
+          doc.text(`Vendedor: ${vendedor.nombre}`, 15, 42);
         }
       }
-
-      // Nombre cliente
-      const titulo = this.nombreCliente || 'PRESUPUESTO';
-      doc.setTextColor(255, 255, 255);
-      doc.setFontSize(22);
-      doc.setFont('helvetica', 'bold');
-      doc.text(titulo.toUpperCase(), xContenido, 22);
-
-      // Línea dorada bajo el nombre
-      doc.setDrawColor(dorado[0], dorado[1], dorado[2]);
-      doc.setLineWidth(0.8);
-      doc.line(xContenido, 26, xContenido + 60, 26);
-
-      // Fecha elegante a la derecha
-      doc.setFillColor(dorado[0], dorado[1], dorado[2]);
-      doc.roundedRect(pageWidth - 50, 12, 40, 18, 2, 2, 'F');
-      doc.setTextColor(negro[0], negro[1], negro[2]);
-      doc.setFontSize(9);
-      doc.setFont('helvetica', 'bold');
-      doc.text('FECHA', pageWidth - 30, 20, { align: 'center' });
-      doc.setFontSize(11);
-      doc.text(fechaHoy, pageWidth - 30, 27, { align: 'center' });
-
-      let yPos = 58;
-
-      // === PRODUCTOS ===
+      
+      let yPos = 52;
+      
+      // Tabla de productos
       if (this.itemsPresupuesto.length > 0) {
-        doc.setFontSize(11);
-        doc.setTextColor(dorado[0], dorado[1], dorado[2]);
-        doc.setFont('helvetica', 'bold');
-        doc.text('DETALLE DE PRODUCTOS', 15, yPos);
-        doc.setDrawColor(dorado[0], dorado[1], dorado[2]);
-        doc.setLineWidth(0.5);
-        doc.line(15, yPos + 2, 70, yPos + 2);
-        yPos += 6;
-
-        const productosData = this.itemsPresupuesto.map(item => {
-          let nombre = item.producto.replace(/\*\*/g, '');
-          if (nombre.length > 42) {
-            nombre = nombre.substring(0, 42) + '...';
-          }
-          return [
-            nombre,
-            item.marca,
-            item.cantidad.toString(),
-            '$ ' + parseFloat(item.netoUSD).toFixed(2),
-            '$ ' + (parseFloat(item.netoUSD) * item.cantidad).toFixed(2)
-          ];
-        });
-
+        doc.setFontSize(12);
+        doc.setTextColor(25, 118, 210);
+        doc.text('Productos', 15, yPos);
+        yPos += 5;
+        
+        const productosData = this.itemsPresupuesto.map(item => [
+          item.producto.substring(0, 40),
+          item.marca,
+          item.cantidad,
+          `$ ${parseFloat(item.netoUSD).toFixed(2)}`,
+          `$ ${(parseFloat(item.netoUSD) * item.cantidad).toFixed(2)}`
+        ]);
+        
         autoTable(doc, {
           startY: yPos,
-          head: [['Producto', 'Marca', 'Cant.', 'Unitario', 'Total']],
+          head: [['Producto', 'Marca', 'Cant.', 'USD Unit.', 'USD Total']],
           body: productosData,
-          theme: 'grid',
+          theme: 'striped',
           headStyles: { 
-            fillColor: negro,
-            textColor: [255, 255, 255],
-            fontSize: 9,
-            fontStyle: 'bold',
-            halign: 'center'
+            fillColor: [25, 118, 210],
+            fontSize: 9
           },
-          bodyStyles: { 
-            fontSize: 8,
-            cellPadding: 3
-          },
+          bodyStyles: { fontSize: 8 },
           columnStyles: {
             0: { cellWidth: 70 },
-            1: { cellWidth: 25, halign: 'center' },
-            2: { cellWidth: 15, halign: 'center' },
+            1: { cellWidth: 30 },
+            2: { cellWidth: 20, halign: 'center' },
             3: { cellWidth: 30, halign: 'right' },
-            4: { cellWidth: 30, halign: 'right', fontStyle: 'bold' }
-          },
-          alternateRowStyles: {
-            fillColor: [250, 250, 250]
+            4: { cellWidth: 30, halign: 'right' }
           }
         });
-
+        
         yPos = doc.lastAutoTable.finalY + 10;
       }
-
-      // === MANO DE OBRA ===
+      
+      // Tabla de mano de obra
       if (this.itemsManoObra.length > 0) {
-        doc.setFontSize(11);
-        doc.setTextColor(dorado[0], dorado[1], dorado[2]);
-        doc.setFont('helvetica', 'bold');
-        doc.text('SERVICIOS ADICIONALES', 15, yPos);
-        doc.setDrawColor(dorado[0], dorado[1], dorado[2]);
-        doc.setLineWidth(0.5);
-        doc.line(15, yPos + 2, 65, yPos + 2);
-        yPos += 6;
-
+        doc.setFontSize(12);
+        doc.setTextColor(25, 118, 210);
+        doc.text('Mano de Obra / Servicios', 15, yPos);
+        yPos += 5;
+        
         const manoObraData = this.itemsManoObra.map(item => [
           item.descripcion,
-          '$ ' + parseFloat(item.precioUSD).toFixed(2)
+          `$ ${parseFloat(item.precioUSD).toFixed(2)}`
         ]);
-
+        
         autoTable(doc, {
           startY: yPos,
-          head: [['Descripción', 'Precio USD']],
+          head: [['Descripción', 'USD']],
           body: manoObraData,
-          theme: 'grid',
+          theme: 'striped',
           headStyles: { 
-            fillColor: negro,
-            textColor: [255, 255, 255],
-            fontSize: 9,
-            fontStyle: 'bold'
+            fillColor: [76, 175, 80],
+            fontSize: 9
           },
-          bodyStyles: { 
-            fontSize: 8,
-            cellPadding: 3
-          },
+          bodyStyles: { fontSize: 8 },
           columnStyles: {
             0: { cellWidth: 140 },
-            1: { cellWidth: 30, halign: 'right', fontStyle: 'bold' }
-          },
-          alternateRowStyles: {
-            fillColor: [250, 250, 250]
+            1: { cellWidth: 40, halign: 'right' }
           }
         });
-
+        
         yPos = doc.lastAutoTable.finalY + 10;
       }
-
-      // === OBSERVACIONES ===
-      if (this.observaciones && this.observaciones.trim()) {
-        doc.setFontSize(11);
-        doc.setTextColor(dorado[0], dorado[1], dorado[2]);
-        doc.setFont('helvetica', 'bold');
-        doc.text('OBSERVACIONES', 15, yPos);
-        doc.setDrawColor(dorado[0], dorado[1], dorado[2]);
-        doc.setLineWidth(0.5);
-        doc.line(15, yPos + 2, 55, yPos + 2);
-
-        yPos += 8;
-        const obsLines = doc.splitTextToSize(
-          this.observaciones, 
-          pageWidth - 30
-        );
-
-        doc.setFont('helvetica', 'normal');
-        doc.setTextColor(grisTexto[0], grisTexto[1], grisTexto[2]);
-        doc.setFontSize(9);
-        doc.text(obsLines, 15, yPos);
-
-        yPos += obsLines.length * 5 + 10;
-      }
-
-      // === CUADRO DE TOTALES ===
-      const totY = Math.max(yPos + 5, 180);
-      const boxX = pageWidth - 75;
-      const boxW = 60;
-
-      doc.setFillColor(negro[0], negro[1], negro[2]);
-      doc.roundedRect(boxX, totY, boxW, 50, 3, 3, 'F');
-
-      doc.setDrawColor(dorado[0], dorado[1], dorado[2]);
-      doc.setLineWidth(1);
-      doc.roundedRect(boxX, totY, boxW, 50, 3, 3, 'S');
-
-      let tY = totY + 12;
-      doc.setFontSize(9);
-      doc.setTextColor(doradoClaro[0], doradoClaro[1], doradoClaro[2]);
-      doc.setFont('helvetica', 'normal');
-
-      doc.text('Subtotal:', boxX + 5, tY);
-      doc.text('$ ' + this.subtotalUSD, boxX + boxW - 5, tY, 
-        { align: 'right' });
-
-      tY += 8;
-      doc.text('IVA ' + this.ivaSeleccionado + '%:', boxX + 5, tY);
-      doc.text('$ ' + this.ivaUSD, boxX + boxW - 5, tY, 
-        { align: 'right' });
-
-      tY += 6;
-      doc.setDrawColor(dorado[0], dorado[1], dorado[2]);
-      doc.setLineWidth(0.5);
-      doc.line(boxX + 5, tY, boxX + boxW - 5, tY);
-
-      tY += 10;
+      
+      // Totales
+      yPos += 5;
+      doc.setDrawColor(200);
+      doc.line(120, yPos, 195, yPos);
+      yPos += 8;
+      
       doc.setFontSize(10);
-      doc.setTextColor(dorado[0], dorado[1], dorado[2]);
-      doc.setFont('helvetica', 'bold');
-      doc.text('TOTAL USD', boxX + 5, tY);
+      doc.setTextColor(0);
+      doc.text('Subtotal USD:', 120, yPos);
+      doc.text(`$ ${this.subtotalUSD}`, 195, yPos, { align: 'right' });
+      
+      yPos += 7;
+      doc.text(`IVA (${this.ivaSeleccionado}%):`, 120, yPos);
+      doc.text(`$ ${this.ivaUSD}`, 195, yPos, { align: 'right' });
+      
+      yPos += 2;
+      doc.setDrawColor(25, 118, 210);
+      doc.line(120, yPos, 195, yPos);
+      
+      yPos += 8;
+      doc.setFontSize(12);
+      doc.setTextColor(25, 118, 210);
+      doc.text('TOTAL USD:', 120, yPos);
       doc.setFontSize(14);
-      doc.setTextColor(255, 255, 255);
-      doc.text('$ ' + this.totalUSD, boxX + boxW - 5, tY, 
-        { align: 'right' });
-
-      tY += 9;
+      doc.text(`$ ${this.totalUSD}`, 195, yPos, { align: 'right' });
+      
+      yPos += 8;
+      doc.setFontSize(11);
+      doc.setTextColor(100);
+      doc.text('Total ARS:', 120, yPos);
+      doc.text(`$ ${this.totalARS}`, 195, yPos, { align: 'right' });
+      
+      // Footer
       doc.setFontSize(8);
-      doc.setTextColor(doradoClaro[0], doradoClaro[1], doradoClaro[2]);
-      doc.setFont('helvetica', 'normal');
-      doc.text('ARS $ ' + this.formatearNumero(this.totalARS), 
-        boxX + boxW - 5, tY, { align: 'right' });
-
-      // === FOOTER ===
-      doc.setFillColor(negro[0], negro[1], negro[2]);
-      doc.rect(0, 282, pageWidth, 15, 'F');
-
-      doc.setFontSize(8);
-      doc.setTextColor(doradoClaro[0], doradoClaro[1], doradoClaro[2]);
-      doc.setFont('helvetica', 'normal');
+      doc.setTextColor(150);
       doc.text(
-        'Presupuesto válido por 7 días  |  ' +
-        'Precios sujetos a modificación sin previo aviso',
-        pageWidth / 2,
-        289,
-        { align: 'center' }
+        'Presupuesto válido por 7 días. Precios sujetos a cambio.',
+        105, 285, { align: 'center' }
       );
-
-      // === NOMBRE ARCHIVO ===
-      let nombreArchivo = 'presupuesto_' + 
-        fechaHoy.replace(/\//g, '-') + '.pdf';
-      if (this.nombreCliente && this.nombreCliente.length > 0) {
-        const nombreLimpio = this.nombreCliente
-          .replace(/[^a-zA-Z0-9\s]/g, '')
-          .replace(/\s+/g, '_');
-        nombreArchivo = 'presupuesto_' + nombreLimpio + '_' + 
-          fechaHoy.replace(/\//g, '-') + '.pdf';
-      }
-
-      // === ENVIAR EMAIL ===
+      
+      // Nombre archivo
+      const nombreArchivo = `presupuesto_${fechaHoy.replace(/\//g, '-')}.pdf`;
+      
+      // Enviar por email
       try {
         const pdfBase64 = doc.output('datauristring').split(',')[1];
         await fetch('/api/enviar-presupuesto', {
@@ -892,16 +518,9 @@ export default {
         console.error('Error enviando email:', emailError);
         this.$alertify.warning('PDF generado pero no se pudo enviar email');
       }
-
-      // === GUARDAR PDF ===
+      
+      // Descargar PDF
       doc.save(nombreArchivo);
-    },
-
-    formatearNumero(numero) {
-      return parseFloat(numero).toLocaleString('es-AR', {
-        minimumFractionDigits: 2,
-        maximumFractionDigits: 2
-      });
     }
   }
 }

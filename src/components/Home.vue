@@ -208,7 +208,7 @@ export default {
             },
             1: {
                 nombre: 'ISENOA',
-                logo: '/logos/Isenoa.png',
+                logo: require('../assets/img/logo_isenoa.png'),
                 direccion: 'Consultar dirección',
                 direccion2: '',
                 ciudad: 'Tucumán',
