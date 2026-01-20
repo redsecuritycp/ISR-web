@@ -327,133 +327,78 @@ export default {
             
             if (!normalizado) return variaciones;
             
+            // 1. Diccionario de correcciones conocidas (typos comunes)
             const correcciones = {
-                'alarma': 'alarma', 'alarmas': 'alarma', 
-                'alarrma': 'alarma', 'alarmma': 'alarma', 
-                'alarmmas': 'alarma', 'alarrmas': 'alarma',
-                'alrma': 'alarma', 'alrmas': 'alarma',
-                
-                'camara': 'camara', 'camaras': 'camara', 
-                'camera': 'camara', 'cameras': 'camara',
-                'cammara': 'camara', 'camra': 'camara',
-                
-                'dvr': 'dvr', 'dvrs': 'dvr', 
-                'nvr': 'nvr', 'nvrs': 'nvr',
-                'grabador': 'grabador', 'grabadores': 'grabador',
-                'grabdor': 'grabador',
-                
-                'disco': 'disco', 'discos': 'disco', 
-                'dicso': 'disco', 'dicsco': 'disco', 
-                'discso': 'disco', 'disko': 'disco',
-                'rigido': 'rigido', 'rijido': 'rigido',
-                'hdd': 'disco', 'ssd': 'disco',
-                
-                'cable': 'cable', 'cables': 'cable', 
-                'cabel': 'cable', 'calbe': 'cable',
-                'utp': 'utp', 'utps': 'utp', 
-                'coaxial': 'coaxial', 'coaxil': 'coaxial',
-                
-                'conector': 'conector', 'conectores': 'conector',
-                'conetor': 'conector', 'conetores': 'conector',
-                'rj45': 'rj45', 'bnc': 'bnc', 
-                'balun': 'balun', 'balunes': 'balun',
-                
-                'fuente': 'fuente', 'fuentes': 'fuente', 
-                'feunte': 'fuente',
-                'ups': 'ups', 'upss': 'ups',
-                'transformador': 'transformador', 
-                'trafo': 'transformador',
-                
-                'sensor': 'sensor', 'sensores': 'sensor', 
-                'senso': 'sensor', 'sesnor': 'sensor',
-                'detector': 'detector', 'detectores': 'detector',
-                'detetor': 'detector',
-                'pir': 'pir', 'magnetico': 'magnetico',
-                
-                'switch': 'switch', 'switches': 'switch', 
-                'swich': 'switch', 'swicth': 'switch', 
-                'suich': 'switch', 'switche': 'switch',
-                'router': 'router', 'routers': 'router', 
-                'ruoter': 'router', 'ruter': 'router',
-                'poe': 'poe', 'ppoe': 'poe',
-                
-                'control': 'control', 'controles': 'control',
-                'acceso': 'acceso', 'aceso': 'acceso',
-                'lector': 'lector', 'lectores': 'lector',
-                'tarjeta': 'tarjeta', 'tarjetas': 'tarjeta',
-                'biometrico': 'biometrico',
-                'huella': 'huella', 'huellas': 'huella',
-                
-                'cerradura': 'cerradura', 'cerraduras': 'cerradura',
-                'electroiman': 'electroiman',
-                
-                'sirena': 'sirena', 'sirenas': 'sirena', 
-                'cirena': 'sirena',
-                
-                'incendio': 'incendio', 'insendio': 'incendio',
-                'humo': 'humo',
-                
-                'domo': 'domo', 'domos': 'domo',
-                'bullet': 'bullet', 'bullets': 'bullet', 
-                'bulet': 'bullet',
-                'turret': 'turret', 'turrets': 'turret',
-                'ptz': 'ptz', 'ptzs': 'ptz', 'pzt': 'ptz',
-                
-                'hikvision': 'hikvision', 'hikvisión': 'hikvision',
-                'hikvicion': 'hikvision', 'hik': 'hikvision',
-                'dahua': 'dahua', 'daua': 'dahua',
-                'ajax': 'ajax', 'ajaz': 'ajax',
-                'ubiquiti': 'ubiquiti', 'ubiquity': 'ubiquiti',
-                'zkteco': 'zkteco', 'zk': 'zkteco',
-                'mikrotik': 'mikrotik', 'microtik': 'mikrotik',
-                
-                'bateria': 'bateria', 'baterias': 'bateria',
-                'pila': 'bateria', 'pilas': 'bateria',
-                'monitor': 'monitor', 'monitores': 'monitor',
-                'pantalla': 'pantalla', 'pantallas': 'pantalla',
-                'rack': 'rack', 'racks': 'rack',
-                'gabinete': 'gabinete', 'gabinetes': 'gabinete'
+                'swich': 'switch', 'swicth': 'switch', 'suich': 'switch',
+                'camra': 'camara', 'cammara': 'camara', 'camera': 'camara',
+                'alarrma': 'alarma', 'alrma': 'alarma',
+                'dicso': 'disco', 'dicsco': 'disco',
+                'grabadr': 'grabador', 'gravador': 'grabador',
+                'ubiquity': 'ubiquiti', 'hikvisión': 'hikvision',
+                'sircuit': 'circuito', 'antena': 'antena'
             };
             
+            // 2. Si hay corrección exacta, agregarla primero
             if (correcciones[normalizado]) {
-                variaciones.unshift(correcciones[normalizado]);
+                variaciones.push(correcciones[normalizado]);
             }
             
-            Object.keys(correcciones).forEach(key => {
-                if (key === normalizado) return;
-                if (normalizado.includes(key) || key.includes(normalizado)) {
-                    if (key.length >= normalizado.length - 2) {
-                        variaciones.unshift(correcciones[key]);
-                    } else {
-                        variaciones.push(correcciones[key]);
-                    }
-                }
-            });
-            
-            if (!correcciones[normalizado] && 
-                !variaciones.includes(normalizado)) {
+            // 3. Texto normalizado original
+            if (!variaciones.includes(normalizado)) {
                 variaciones.push(normalizado);
             }
             
-            if (normalizado.endsWith('s') && normalizado.length > 3) {
-                const sinS = normalizado.slice(0, -1);
-                if (!variaciones.includes(sinS)) {
-                    if (correcciones[sinS]) {
-                        variaciones.unshift(correcciones[sinS]);
-                    } else {
-                        variaciones.push(sinS);
+            // 4. AUTOMÁTICO: Quitar terminaciones de plural
+            const terminaciones = ['es', 's', 'as', 'os', 'nes'];
+            for (const term of terminaciones) {
+                if (normalizado.endsWith(term) && normalizado.length > term.length + 2) {
+                    const sinTerminacion = normalizado.slice(0, -term.length);
+                    if (!variaciones.includes(sinTerminacion)) {
+                        variaciones.push(sinTerminacion);
                     }
                 }
             }
             
-            if (normalizado.endsWith('es') && normalizado.length > 4) {
-                const sinEs = normalizado.slice(0, -2);
-                if (!variaciones.includes(sinEs)) {
-                    if (correcciones[sinEs]) {
-                        variaciones.unshift(correcciones[sinEs]);
-                    } else {
-                        variaciones.push(sinEs);
+            // 5. AUTOMÁTICO: Quitar letras duplicadas (alarmmas → alarmas → alarma)
+            const sinDuplicadas = normalizado.replace(/(.)\1+/g, '$1');
+            if (!variaciones.includes(sinDuplicadas)) {
+                variaciones.push(sinDuplicadas);
+            }
+            // También sin duplicadas + sin plural
+            for (const term of terminaciones) {
+                if (sinDuplicadas.endsWith(term) && sinDuplicadas.length > term.length + 2) {
+                    const sinTerminacion = sinDuplicadas.slice(0, -term.length);
+                    if (!variaciones.includes(sinTerminacion)) {
+                        variaciones.push(sinTerminacion);
                     }
+                }
+            }
+            
+            // 6. AUTOMÁTICO: Si termina en consonante, probar agregando vocales
+            const ultimaLetra = normalizado.slice(-1);
+            const consonantes = 'bcdfghjklmnpqrstvwxyz';
+            if (consonantes.includes(ultimaLetra)) {
+                const conA = normalizado + 'a';
+                const conO = normalizado + 'o';
+                const conE = normalizado + 'e';
+                if (!variaciones.includes(conA)) variaciones.push(conA);
+                if (!variaciones.includes(conO)) variaciones.push(conO);
+                if (!variaciones.includes(conE)) variaciones.push(conE);
+            }
+            
+            // 7. AUTOMÁTICO: Quitar última letra (por si sobra)
+            if (normalizado.length > 3) {
+                const sinUltima = normalizado.slice(0, -1);
+                if (!variaciones.includes(sinUltima)) {
+                    variaciones.push(sinUltima);
+                }
+            }
+            
+            // 8. AUTOMÁTICO: Quitar últimas 2 letras
+            if (normalizado.length > 4) {
+                const sinUltimas2 = normalizado.slice(0, -2);
+                if (!variaciones.includes(sinUltimas2)) {
+                    variaciones.push(sinUltimas2);
                 }
             }
             
@@ -474,56 +419,73 @@ export default {
 
         async buscarProductos() {
             this.overlay = true;
-            const url = this.$store.state.urlService + 
-                "/Productos/ConsProductos?Producto=" + 
-                this.searchData.trim() +
-                "&CategoriaId=" + this.selectedCategoria + 
-                "&MarcaId=" + this.selectedMarca + 
-                "&OrdenId=" + this.selectedOrder + 
-                "&SucursalId=" + this.selectedSucursal + 
-                "&Oferta=" + this.chkVerSoloOfertas;
-            const resultado = await (await fetch(url)).json();
+            
+            let resultado = null;
+            
+            // Si hay texto de búsqueda, usar variaciones inteligentes
+            if (this.searchData && this.searchData.trim()) {
+                const variaciones = this.generarVariaciones(this.searchData);
+                
+                // Probar cada variación hasta encontrar resultados
+                for (const variacion of variaciones) {
+                    resultado = await this.ejecutarBusqueda(variacion);
+                    if (resultado.producto && resultado.producto.length > 0) {
+                        break;
+                    }
+                }
+                
+                // Si ninguna variación funcionó, intentar con el original
+                if (!resultado || !resultado.producto || resultado.producto.length === 0) {
+                    resultado = await this.ejecutarBusqueda(this.searchData.trim());
+                }
+            } else {
+                // Sin texto de búsqueda, buscar todo
+                resultado = await this.ejecutarBusqueda('');
+            }
             
             this.itemsProductos = [];
-            resultado.producto.forEach(element => {
-                this.itemsProductos.push({
-                    id: element.id,
-                    codigoInterno: element.codigoInterno,
-                    producto: element.producto,
-                    descripcion: element.descripcion,
-                    netoUSD: element.netoUSD,
-                    precioUSD: parseFloat(element.precioUSD)
-                        .toFixed(2).replace('.', ','),
-                    netoARS: element.netoARS,
-                    precioARS: parseFloat(element.precioARS)
-                        .toFixed(2).replace('.', ','),
-                    imagen: element.imagenes != null 
-                        ? element.imagenes[0] : '',
-                    idMarca: element.marcaId,
-                    marca: element.marca,
-                    idCategoria: element.categoriaId,
-                    categoria: element.categoria,
-                    stockTotal: element.stockTotal,
-                    oferta: element.oferta,
-                    precioOfertaUSD: parseFloat(element.precioOfertaUSD)
-                        .toFixed(2),
-                    precioOfertaARS: parseFloat(element.precioOfertaARS)
-                        .toFixed(2),
-                    disponible: element.disponible
+            if (resultado && resultado.producto) {
+                resultado.producto.forEach(element => {
+                    this.itemsProductos.push({
+                        id: element.id,
+                        codigoInterno: element.codigoInterno,
+                        producto: element.producto,
+                        descripcion: element.descripcion,
+                        netoUSD: element.netoUSD,
+                        precioUSD: parseFloat(element.precioUSD)
+                            .toFixed(2).replace('.', ','),
+                        netoARS: element.netoARS,
+                        precioARS: parseFloat(element.precioARS)
+                            .toFixed(2).replace('.', ','),
+                        imagen: element.imagenes != null 
+                            ? element.imagenes[0] : '',
+                        idMarca: element.marcaId,
+                        marca: element.marca,
+                        idCategoria: element.categoriaId,
+                        categoria: element.categoria,
+                        stockTotal: element.stockTotal,
+                        oferta: element.oferta,
+                        precioOfertaUSD: parseFloat(element.precioOfertaUSD)
+                            .toFixed(2),
+                        precioOfertaARS: parseFloat(element.precioOfertaARS)
+                            .toFixed(2),
+                        disponible: element.disponible
+                    });
                 });
-            });
+            }
+            
             // Ordenar: primero los que tienen stock > 0
             if (this.selectedOrder === 5) {
-              this.itemsProductos.sort((a, b) => {
-                if (a.stockTotal > 0 && b.stockTotal <= 0) return -1;
-                if (a.stockTotal <= 0 && b.stockTotal > 0) return 1;
-                return b.stockTotal - a.stockTotal;
-              });
+                this.itemsProductos.sort((a, b) => {
+                    if (a.stockTotal > 0 && b.stockTotal <= 0) return -1;
+                    if (a.stockTotal <= 0 && b.stockTotal > 0) return 1;
+                    return b.stockTotal - a.stockTotal;
+                });
             }
             this.$store.commit('setItemsProductos', this.itemsProductos);
 
-            // Marcas.
-            if (this.selectedMarca == 0) {
+            // Marcas
+            if (this.selectedMarca == 0 && resultado && resultado.marca) {
                 this.itemsMarcas = [];
                 resultado.marca.forEach(element => {
                     this.itemsMarcas.push({ 
