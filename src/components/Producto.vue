@@ -420,6 +420,19 @@ export default {
         async buscarProductos() {
             this.overlay = true;
             
+            // Registrar búsqueda en historial
+            if (this.searchData && this.searchData.trim()) {
+              fetch('/api/busqueda', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                  usuarioId: this.$store.state.usuarioId,
+                  usuario: this.$store.state.usuario,
+                  termino: this.searchData.trim()
+                })
+              }).catch(err => console.log('Error guardando búsqueda:', err));
+            }
+            
             let resultado = null;
             
             // Si hay texto de búsqueda, usar variaciones inteligentes

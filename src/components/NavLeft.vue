@@ -90,6 +90,22 @@ export default {
         // Buscar porductos por catetoría.
         buscarProductosPorCategoria(id) {
             this.$store.state.idCategoria = id;
+            
+            // Registrar navegación por categoría
+            const categoria = this.$store.state.itemsCategorias
+              .find(c => c.id === id);
+            if (categoria) {
+              fetch('/api/busqueda', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                  usuarioId: this.$store.state.usuarioId,
+                  usuario: this.$store.state.usuario,
+                  termino: '[CAT] ' + categoria.categoria
+                })
+              }).catch(err => console.log('Error:', err));
+            }
+            
             this.mostrarProductos();
         },
 

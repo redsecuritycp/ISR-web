@@ -1,829 +1,496 @@
-<template>
-  <v-container>
-    <v-row>
-      <v-col cols="12">
-        <h1 class="text-h4 mb-4">
-          <v-icon left>mdi-file-document-outline</v-icon>
-          Presupuestador
-        </h1>
-      </v-col>
-    </v-row>
+const express = require("express");
+const cors = require("cors");
+const fs = require("fs");
+const path = require("path");
+const nodemailer = require("nodemailer");
 
-    <!-- Datos del cliente -->
-    <v-row>
-      <v-col cols="12" md="6">
-        <v-card class="pa-4 mb-4">
-          <v-card-title class="pa-0 mb-3">
-            <v-icon left>mdi-account</v-icon>
-            Datos para el Presupuesto
-          </v-card-title>
+const app = express();
+const PORT = 3001;
 
-          <!-- Logo -->
-          <div class="mb-4">
-            <label class="subtitle-2">Logo de tu empresa</label>
-            <div class="d-flex align-center mt-2">
-              <v-avatar size="80" class="mr-4" color="grey lighten-3">
-                <v-img 
-                  v-if="logoPreview" 
-                  :src="logoPreview"
-                ></v-img>
-                <v-icon v-else size="40">mdi-image-plus</v-icon>
-              </v-avatar>
+app.use(cors());
+app.use(express.json({ limit: "10mb" }));
+
+const DATA_DIR = path.join(__dirname, "data");
+const VENDEDORES_FILE = path.join(DATA_DIR, "vendedores.json");
+const CLIENTES_FILE = path.join(DATA_DIR, "clientes.json");
+const BUSQUEDAS_FILE = path.join(DATA_DIR, "busquedas.json");
+
+// Crear directorio data si no existe
+if (!fs.existsSync(DATA_DIR)) {
+  fs.mkdirSync(DATA_DIR, { recursive: true });
+}
+
+// Helper para leer/escribir JSON
+const readJSON = (file) => {
+  try {
+    return JSON.parse(fs.readFileSync(file, "utf8"));
+  } catch (e) {
+    if (file.includes("busquedas")) return [];
+    return file.includes("clientes") ? {} : [];
+  }
+};
+
+const writeJSON = (file, data) => {
+  fs.writeFileSync(file, JSON.stringify(data, null, 2));
+};
+
+// GET /api/vendedores
+app.get("/api/vendedores", (req, res) => {
+  const vendedores = readJSON(VENDEDORES_FILE);
+  res.json(vendedores);
+});
+
+// GET /api/cliente/:usuarioId
+app.get("/api/cliente/:usuarioId", (req, res) => {
+  const { usuarioId } = req.params;
+  const clientes = readJSON(CLIENTES_FILE);
+  const cliente = clientes[usuarioId] || {
+    logo: "",
+    vendedorId: null,
+    sucursalId: 2,
+  };
+  res.json(cliente);
+});
+
+// POST /api/cliente/:usuarioId/logo
+app.post("/api/cliente/:usuarioId/logo", (req, res) => {
+  const { usuarioId } = req.params;
+  const { logo } = req.body;
+
+  const clientes = readJSON(CLIENTES_FILE);
+  if (!clientes[usuarioId]) {
+    clientes[usuarioId] = { logo: "", vendedorId: null };
+  }
+  clientes[usuarioId].logo = logo;
+  writeJSON(CLIENTES_FILE, clientes);
+
+  res.json({ success: true });
+});
+
+// POST /api/cliente/:usuarioId/vendedor
+app.post("/api/cliente/:usuarioId/vendedor", (req, res) => {
+  const { usuarioId } = req.params;
+  const { vendedorId } = req.body;
+
+  const clientes = readJSON(CLIENTES_FILE);
+  if (!clientes[usuarioId]) {
+    clientes[usuarioId] = { logo: "", vendedorId: null };
+  }
+  clientes[usuarioId].vendedorId = vendedorId;
+  writeJSON(CLIENTES_FILE, clientes);
+
+  res.json({ success: true });
+});
+
+// POST /api/cliente/:usuarioId/sucursal
+app.post("/api/cliente/:usuarioId/sucursal", (req, res) => {
+  const { usuarioId } = req.params;
+  const { sucursalId } = req.body;
+
+  const clientes = readJSON(CLIENTES_FILE);
+  if (!clientes[usuarioId]) {
+    clientes[usuarioId] = {
+      logo: "",
+      vendedorId: null,
+      sucursalId: 2,
+    };
+  }
+  clientes[usuarioId].sucursalId = sucursalId;
+  writeJSON(CLIENTES_FILE, clientes);
+
+  res.json({ success: true });
+});
+
+// ================================================
+// HISTORIAL DE BÚSQUEDAS
+// ================================================
+
+// POST /api/busqueda - Guardar búsqueda
+app.post("/api/busqueda", (req, res) => {
+  const { usuarioId, usuario, termino } = req.body;
+
+  if (!termino || !termino.trim()) {
+    return res.json({ success: false, message: "Sin término" });
+  }
+
+  const busquedas = readJSON(BUSQUEDAS_FILE);
+
+  busquedas.push({
+    usuarioId: usuarioId || 0,
+    usuario: usuario || "Anónimo",
+    termino: termino.trim().toLowerCase(),
+    fecha: new Date().toISOString(),
+  });
+
+  writeJSON(BUSQUEDAS_FILE, busquedas);
+
+  res.json({ success: true });
+});
+
+// GET /api/reporte-busquedas - Generar y enviar reporte mensual
+app.get("/api/reporte-busquedas", async (req, res) => {
+  try {
+    const busquedas = readJSON(BUSQUEDAS_FILE);
+
+    // Filtrar búsquedas del último mes
+    const haceUnMes = new Date();
+    haceUnMes.setMonth(haceUnMes.getMonth() - 1);
+
+    const busquedasMes = busquedas.filter(
+      (b) => new Date(b.fecha) >= haceUnMes,
+    );
+
+    // Agrupar por cliente
+    const porCliente = {};
+    busquedasMes.forEach((b) => {
+      const key = b.usuario || "Anónimo";
+      if (!porCliente[key]) {
+        porCliente[key] = {
+          usuario: key,
+          usuarioId: b.usuarioId,
+          totalBusquedas: 0,
+          terminos: {},
+        };
+      }
+      porCliente[key].totalBusquedas++;
+
+      // Contar términos
+      const term = b.termino;
+      porCliente[key].terminos[term] =
+        (porCliente[key].terminos[term] || 0) + 1;
+    });
+
+    // Ordenar clientes por cantidad de búsquedas
+    const clientesOrdenados = Object.values(porCliente).sort(
+      (a, b) => b.totalBusquedas - a.totalBusquedas,
+    );
+
+    // Top 10 términos globales
+    const terminosGlobales = {};
+    busquedasMes.forEach((b) => {
+      terminosGlobales[b.termino] = (terminosGlobales[b.termino] || 0) + 1;
+    });
+    const topTerminos = Object.entries(terminosGlobales)
+      .sort((a, b) => b[1] - a[1])
+      .slice(0, 10);
+
+    // Generar URL del gráfico con QuickChart
+    const labels = topTerminos.map((t) => t[0]).slice(0, 8);
+    const data = topTerminos.map((t) => t[1]).slice(0, 8);
+
+    const chartConfig = {
+      type: "bar",
+      data: {
+        labels: labels,
+        datasets: [
+          {
+            label: "Búsquedas",
+            data: data,
+            backgroundColor: "rgba(25, 118, 210, 0.8)",
+          },
+        ],
+      },
+      options: {
+        plugins: {
+          title: {
+            display: true,
+            text: "Top Términos Buscados",
+          },
+        },
+      },
+    };
+
+    const chartUrl = `https://quickchart.io/chart?c=${encodeURIComponent(
+      JSON.stringify(chartConfig),
+    )}&w=500&h=300`;
+
+    // Generar HTML del email
+    const fechaReporte = new Date().toLocaleDateString("es-AR");
+    const mesAnterior = new Date();
+    mesAnterior.setMonth(mesAnterior.getMonth() - 1);
+    const mesNombre = mesAnterior.toLocaleDateString("es-AR", {
+      month: "long",
+      year: "numeric",
+    });
+
+    let tablaClientes = "";
+    clientesOrdenados.slice(0, 20).forEach((c, i) => {
+      const topTerms = Object.entries(c.terminos)
+        .sort((a, b) => b[1] - a[1])
+        .slice(0, 3)
+        .map((t) => t[0])
+        .join(", ");
+
+      tablaClientes += `
+        <tr style="background-color: ${i % 2 === 0 ? "#f9f9f9" : "#fff"};">
+          <td style="padding: 10px; border-bottom: 1px solid #ddd;">
+            ${c.usuario}
+          </td>
+          <td style="padding: 10px; border-bottom: 1px solid #ddd; 
+              text-align: center; font-weight: bold; color: #1976D2;">
+            ${c.totalBusquedas}
+          </td>
+          <td style="padding: 10px; border-bottom: 1px solid #ddd; 
+              font-size: 12px; color: #666;">
+            ${topTerms || "-"}
+          </td>
+        </tr>
+      `;
+    });
+
+    const htmlEmail = `
+      <div style="font-family: Arial, sans-serif; max-width: 700px; 
+                  margin: 0 auto;">
+        <div style="background: linear-gradient(135deg, #1e1e1e, #333); 
+                    color: white; padding: 25px; text-align: center;">
+          <h1 style="margin: 0; color: #d4af37;">
+            📊 Reporte de Búsquedas
+          </h1>
+          <p style="margin: 10px 0 0 0; color: #ccc;">
+            ${mesNombre.charAt(0).toUpperCase() + mesNombre.slice(1)}
+          </p>
+        </div>
+
+        <div style="padding: 25px; background-color: #f5f5f5;">
+          <div style="background: white; border-radius: 8px; 
+                      padding: 20px; margin-bottom: 20px; 
+                      box-shadow: 0 2px 5px rgba(0,0,0,0.1);">
+            <h2 style="color: #333; margin-top: 0;">
+              Resumen General
+            </h2>
+            <div style="display: flex; justify-content: space-around; 
+                        text-align: center;">
               <div>
-                <v-btn 
-                  small 
-                  color="primary" 
-                  @click="$refs.logoInput.click()"
-                >
-                  Subir Logo
-                </v-btn>
-                <v-btn 
-                  v-if="logoPreview" 
-                  small 
-                  text 
-                  color="error" 
-                  @click="eliminarLogo"
-                  class="ml-2"
-                >
-                  Quitar
-                </v-btn>
-                <input
-                  ref="logoInput"
-                  type="file"
-                  accept="image/*"
-                  style="display: none"
-                  @change="onLogoSelected"
-                />
+                <p style="font-size: 36px; font-weight: bold; 
+                          color: #1976D2; margin: 0;">
+                  ${busquedasMes.length}
+                </p>
+                <p style="color: #666; margin: 5px 0;">
+                  Búsquedas Totales
+                </p>
+              </div>
+              <div>
+                <p style="font-size: 36px; font-weight: bold; 
+                          color: #43a047; margin: 0;">
+                  ${clientesOrdenados.length}
+                </p>
+                <p style="color: #666; margin: 5px 0;">
+                  Clientes Activos
+                </p>
               </div>
             </div>
           </div>
 
-          <!-- Nombre Cliente Final (editable) -->
-          <v-text-field
-            v-model="nombreClienteFinal"
-            label="Nombre del cliente (aparece en el PDF)"
-            outlined
-            dense
-            prepend-inner-icon="mdi-account-box"
-            placeholder="Ej: Juan Pérez / Empresa SRL"
-            class="mb-3"
-          ></v-text-field>
-
-          <!-- Vendedor -->
-          <v-select
-            v-model="vendedorSeleccionado"
-            :items="vendedores"
-            item-text="nombre"
-            item-value="id"
-            label="Vendedor asignado"
-            outlined
-            dense
-            prepend-inner-icon="mdi-account-tie"
-            @change="guardarVendedor"
-          ></v-select>
-
-          <!-- IVA -->
-          <v-select
-            v-model="ivaSeleccionado"
-            :items="opcionesIva"
-            item-text="texto"
-            item-value="valor"
-            label="IVA a aplicar"
-            outlined
-            dense
-            prepend-inner-icon="mdi-percent"
-            class="mt-3"
-          ></v-select>
-
-          <!-- Observaciones -->
-          <v-textarea
-            v-model="observaciones"
-            label="Observaciones (opcional)"
-            outlined
-            dense
-            rows="3"
-            prepend-inner-icon="mdi-note-text"
-            class="mt-3"
-          ></v-textarea>
-        </v-card>
-      </v-col>
-
-      <!-- Resumen -->
-      <v-col cols="12" md="6">
-        <v-card class="pa-4 mb-4">
-          <v-card-title class="pa-0 mb-3">
-            <v-icon left>mdi-calculator</v-icon>
-            Resumen
-          </v-card-title>
-          <div class="d-flex justify-space-between mb-2">
-            <span>Usuario logueado:</span>
-            <strong>{{ usuarioLogueado }}</strong>
+          <div style="background: white; border-radius: 8px; 
+                      padding: 20px; margin-bottom: 20px;
+                      box-shadow: 0 2px 5px rgba(0,0,0,0.1);">
+            <h2 style="color: #333; margin-top: 0;">
+              Top Términos Buscados
+            </h2>
+            <img src="${chartUrl}" alt="Gráfico de búsquedas" 
+                 style="width: 100%; max-width: 500px; display: block; 
+                        margin: 0 auto;">
           </div>
-          <div class="d-flex justify-space-between mb-2">
-            <span>Cliente en PDF:</span>
-            <strong>{{ nombreClienteFinal || '(sin definir)' }}</strong>
-          </div>
-          <v-divider class="my-2"></v-divider>
-          <div class="d-flex justify-space-between mb-2">
-            <span>Productos:</span>
-            <strong>{{ itemsPresupuesto.length }}</strong>
-          </div>
-          <div class="d-flex justify-space-between mb-2">
-            <span>Mano de obra:</span>
-            <strong>{{ itemsManoObra.length }}</strong>
-          </div>
-          <v-divider class="my-2"></v-divider>
-          <div class="d-flex justify-space-between mb-2">
-            <span>Subtotal USD:</span>
-            <strong>$ {{ subtotalUSD }}</strong>
-          </div>
-          <div class="d-flex justify-space-between mb-2">
-            <span>IVA ({{ ivaSeleccionado }}%):</span>
-            <strong>$ {{ ivaUSD }}</strong>
-          </div>
-          <v-divider class="my-2"></v-divider>
-          <div class="d-flex justify-space-between mb-2">
-            <span>Total USD:</span>
-            <strong class="green--text text-h6">
-              $ {{ totalUSD }}
-            </strong>
-          </div>
-          <div class="d-flex justify-space-between mb-4">
-            <span>Total ARS:</span>
-            <strong class="blue--text text-h6">
-              $ {{ totalARS }}
-            </strong>
-          </div>
-          <v-btn 
-            block 
-            color="success" 
-            :disabled="itemsPresupuesto.length === 0"
-            :loading="generandoPDF"
-            @click="generarPDF"
-            class="mb-2"
-          >
-            <v-icon left>mdi-file-pdf-box</v-icon>
-            GENERAR PDF
-          </v-btn>
-          <v-btn 
-            block 
-            outlined
-            color="primary" 
-            @click="$router.push('/productos')"
-          >
-            <v-icon left>mdi-cart-plus</v-icon>
-            Seguir comprando
-          </v-btn>
-        </v-card>
 
-        <!-- Mano de obra -->
-        <v-card class="pa-4">
-          <v-card-title class="pa-0 mb-3">
-            <v-icon left>mdi-wrench</v-icon>
-            Mano de Obra / Servicios
-          </v-card-title>
-          <v-row dense>
-            <v-col cols="8">
-              <v-text-field
-                v-model="nuevaManoObra.descripcion"
-                label="Descripción"
-                outlined
-                dense
-              ></v-text-field>
-            </v-col>
-            <v-col cols="4">
-              <v-text-field
-                v-model="nuevaManoObra.precioUSD"
-                label="USD"
-                outlined
-                dense
-                type="number"
-                prefix="$"
-              ></v-text-field>
-            </v-col>
-          </v-row>
-          <v-btn 
-            small 
-            color="primary" 
-            @click="agregarManoObra"
-            :disabled="!nuevaManoObra.descripcion"
-          >
-            <v-icon left small>mdi-plus</v-icon>
-            Agregar
-          </v-btn>
-          <v-list dense v-if="itemsManoObra.length > 0" class="mt-3">
-            <v-list-item 
-              v-for="(item, idx) in itemsManoObra" 
-              :key="idx"
-            >
-              <v-list-item-content>
-                <v-list-item-title>
-                  {{ item.descripcion }}
-                </v-list-item-title>
-              </v-list-item-content>
-              <v-list-item-action>
-                <div class="d-flex align-center">
-                  <span class="mr-3">$ {{ item.precioUSD }}</span>
-                  <v-btn 
-                    icon 
-                    x-small 
-                    color="error"
-                    @click="eliminarManoObra(idx)"
-                  >
-                    <v-icon small>mdi-delete</v-icon>
-                  </v-btn>
-                </div>
-              </v-list-item-action>
-            </v-list-item>
-          </v-list>
-        </v-card>
-      </v-col>
-    </v-row>
-
-    <!-- Lista de productos -->
-    <v-row>
-      <v-col cols="12">
-        <v-card>
-          <v-card-title>
-            <v-icon left>mdi-cart</v-icon>
-            Productos en el presupuesto
-            <v-spacer></v-spacer>
-            <v-btn 
-              small 
-              text 
-              color="error" 
-              @click="limpiarPresupuesto"
-              v-if="itemsPresupuesto.length > 0"
-            >
-              <v-icon left small>mdi-delete</v-icon>
-              Limpiar todo
-            </v-btn>
-          </v-card-title>
-          <v-divider></v-divider>
-
-          <v-card-text v-if="itemsPresupuesto.length === 0">
-            <v-alert type="info" text>
-              No hay productos en el presupuesto. 
-              Agregá productos desde el catálogo.
-            </v-alert>
-          </v-card-text>
-
-          <v-simple-table v-else>
-            <template v-slot:default>
+          <div style="background: white; border-radius: 8px; 
+                      padding: 20px; box-shadow: 0 2px 5px rgba(0,0,0,0.1);">
+            <h2 style="color: #333; margin-top: 0;">
+              Búsquedas por Cliente
+            </h2>
+            <table style="width: 100%; border-collapse: collapse;">
               <thead>
-                <tr>
-                  <th>Producto</th>
-                  <th>Marca</th>
-                  <th class="text-center">Cantidad</th>
-                  <th class="text-right">USD Unit.</th>
-                  <th class="text-right">USD Total</th>
-                  <th class="text-right">ARS Total</th>
-                  <th></th>
+                <tr style="background-color: #1976D2; color: white;">
+                  <th style="padding: 12px; text-align: left;">Cliente</th>
+                  <th style="padding: 12px; text-align: center;">
+                    Búsquedas
+                  </th>
+                  <th style="padding: 12px; text-align: left;">
+                    Términos Top
+                  </th>
                 </tr>
               </thead>
               <tbody>
-                <tr v-for="item in itemsPresupuesto" :key="item.id">
-                  <td>{{ item.producto }}</td>
-                  <td>{{ item.marca }}</td>
-                  <td class="text-center" style="width: 120px;">
-                    <v-text-field
-                      v-model.number="item.cantidad"
-                      type="number"
-                      min="1"
-                      dense
-                      hide-details
-                      outlined
-                      class="centered-input"
-                      style="max-width: 80px; margin: 0 auto;"
-                      @change="actualizarCantidad(item)"
-                    ></v-text-field>
-                  </td>
-                  <td class="text-right">
-                    $ {{ parseFloat(item.netoUSD).toFixed(2) }}
-                  </td>
-                  <td class="text-right">
-                    $ {{ calcularTotalItem(item, 'USD') }}
-                  </td>
-                  <td class="text-right">
-                    $ {{ calcularTotalItem(item, 'ARS') }}
-                  </td>
-                  <td class="text-right">
-                    <v-btn 
-                      icon 
-                      small 
-                      color="error"
-                      @click="eliminarItem(item.id)"
-                    >
-                      <v-icon small>mdi-delete</v-icon>
-                    </v-btn>
-                  </td>
-                </tr>
+                ${tablaClientes}
               </tbody>
-            </template>
-          </v-simple-table>
-        </v-card>
-      </v-col>
-    </v-row>
-  </v-container>
-</template>
+            </table>
+          </div>
+        </div>
 
-<script>
-import jsPDF from 'jspdf';
-import autoTable from 'jspdf-autotable';
+        <div style="background-color: #1e1e1e; color: #888; 
+                    padding: 15px; text-align: center; font-size: 12px;">
+          Reporte generado automáticamente - IDSR Fortia<br>
+          ${fechaReporte}
+        </div>
+      </div>
+    `;
 
-export default {
-  name: 'PresupuestadorView',
-
-  data() {
-    return {
-      logoPreview: '',
-      nombreClienteFinal: '',
-      vendedorSeleccionado: null,
-      vendedores: [],
-      ivaSeleccionado: 21,
-      opcionesIva: [
-        { texto: '21%', valor: 21 },
-        { texto: '10.5%', valor: 10.5 },
-        { texto: 'Exento (0%)', valor: 0 }
-      ],
-      observaciones: '',
-      itemsManoObra: [],
-      nuevaManoObra: {
-        descripcion: '',
-        precioUSD: ''
+    // Enviar email
+    const transporter = nodemailer.createTransport({
+      service: "gmail",
+      auth: {
+        user: process.env.GMAIL_USER,
+        pass: process.env.GMAIL_APP_PASSWORD,
       },
-      generandoPDF: false
-    }
-  },
+    });
 
-  computed: {
-    usuarioLogueado() {
-      return this.$store.state.usuario || '';
-    },
-    itemsPresupuesto() {
-      return this.$store.state.itemsPresupuesto;
-    },
-    subtotalProductosUSD() {
-      return this.itemsPresupuesto
-        .reduce((sum, item) => {
-          return sum + (parseFloat(item.netoUSD) * item.cantidad);
-        }, 0);
-    },
-    subtotalManoObraUSD() {
-      return this.itemsManoObra
-        .reduce((sum, item) => {
-          return sum + parseFloat(item.precioUSD || 0);
-        }, 0);
-    },
-    subtotalUSD() {
-      return (this.subtotalProductosUSD + this.subtotalManoObraUSD)
-        .toFixed(2);
-    },
-    ivaUSD() {
-      return (parseFloat(this.subtotalUSD) * this.ivaSeleccionado / 100)
-        .toFixed(2);
-    },
-    totalUSD() {
-      return (parseFloat(this.subtotalUSD) + parseFloat(this.ivaUSD))
-        .toFixed(2);
-    },
-    totalARS() {
-      const cotizacion = 1460;
-      return (parseFloat(this.totalUSD) * cotizacion)
-        .toLocaleString('es-AR', { 
-          minimumFractionDigits: 2, 
-          maximumFractionDigits: 2 
-        });
-    }
-  },
+    await transporter.sendMail({
+      from: process.env.GMAIL_USER,
+      to: "pansapablo@gmail.com",
+      subject: `📊 Reporte de Búsquedas - ${mesNombre}`,
+      html: htmlEmail,
+    });
 
-  async mounted() {
-    await this.cargarVendedores();
-    await this.cargarDatosCliente();
-  },
+    // Limpiar búsquedas del mes anterior (opcional)
+    // writeJSON(BUSQUEDAS_FILE, []);
 
-  methods: {
-    async cargarVendedores() {
-      try {
-        const response = await fetch('/api/vendedores');
-        this.vendedores = await response.json();
-      } catch (error) {
-        console.error('Error cargando vendedores:', error);
-      }
-    },
-
-    async cargarDatosCliente() {
-      const usuarioId = this.$store.state.usuarioId;
-      if (!usuarioId || usuarioId === 0) return;
-
-      try {
-        const response = await fetch(`/api/cliente/${usuarioId}`);
-        const data = await response.json();
-        if (data.logo) {
-          this.logoPreview = data.logo;
-        }
-        if (data.vendedorId) {
-          this.vendedorSeleccionado = data.vendedorId;
-        }
-      } catch (error) {
-        console.error('Error cargando datos cliente:', error);
-      }
-    },
-
-    onLogoSelected(event) {
-      const file = event.target.files[0];
-      if (!file) return;
-
-      const reader = new FileReader();
-      reader.onload = async (e) => {
-        this.logoPreview = e.target.result;
-        await this.guardarLogo(e.target.result);
-      };
-      reader.readAsDataURL(file);
-    },
-
-    async guardarLogo(logoBase64) {
-      const usuarioId = this.$store.state.usuarioId;
-      if (!usuarioId || usuarioId === 0) return;
-
-      try {
-        await fetch(`/api/cliente/${usuarioId}/logo`, {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ logo: logoBase64 })
-        });
-      } catch (error) {
-        console.error('Error guardando logo:', error);
-      }
-    },
-
-    async eliminarLogo() {
-      this.logoPreview = '';
-      await this.guardarLogo('');
-    },
-
-    async guardarVendedor() {
-      const usuarioId = this.$store.state.usuarioId;
-      if (!usuarioId || usuarioId === 0) return;
-
-      try {
-        await fetch(`/api/cliente/${usuarioId}/vendedor`, {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ 
-            vendedorId: this.vendedorSeleccionado 
-          })
-        });
-      } catch (error) {
-        console.error('Error guardando vendedor:', error);
-      }
-    },
-
-    agregarManoObra() {
-      if (!this.nuevaManoObra.descripcion) return;
-
-      this.itemsManoObra.push({
-        descripcion: this.nuevaManoObra.descripcion,
-        precioUSD: parseFloat(this.nuevaManoObra.precioUSD) || 0
-      });
-
-      this.nuevaManoObra = { descripcion: '', precioUSD: '' };
-    },
-
-    eliminarManoObra(idx) {
-      this.itemsManoObra.splice(idx, 1);
-    },
-
-    actualizarCantidad(item) {
-      if (item.cantidad < 1) item.cantidad = 1;
-      this.$store.commit('updateCantidadPresupuesto', {
-        id: item.id,
-        cantidad: item.cantidad
-      });
-    },
-
-    eliminarItem(id) {
-      this.$store.commit('removeItemPresupuesto', id);
-    },
-
-    limpiarPresupuesto() {
-      if (confirm('¿Seguro que querés limpiar todo el presupuesto?')) {
-        this.$store.commit('clearPresupuesto');
-        this.itemsManoObra = [];
-      }
-    },
-
-    calcularTotalItem(item, moneda) {
-      const precio = moneda === 'USD' 
-        ? parseFloat(item.netoUSD) 
-        : parseFloat(item.netoARS);
-      return (precio * item.cantidad).toFixed(2);
-    },
-
-    generarPDF() {
-      this.generandoPDF = true;
-
-      try {
-        const doc = new jsPDF();
-        const fechaHoy = new Date().toLocaleDateString('es-AR');
-        const pageWidth = doc.internal.pageSize.getWidth();
-        const pageHeight = doc.internal.pageSize.getHeight();
-
-        // Colores fijos: negro y dorado
-        const negro = [30, 30, 30];
-        const dorado = [212, 175, 55];
-
-        // === HEADER NEGRO ===
-        doc.setFillColor(negro[0], negro[1], negro[2]);
-        doc.rect(0, 0, pageWidth, 55, 'F');
-
-        // Logo del cliente
-        let xTexto = 20;
-        if (this.logoPreview && this.logoPreview.length > 100) {
-          try {
-            // Fondo blanco para logo
-            doc.setFillColor(255, 255, 255);
-            doc.roundedRect(12, 8, 38, 38, 3, 3, 'F');
-
-            let formato = 'JPEG';
-            if (this.logoPreview.includes('data:image/png')) {
-              formato = 'PNG';
-            } else if (this.logoPreview.includes('data:image/gif')) {
-              formato = 'GIF';
-            }
-            doc.addImage(this.logoPreview, formato, 14, 10, 34, 34);
-            xTexto = 58;
-          } catch (e) {
-            console.log('Error agregando logo al PDF:', e);
-            xTexto = 20;
-          }
-        }
-
-        // Nombre del cliente final (grande)
-        const nombrePDF = this.nombreClienteFinal || 'PRESUPUESTO';
-        doc.setTextColor(255, 255, 255);
-        doc.setFontSize(24);
-        doc.setFont('helvetica', 'bold');
-        doc.text(nombrePDF.toUpperCase(), xTexto, 28);
-
-        // Línea dorada decorativa
-        doc.setDrawColor(dorado[0], dorado[1], dorado[2]);
-        doc.setLineWidth(2);
-        doc.line(xTexto, 34, xTexto + 70, 34);
-
-        // Cuadro de fecha
-        doc.setFillColor(255, 255, 255);
-        doc.roundedRect(pageWidth - 45, 12, 35, 30, 2, 2, 'F');
-        doc.setTextColor(negro[0], negro[1], negro[2]);
-        doc.setFontSize(8);
-        doc.setFont('helvetica', 'bold');
-        doc.text('FECHA', pageWidth - 27.5, 22, { align: 'center' });
-        doc.setFontSize(11);
-        doc.text(fechaHoy, pageWidth - 27.5, 35, { align: 'center' });
-
-        let yPos = 70;
-
-        // Vendedor
-        if (this.vendedorSeleccionado) {
-          const vendedor = this.vendedores.find(
-            v => v.id === this.vendedorSeleccionado
-          );
-          if (vendedor) {
-            doc.setTextColor(100, 100, 100);
-            doc.setFontSize(10);
-            doc.setFont('helvetica', 'normal');
-            doc.text(`Vendedor: ${vendedor.nombre}`, 15, yPos);
-            yPos += 15;
-          }
-        }
-
-        // === TABLA DE PRODUCTOS ===
-        if (this.itemsPresupuesto.length > 0) {
-          // Título con subrayado dorado
-          doc.setTextColor(negro[0], negro[1], negro[2]);
-          doc.setFontSize(12);
-          doc.setFont('helvetica', 'bold');
-          doc.text('DETALLE DE PRODUCTOS', 15, yPos);
-          doc.setDrawColor(dorado[0], dorado[1], dorado[2]);
-          doc.setLineWidth(1);
-          doc.line(15, yPos + 2, 78, yPos + 2);
-          yPos += 10;
-
-          const productosData = this.itemsPresupuesto.map(item => {
-            let nombre = item.producto.replace(/\*\*/g, '');
-            if (nombre.length > 40) {
-              nombre = nombre.substring(0, 40) + '...';
-            }
-            return [
-              nombre,
-              item.marca,
-              item.cantidad.toString(),
-              `$ ${parseFloat(item.netoUSD).toFixed(2)}`,
-              `$ ${(parseFloat(item.netoUSD) * item.cantidad).toFixed(2)}`
-            ];
-          });
-
-          autoTable(doc, {
-            startY: yPos,
-            head: [['Producto', 'Marca', 'Cant.', 'Unitario', 'Total']],
-            body: productosData,
-            theme: 'plain',
-            headStyles: { 
-              fillColor: [245, 245, 245],
-              textColor: negro,
-              fontStyle: 'bold',
-              fontSize: 9,
-              cellPadding: 5
-            },
-            bodyStyles: { 
-              fontSize: 9,
-              cellPadding: 5
-            },
-            columnStyles: {
-              0: { cellWidth: 65 },
-              1: { cellWidth: 30 },
-              2: { cellWidth: 18, halign: 'center' },
-              3: { cellWidth: 28, halign: 'right' },
-              4: { cellWidth: 28, halign: 'right', fontStyle: 'bold' }
-            },
-            alternateRowStyles: { fillColor: [252, 252, 252] }
-          });
-
-          yPos = doc.lastAutoTable.finalY + 15;
-        }
-
-        // === TABLA DE MANO DE OBRA ===
-        if (this.itemsManoObra.length > 0) {
-          doc.setTextColor(negro[0], negro[1], negro[2]);
-          doc.setFontSize(12);
-          doc.setFont('helvetica', 'bold');
-          doc.text('SERVICIOS ADICIONALES', 15, yPos);
-          doc.setDrawColor(dorado[0], dorado[1], dorado[2]);
-          doc.setLineWidth(1);
-          doc.line(15, yPos + 2, 73, yPos + 2);
-          yPos += 10;
-
-          const manoObraData = this.itemsManoObra.map(item => [
-            item.descripcion,
-            `$ ${parseFloat(item.precioUSD).toFixed(2)}`
-          ]);
-
-          autoTable(doc, {
-            startY: yPos,
-            head: [['Descripción', 'Precio USD']],
-            body: manoObraData,
-            theme: 'plain',
-            headStyles: { 
-              fillColor: [245, 245, 245],
-              textColor: negro,
-              fontStyle: 'bold',
-              fontSize: 9,
-              cellPadding: 5
-            },
-            bodyStyles: { 
-              fontSize: 9,
-              cellPadding: 5
-            },
-            columnStyles: {
-              0: { cellWidth: 120 },
-              1: { cellWidth: 40, halign: 'right', fontStyle: 'bold' }
-            }
-          });
-
-          yPos = doc.lastAutoTable.finalY + 15;
-        }
-
-        // === OBSERVACIONES ===
-        if (this.observaciones && this.observaciones.trim()) {
-          doc.setTextColor(dorado[0], dorado[1], dorado[2]);
-          doc.setFontSize(11);
-          doc.setFont('helvetica', 'bold');
-          doc.text('OBSERVACIONES', 15, yPos);
-          yPos += 6;
-
-          doc.setTextColor(60, 60, 60);
-          doc.setFontSize(10);
-          doc.setFont('helvetica', 'normal');
-          const lineas = doc.splitTextToSize(this.observaciones, 120);
-          doc.text(lineas, 15, yPos);
-          yPos += (lineas.length * 5) + 10;
-        }
-
-        // === CUADRO DE TOTALES ===
-        const totalesY = Math.max(yPos + 5, 185);
-        const totalesX = pageWidth - 80;
-        const totalesW = 65;
-
-        // Fondo negro
-        doc.setFillColor(negro[0], negro[1], negro[2]);
-        doc.roundedRect(totalesX, totalesY, totalesW, 58, 3, 3, 'F');
-
-        // Subtotal
-        doc.setTextColor(180, 180, 180);
-        doc.setFontSize(9);
-        doc.setFont('helvetica', 'normal');
-        doc.text('Subtotal:', totalesX + 5, totalesY + 12);
-        doc.setTextColor(255, 255, 255);
-        doc.text(`$ ${this.subtotalUSD}`, totalesX + totalesW - 5, 
-          totalesY + 12, { align: 'right' });
-
-        // IVA
-        doc.setTextColor(180, 180, 180);
-        doc.text(`IVA ${this.ivaSeleccionado}%:`, totalesX + 5, totalesY + 22);
-        doc.setTextColor(255, 255, 255);
-        doc.text(`$ ${this.ivaUSD}`, totalesX + totalesW - 5, 
-          totalesY + 22, { align: 'right' });
-
-        // Línea dorada
-        doc.setDrawColor(dorado[0], dorado[1], dorado[2]);
-        doc.setLineWidth(1);
-        doc.line(totalesX + 5, totalesY + 28, 
-          totalesX + totalesW - 5, totalesY + 28);
-
-        // TOTAL USD
-        doc.setTextColor(dorado[0], dorado[1], dorado[2]);
-        doc.setFontSize(10);
-        doc.setFont('helvetica', 'bold');
-        doc.text('TOTAL USD', totalesX + 5, totalesY + 40);
-        doc.setFontSize(16);
-        doc.text(`$ ${this.totalUSD}`, totalesX + totalesW - 5, 
-          totalesY + 40, { align: 'right' });
-
-        // ARS
-        doc.setTextColor(160, 160, 160);
-        doc.setFontSize(9);
-        doc.setFont('helvetica', 'normal');
-        doc.text(`ARS $ ${this.totalARS}`, totalesX + totalesW - 5, 
-          totalesY + 52, { align: 'right' });
-
-        // === FOOTER NEGRO ===
-        doc.setFillColor(negro[0], negro[1], negro[2]);
-        doc.rect(0, pageHeight - 15, pageWidth, 15, 'F');
-
-        doc.setTextColor(160, 160, 160);
-        doc.setFontSize(8);
-        doc.setFont('helvetica', 'normal');
-        doc.text(
-          'Presupuesto válido por 7 días | ' +
-          'Precios sujetos a modificación sin previo aviso',
-          pageWidth / 2,
-          pageHeight - 6,
-          { align: 'center' }
-        );
-
-        // === NOMBRE ARCHIVO ===
-        let nombreArchivo = `presupuesto_${fechaHoy.replace(/\//g, '-')}.pdf`;
-        if (this.nombreClienteFinal) {
-          const nombreLimpio = this.nombreClienteFinal
-            .replace(/[^a-zA-Z0-9\s]/g, '')
-            .replace(/\s+/g, '_')
-            .toLowerCase();
-          nombreArchivo = `presupuesto_${nombreLimpio}_` +
-            `${fechaHoy.replace(/\//g, '-')}.pdf`;
-        }
-
-        // === DESCARGAR PDF ===
-        doc.save(nombreArchivo);
-        this.$alertify.success('PDF generado correctamente');
-
-        // === ENVIAR EMAIL EN BACKGROUND ===
-        // El email lleva el nombre del usuario LOGUEADO (no el cliente final)
-        const pdfBase64 = doc.output('datauristring').split(',')[1];
-        fetch('/api/enviar-presupuesto', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({
-            pdfBase64,
-            nombreCliente: this.usuarioLogueado,
-            clienteFinal: this.nombreClienteFinal,
-            totalUSD: this.totalUSD,
-            totalARS: this.totalARS,
-            emailDestino: 'pansapablo@gmail.com'
-          })
-        })
-        .then(res => res.json())
-        .then(data => {
-          if (data.success) {
-            this.$alertify.success('Email enviado al vendedor');
-          }
-        })
-        .catch(err => {
-          console.error('Error enviando email:', err);
-        });
-
-      } catch (error) {
-        console.error('Error generando PDF:', error);
-        this.$alertify.error('Error al generar el PDF: ' + error.message);
-      } finally {
-        this.generandoPDF = false;
-      }
-    }
+    res.json({
+      success: true,
+      message: "Reporte enviado",
+      stats: {
+        totalBusquedas: busquedasMes.length,
+        clientesActivos: clientesOrdenados.length,
+        topTerminos: topTerminos.slice(0, 5),
+      },
+    });
+  } catch (error) {
+    console.error("Error generando reporte:", error);
+    res.status(500).json({
+      success: false,
+      message: error.message,
+    });
   }
-}
-</script>
+});
 
-<style scoped>
-.centered-input >>> input {
-  text-align: center;
-}
-</style>
+// Health check
+app.get("/api/health", (req, res) => {
+  res.json({ status: "ok", timestamp: new Date().toISOString() });
+});
+
+// POST /api/enviar-presupuesto
+app.post("/api/enviar-presupuesto", async (req, res) => {
+  const {
+    pdfBase64,
+    nombreCliente,
+    clienteFinal,
+    totalUSD,
+    totalARS,
+    emailDestino,
+  } = req.body;
+
+  try {
+    const transporter = nodemailer.createTransport({
+      service: "gmail",
+      auth: {
+        user: process.env.GMAIL_USER,
+        pass: process.env.GMAIL_APP_PASSWORD,
+      },
+    });
+
+    const fechaHoy = new Date().toLocaleDateString("es-AR");
+
+    let nombreArchivo;
+    if (clienteFinal) {
+      nombreArchivo = `presupuesto_${clienteFinal.replace(
+        /\s+/g,
+        "_",
+      )}_${fechaHoy.replace(/\//g, "-")}.pdf`;
+    } else if (nombreCliente) {
+      nombreArchivo = `presupuesto_${nombreCliente.replace(
+        /\s+/g,
+        "_",
+      )}_${fechaHoy.replace(/\//g, "-")}.pdf`;
+    } else {
+      nombreArchivo = `presupuesto_${fechaHoy.replace(/\//g, "-")}.pdf`;
+    }
+
+    const mailOptions = {
+      from: process.env.GMAIL_USER,
+      to: emailDestino || "pansapablo@gmail.com",
+      subject: `Nuevo Presupuesto - ${nombreCliente || "Cliente"} - ${fechaHoy}`,
+      html: `
+        <div style="font-family: Arial, sans-serif; max-width: 600px; 
+                    margin: 0 auto;">
+          <div style="background-color: #1e1e1e; color: white; 
+                      padding: 20px; text-align: center;">
+            <h2 style="margin: 0; color: #d4af37;">
+              Nuevo Presupuesto Generado
+            </h2>
+          </div>
+
+          <div style="padding: 20px; background-color: #f5f5f5;">
+            <table style="width: 100%; border-collapse: collapse;">
+              <tr>
+                <td style="padding: 10px; border-bottom: 1px solid #ddd;">
+                  <strong>Generado por:</strong>
+                </td>
+                <td style="padding: 10px; border-bottom: 1px solid #ddd;">
+                  ${nombreCliente || "No especificado"}
+                </td>
+              </tr>
+              <tr>
+                <td style="padding: 10px; border-bottom: 1px solid #ddd;">
+                  <strong>Cliente final:</strong>
+                </td>
+                <td style="padding: 10px; border-bottom: 1px solid #ddd;">
+                  ${clienteFinal || "No especificado"}
+                </td>
+              </tr>
+              <tr>
+                <td style="padding: 10px; border-bottom: 1px solid #ddd;">
+                  <strong>Fecha:</strong>
+                </td>
+                <td style="padding: 10px; border-bottom: 1px solid #ddd;">
+                  ${fechaHoy}
+                </td>
+              </tr>
+              <tr>
+                <td style="padding: 10px; border-bottom: 1px solid #ddd;">
+                  <strong>Total USD:</strong>
+                </td>
+                <td style="padding: 10px; border-bottom: 1px solid #ddd; 
+                    color: #2e7d32; font-weight: bold;">
+                  $${totalUSD}
+                </td>
+              </tr>
+              <tr>
+                <td style="padding: 10px;">
+                  <strong>Total ARS:</strong>
+                </td>
+                <td style="padding: 10px; color: #1565c0; font-weight: bold;">
+                  $${totalARS}
+                </td>
+              </tr>
+            </table>
+          </div>
+
+          <div style="padding: 15px; background-color: #1e1e1e; 
+                      color: #888; text-align: center; font-size: 12px;">
+            Se adjunta el PDF del presupuesto.<br>
+            Email enviado automáticamente desde IDSR - Fortia
+          </div>
+        </div>
+      `,
+      attachments: [
+        {
+          filename: nombreArchivo,
+          content: pdfBase64,
+          encoding: "base64",
+        },
+      ],
+    };
+
+    await transporter.sendMail(mailOptions);
+    res.json({ success: true, message: "Email enviado correctamente" });
+  } catch (error) {
+    console.error("Error enviando email:", error);
+    res.status(500).json({
+      success: false,
+      message: "Error al enviar email",
+      error: error.message,
+    });
+  }
+});
+
+app.listen(PORT, "0.0.0.0", () => {
+  console.log(`Backend IDSR corriendo en puerto ${PORT}`);
+});

@@ -282,10 +282,16 @@ export default {
     opacity: 1;
     border-bottom: 3px solid #1976D2;
     padding-bottom: 4px;
+    height: 50px;
+    display: flex;
+    align-items: center;
 }
 
 .pointer {
     transition: opacity 0.2s ease;
+    height: 50px;
+    display: flex;
+    align-items: center;
 }
 
 .pointer:not(.logo-activo) {
