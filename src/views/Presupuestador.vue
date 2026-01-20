@@ -330,6 +330,7 @@
 <script>
 import jsPDF from 'jspdf';
 import autoTable from 'jspdf-autotable';
+import ColorThief from 'colorthief';
 
 export default {
   name: 'PresupuestadorView',
@@ -352,7 +353,9 @@ export default {
         descripcion: '',
         precioUSD: ''
       },
-      generandoPDF: false
+      generandoPDF: false,
+      colorPrimario: [30, 30, 30],
+      colorSecundario: [212, 175, 55]
     }
   },
 
@@ -421,6 +424,9 @@ export default {
         const data = await response.json();
         if (data.logo) {
           this.logoPreview = data.logo;
+          this.$nextTick(() => {
+            this.extraerColoresLogo();
+          });
         }
         if (data.vendedorId) {
           this.vendedorSeleccionado = data.vendedorId;
@@ -438,8 +444,41 @@ export default {
       reader.onload = async (e) => {
         this.logoPreview = e.target.result;
         await this.guardarLogo(e.target.result);
+        this.extraerColoresLogo();
       };
       reader.readAsDataURL(file);
+    },
+
+    extraerColoresLogo() {
+      if (!this.logoPreview) return;
+      
+      const img = new Image();
+      img.crossOrigin = 'Anonymous';
+      img.src = this.logoPreview;
+      
+      img.onload = () => {
+        try {
+          const colorThief = new ColorThief();
+          const palette = colorThief.getPalette(img, 5);
+          
+          if (palette && palette.length >= 2) {
+            let primario = palette[0];
+            let secundario = palette[1];
+            
+            // Si el primario es muy claro, usar el siguiente
+            const lum = (0.299*primario[0] + 0.587*primario[1] + 0.114*primario[2]) / 255;
+            if (lum > 0.7 && palette[1]) {
+              primario = palette[1];
+              secundario = palette[2] || [212, 175, 55];
+            }
+            
+            this.colorPrimario = primario;
+            this.colorSecundario = secundario;
+          }
+        } catch (err) {
+          console.log('ColorThief error:', err);
+        }
+      };
     },
 
     async guardarLogo(logoBase64) {
@@ -529,9 +568,9 @@ export default {
         const pageWidth = doc.internal.pageSize.getWidth();
         const pageHeight = doc.internal.pageSize.getHeight();
 
-        // Colores fijos: negro y dorado
-        const negro = [30, 30, 30];
-        const dorado = [212, 175, 55];
+        // Colores del logo o default negro/dorado
+        const negro = this.colorPrimario;
+        const dorado = this.colorSecundario;
 
         // === HEADER NEGRO ===
         doc.setFillColor(negro[0], negro[1], negro[2]);
