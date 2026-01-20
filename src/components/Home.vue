@@ -6,8 +6,8 @@
                     :src="logoSucursal" 
                     class="mx-auto mb-4" 
                     contain 
-                    max-height="160"
-                    max-width="160"
+                    max-height="180"
+                    max-width="400"
                 />
                 <h1 class="text-h4 text-md-h3 font-weight-bold mb-2">
                     Bienvenido a
@@ -208,7 +208,7 @@ export default {
             },
             1: {
                 nombre: 'ISENOA',
-                logo: require('../assets/img/logo_isenoa.png'),
+                logo: '/logos/Isenoa.png',
                 direccion: 'Consultar dirección',
                 direccion2: '',
                 ciudad: 'Tucumán',
