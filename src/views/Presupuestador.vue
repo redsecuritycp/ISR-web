@@ -36,20 +36,14 @@
             prepend-inner-icon="mdi-domain"
             placeholder="Ej: Seguridad Total SRL"
             class="mb-3"
+            disabled
           ></v-text-field>
 
           <div class="mb-4">
-            <label class="subtitle-2">Logo de tu empresa</label>
+            <label class="subtitle-2">Logo de la empresa</label>
             <div class="d-flex align-center mt-2">
-              <v-avatar 
-                size="80" 
-                class="mr-4" 
-                color="grey lighten-3"
-              >
-                <v-img 
-                  v-if="logoPreview" 
-                  :src="logoPreview"
-                ></v-img>
+              <v-avatar size="80" class="mr-4" color="grey lighten-3">
+                <v-img v-if="logoPreview" :src="logoPreview"></v-img>
                 <v-icon v-else size="40">mdi-image-plus</v-icon>
               </v-avatar>
               <div>
@@ -90,6 +84,7 @@
             outlined
             dense
             prepend-inner-icon="mdi-account-tie"
+            @change="guardarVendedor"
           ></v-select>
 
           <v-select
@@ -388,8 +383,7 @@ export default {
 
   data() {
     return {
-      nombreCliente: localStorage.getItem('nombreCliente') || '',
-      observaciones: localStorage.getItem('observaciones') || '',
+      nombreCliente: '',
       logoPreview: '',
       vendedorSeleccionado: null,
       vendedores: [],
@@ -399,6 +393,7 @@ export default {
         { texto: '10.5%', valor: 10.5 },
         { texto: 'Exento (0%)', valor: 0 }
       ],
+      observaciones: localStorage.getItem('observaciones') || '',
       itemsManoObra: [],
       mostrarDialogManoObra: false,
       nuevaManoObra: {
@@ -445,15 +440,15 @@ export default {
   },
 
   watch: {
-    nombreCliente(val) {
-      localStorage.setItem('nombreCliente', val);
-    },
     observaciones(val) {
       localStorage.setItem('observaciones', val);
     }
   },
 
   async mounted() {
+    // Obtener nombre del cliente desde el store
+    this.nombreCliente = this.$store.state.usuario || '';
+
     await this.cargarVendedores();
     await this.cargarDatosCliente();
     await this.obtenerCotizacionDolar();
@@ -534,6 +529,23 @@ export default {
       await this.guardarLogo('');
     },
 
+    async guardarVendedor() {
+      const usuarioId = this.$store.state.usuarioId;
+      if (!usuarioId || usuarioId === 0) return;
+
+      try {
+        await fetch(`/api/cliente/${usuarioId}/vendedor`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ 
+            vendedorId: this.vendedorSeleccionado 
+          })
+        });
+      } catch (error) {
+        console.error('Error guardando vendedor:', error);
+      }
+    },
+
     actualizarCantidad(item) {
       if (item.cantidad < 1) item.cantidad = 1;
       this.$store.commit('updateCantidadPresupuesto', {
@@ -547,7 +559,9 @@ export default {
     },
 
     limpiarPresupuesto() {
-      if (confirm('¿Seguro que querés limpiar todo el presupuesto?')) {
+      if (confirm(
+        '¿Seguro que querés limpiar todo el presupuesto?'
+      )) {
         this.$store.commit('clearPresupuesto');
         this.itemsManoObra = [];
         this.guardarManoObra();
@@ -578,7 +592,9 @@ export default {
     },
 
     eliminarManoObra(id) {
-      this.itemsManoObra = this.itemsManoObra.filter(i => i.id !== id);
+      this.itemsManoObra = this.itemsManoObra.filter(
+        i => i.id !== id
+      );
       this.guardarManoObra();
     },
 
@@ -600,14 +616,7 @@ export default {
       }
     },
 
-    formatearNumero(numero) {
-      return parseFloat(numero).toLocaleString('es-AR', {
-        minimumFractionDigits: 2,
-        maximumFractionDigits: 2
-      });
-    },
-
-    generarPDF() {
+    async generarPDF() {
       const doc = new jsPDF();
       const fechaHoy = new Date().toLocaleDateString('es-AR');
       const pageWidth = doc.internal.pageSize.getWidth();
@@ -616,7 +625,6 @@ export default {
       const negro = [25, 25, 25];
       const dorado = [184, 157, 102];
       const doradoClaro = [212, 192, 150];
-      const grisMuyClaro = [250, 250, 250];
       const grisTexto = [80, 80, 80];
 
       // === HEADER NEGRO ===
@@ -670,7 +678,6 @@ export default {
 
       // === PRODUCTOS ===
       if (this.itemsPresupuesto.length > 0) {
-        // Título con línea dorada
         doc.setFontSize(11);
         doc.setTextColor(dorado[0], dorado[1], dorado[2]);
         doc.setFont('helvetica', 'bold');
@@ -698,43 +705,34 @@ export default {
           startY: yPos,
           head: [['Producto', 'Marca', 'Cant.', 'Unitario', 'Total']],
           body: productosData,
-          theme: 'plain',
-          headStyles: {
+          theme: 'grid',
+          headStyles: { 
             fillColor: negro,
             textColor: [255, 255, 255],
             fontSize: 9,
             fontStyle: 'bold',
-            cellPadding: 4
+            halign: 'center'
           },
-          bodyStyles: {
-            fontSize: 9,
-            cellPadding: 4,
-            textColor: grisTexto,
-            lineColor: [230, 230, 230],
-            lineWidth: 0.1
+          bodyStyles: { 
+            fontSize: 8,
+            cellPadding: 3
           },
           columnStyles: {
-            0: { cellWidth: 68 },
-            1: { cellWidth: 28, halign: 'center' },
-            2: { cellWidth: 16, halign: 'center' },
-            3: { cellWidth: 28, halign: 'right' },
-            4: { 
-              cellWidth: 30, 
-              halign: 'right', 
-              fontStyle: 'bold',
-              textColor: negro
-            }
+            0: { cellWidth: 70 },
+            1: { cellWidth: 25, halign: 'center' },
+            2: { cellWidth: 15, halign: 'center' },
+            3: { cellWidth: 30, halign: 'right' },
+            4: { cellWidth: 30, halign: 'right', fontStyle: 'bold' }
           },
           alternateRowStyles: {
-            fillColor: grisMuyClaro
-          },
-          margin: { left: 15, right: 15 }
+            fillColor: [250, 250, 250]
+          }
         });
 
         yPos = doc.lastAutoTable.finalY + 10;
       }
 
-      // === SERVICIOS ===
+      // === MANO DE OBRA ===
       if (this.itemsManoObra.length > 0) {
         doc.setFontSize(11);
         doc.setTextColor(dorado[0], dorado[1], dorado[2]);
@@ -745,81 +743,70 @@ export default {
         doc.line(15, yPos + 2, 65, yPos + 2);
         yPos += 6;
 
-        const manoObraData = this.itemsManoObra.map(item => {
-          return [
-            item.descripcion,
-            '$ ' + parseFloat(item.precioUSD).toFixed(2)
-          ];
-        });
+        const manoObraData = this.itemsManoObra.map(item => [
+          item.descripcion,
+          '$ ' + parseFloat(item.precioUSD).toFixed(2)
+        ]);
 
         autoTable(doc, {
           startY: yPos,
           head: [['Descripción', 'Precio USD']],
           body: manoObraData,
-          theme: 'plain',
-          headStyles: {
+          theme: 'grid',
+          headStyles: { 
             fillColor: negro,
             textColor: [255, 255, 255],
             fontSize: 9,
-            fontStyle: 'bold',
-            cellPadding: 4
+            fontStyle: 'bold'
           },
-          bodyStyles: {
-            fontSize: 9,
-            cellPadding: 4,
-            textColor: grisTexto
+          bodyStyles: { 
+            fontSize: 8,
+            cellPadding: 3
           },
           columnStyles: {
             0: { cellWidth: 140 },
-            1: { 
-              cellWidth: 30, 
-              halign: 'right', 
-              fontStyle: 'bold',
-              textColor: negro
-            }
+            1: { cellWidth: 30, halign: 'right', fontStyle: 'bold' }
           },
           alternateRowStyles: {
-            fillColor: grisMuyClaro
-          },
-          margin: { left: 15, right: 15 }
+            fillColor: [250, 250, 250]
+          }
         });
 
         yPos = doc.lastAutoTable.finalY + 10;
       }
 
       // === OBSERVACIONES ===
-      if (this.observaciones && this.observaciones.trim().length > 0) {
-        yPos += 3;
-
-        doc.setFontSize(9);
+      if (this.observaciones && this.observaciones.trim()) {
+        doc.setFontSize(11);
         doc.setTextColor(dorado[0], dorado[1], dorado[2]);
         doc.setFont('helvetica', 'bold');
         doc.text('OBSERVACIONES', 15, yPos);
+        doc.setDrawColor(dorado[0], dorado[1], dorado[2]);
+        doc.setLineWidth(0.5);
+        doc.line(15, yPos + 2, 55, yPos + 2);
 
-        doc.setDrawColor(doradoClaro[0], doradoClaro[1], doradoClaro[2]);
-        doc.setLineWidth(0.3);
+        yPos += 8;
+        const obsLines = doc.splitTextToSize(
+          this.observaciones, 
+          pageWidth - 30
+        );
 
-        const obsLines = doc.splitTextToSize(this.observaciones, 120);
-
-        yPos += 5;
         doc.setFont('helvetica', 'normal');
         doc.setTextColor(grisTexto[0], grisTexto[1], grisTexto[2]);
         doc.setFontSize(9);
         doc.text(obsLines, 15, yPos);
 
-        yPos += obsLines.length * 5 + 8;
+        yPos += obsLines.length * 5 + 10;
       }
 
-      // === CUADRO DE TOTALES NEGRO CON DORADO ===
-      const totY = Math.max(yPos + 5, 190);
+      // === CUADRO DE TOTALES ===
+      const totY = Math.max(yPos + 5, 180);
       const boxX = pageWidth - 75;
       const boxW = 60;
 
-      // Fondo negro
       doc.setFillColor(negro[0], negro[1], negro[2]);
       doc.roundedRect(boxX, totY, boxW, 50, 3, 3, 'F');
 
-      // Borde dorado
       doc.setDrawColor(dorado[0], dorado[1], dorado[2]);
       doc.setLineWidth(1);
       doc.roundedRect(boxX, totY, boxW, 50, 3, 3, 'S');
@@ -838,13 +825,11 @@ export default {
       doc.text('$ ' + this.ivaUSD, boxX + boxW - 5, tY, 
         { align: 'right' });
 
-      // Línea dorada
       tY += 6;
       doc.setDrawColor(dorado[0], dorado[1], dorado[2]);
       doc.setLineWidth(0.5);
       doc.line(boxX + 5, tY, boxX + boxW - 5, tY);
 
-      // Total USD grande
       tY += 10;
       doc.setFontSize(10);
       doc.setTextColor(dorado[0], dorado[1], dorado[2]);
@@ -855,7 +840,6 @@ export default {
       doc.text('$ ' + this.totalUSD, boxX + boxW - 5, tY, 
         { align: 'right' });
 
-      // Total ARS
       tY += 9;
       doc.setFontSize(8);
       doc.setTextColor(doradoClaro[0], doradoClaro[1], doradoClaro[2]);
@@ -871,13 +855,14 @@ export default {
       doc.setTextColor(doradoClaro[0], doradoClaro[1], doradoClaro[2]);
       doc.setFont('helvetica', 'normal');
       doc.text(
-        'Presupuesto válido por 7 días  |  Precios sujetos a modificación sin previo aviso',
+        'Presupuesto válido por 7 días  |  ' +
+        'Precios sujetos a modificación sin previo aviso',
         pageWidth / 2,
         289,
         { align: 'center' }
       );
 
-      // === GUARDAR ===
+      // === NOMBRE ARCHIVO ===
       let nombreArchivo = 'presupuesto_' + 
         fechaHoy.replace(/\//g, '-') + '.pdf';
       if (this.nombreCliente && this.nombreCliente.length > 0) {
@@ -887,7 +872,36 @@ export default {
         nombreArchivo = 'presupuesto_' + nombreLimpio + '_' + 
           fechaHoy.replace(/\//g, '-') + '.pdf';
       }
+
+      // === ENVIAR EMAIL ===
+      try {
+        const pdfBase64 = doc.output('datauristring').split(',')[1];
+        await fetch('/api/enviar-presupuesto', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            pdfBase64,
+            nombreCliente: this.nombreCliente,
+            totalUSD: this.totalUSD,
+            totalARS: this.totalARS,
+            emailDestino: 'pansapablo@gmail.com'
+          })
+        });
+        this.$alertify.success('Presupuesto enviado por email');
+      } catch (emailError) {
+        console.error('Error enviando email:', emailError);
+        this.$alertify.warning('PDF generado pero no se pudo enviar email');
+      }
+
+      // === GUARDAR PDF ===
       doc.save(nombreArchivo);
+    },
+
+    formatearNumero(numero) {
+      return parseFloat(numero).toLocaleString('es-AR', {
+        minimumFractionDigits: 2,
+        maximumFractionDigits: 2
+      });
     }
   }
 }

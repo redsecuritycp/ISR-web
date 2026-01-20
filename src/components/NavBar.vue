@@ -1,6 +1,6 @@
 <template>
 
-    <v-app-bar app flat>
+    <v-app-bar app flat elevation="0" color="white" style="border-bottom: none !important; box-shadow: none !important;">
 
         <!-- Menú lateral izquierdo -->
         <v-app-bar-nav-icon @click="showNavLeft()"></v-app-bar-nav-icon>
