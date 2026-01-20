@@ -1,167 +1,829 @@
-const express = require('express');
-const cors = require('cors');
-const fs = require('fs');
-const path = require('path');
-const nodemailer = require('nodemailer');
+<template>
+  <v-container>
+    <v-row>
+      <v-col cols="12">
+        <h1 class="text-h4 mb-4">
+          <v-icon left>mdi-file-document-outline</v-icon>
+          Presupuestador
+        </h1>
+      </v-col>
+    </v-row>
 
-const app = express();
-const PORT = 3001;
+    <!-- Datos del cliente -->
+    <v-row>
+      <v-col cols="12" md="6">
+        <v-card class="pa-4 mb-4">
+          <v-card-title class="pa-0 mb-3">
+            <v-icon left>mdi-account</v-icon>
+            Datos para el Presupuesto
+          </v-card-title>
 
-app.use(cors());
-app.use(express.json({ limit: '10mb' }));
+          <!-- Logo -->
+          <div class="mb-4">
+            <label class="subtitle-2">Logo de tu empresa</label>
+            <div class="d-flex align-center mt-2">
+              <v-avatar size="80" class="mr-4" color="grey lighten-3">
+                <v-img 
+                  v-if="logoPreview" 
+                  :src="logoPreview"
+                ></v-img>
+                <v-icon v-else size="40">mdi-image-plus</v-icon>
+              </v-avatar>
+              <div>
+                <v-btn 
+                  small 
+                  color="primary" 
+                  @click="$refs.logoInput.click()"
+                >
+                  Subir Logo
+                </v-btn>
+                <v-btn 
+                  v-if="logoPreview" 
+                  small 
+                  text 
+                  color="error" 
+                  @click="eliminarLogo"
+                  class="ml-2"
+                >
+                  Quitar
+                </v-btn>
+                <input
+                  ref="logoInput"
+                  type="file"
+                  accept="image/*"
+                  style="display: none"
+                  @change="onLogoSelected"
+                />
+              </div>
+            </div>
+          </div>
 
-const DATA_DIR = path.join(__dirname, 'data');
-const VENDEDORES_FILE = path.join(DATA_DIR, 'vendedores.json');
-const CLIENTES_FILE = path.join(DATA_DIR, 'clientes.json');
+          <!-- Nombre Cliente Final (editable) -->
+          <v-text-field
+            v-model="nombreClienteFinal"
+            label="Nombre del cliente (aparece en el PDF)"
+            outlined
+            dense
+            prepend-inner-icon="mdi-account-box"
+            placeholder="Ej: Juan Pérez / Empresa SRL"
+            class="mb-3"
+          ></v-text-field>
 
-// Helper para leer/escribir JSON
-const readJSON = (file) => {
-  try {
-    return JSON.parse(fs.readFileSync(file, 'utf8'));
-  } catch (e) {
-    return file.includes('clientes') ? {} : [];
-  }
-};
+          <!-- Vendedor -->
+          <v-select
+            v-model="vendedorSeleccionado"
+            :items="vendedores"
+            item-text="nombre"
+            item-value="id"
+            label="Vendedor asignado"
+            outlined
+            dense
+            prepend-inner-icon="mdi-account-tie"
+            @change="guardarVendedor"
+          ></v-select>
 
-const writeJSON = (file, data) => {
-  fs.writeFileSync(file, JSON.stringify(data, null, 2));
-};
+          <!-- IVA -->
+          <v-select
+            v-model="ivaSeleccionado"
+            :items="opcionesIva"
+            item-text="texto"
+            item-value="valor"
+            label="IVA a aplicar"
+            outlined
+            dense
+            prepend-inner-icon="mdi-percent"
+            class="mt-3"
+          ></v-select>
 
-// GET /api/vendedores - Lista de vendedores
-app.get('/api/vendedores', (req, res) => {
-  const vendedores = readJSON(VENDEDORES_FILE);
-  res.json(vendedores);
-});
+          <!-- Observaciones -->
+          <v-textarea
+            v-model="observaciones"
+            label="Observaciones (opcional)"
+            outlined
+            dense
+            rows="3"
+            prepend-inner-icon="mdi-note-text"
+            class="mt-3"
+          ></v-textarea>
+        </v-card>
+      </v-col>
 
-// GET /api/cliente/:usuarioId - Datos del cliente
-app.get('/api/cliente/:usuarioId', (req, res) => {
-  const { usuarioId } = req.params;
-  const clientes = readJSON(CLIENTES_FILE);
-  const cliente = clientes[usuarioId] || { 
-    logo: '', 
-    vendedorId: null,
-    sucursalId: 2
-  };
-  res.json(cliente);
-});
+      <!-- Resumen -->
+      <v-col cols="12" md="6">
+        <v-card class="pa-4 mb-4">
+          <v-card-title class="pa-0 mb-3">
+            <v-icon left>mdi-calculator</v-icon>
+            Resumen
+          </v-card-title>
+          <div class="d-flex justify-space-between mb-2">
+            <span>Usuario logueado:</span>
+            <strong>{{ usuarioLogueado }}</strong>
+          </div>
+          <div class="d-flex justify-space-between mb-2">
+            <span>Cliente en PDF:</span>
+            <strong>{{ nombreClienteFinal || '(sin definir)' }}</strong>
+          </div>
+          <v-divider class="my-2"></v-divider>
+          <div class="d-flex justify-space-between mb-2">
+            <span>Productos:</span>
+            <strong>{{ itemsPresupuesto.length }}</strong>
+          </div>
+          <div class="d-flex justify-space-between mb-2">
+            <span>Mano de obra:</span>
+            <strong>{{ itemsManoObra.length }}</strong>
+          </div>
+          <v-divider class="my-2"></v-divider>
+          <div class="d-flex justify-space-between mb-2">
+            <span>Subtotal USD:</span>
+            <strong>$ {{ subtotalUSD }}</strong>
+          </div>
+          <div class="d-flex justify-space-between mb-2">
+            <span>IVA ({{ ivaSeleccionado }}%):</span>
+            <strong>$ {{ ivaUSD }}</strong>
+          </div>
+          <v-divider class="my-2"></v-divider>
+          <div class="d-flex justify-space-between mb-2">
+            <span>Total USD:</span>
+            <strong class="green--text text-h6">
+              $ {{ totalUSD }}
+            </strong>
+          </div>
+          <div class="d-flex justify-space-between mb-4">
+            <span>Total ARS:</span>
+            <strong class="blue--text text-h6">
+              $ {{ totalARS }}
+            </strong>
+          </div>
+          <v-btn 
+            block 
+            color="success" 
+            :disabled="itemsPresupuesto.length === 0"
+            :loading="generandoPDF"
+            @click="generarPDF"
+            class="mb-2"
+          >
+            <v-icon left>mdi-file-pdf-box</v-icon>
+            GENERAR PDF
+          </v-btn>
+          <v-btn 
+            block 
+            outlined
+            color="primary" 
+            @click="$router.push('/productos')"
+          >
+            <v-icon left>mdi-cart-plus</v-icon>
+            Seguir comprando
+          </v-btn>
+        </v-card>
 
-// POST /api/cliente/:usuarioId/logo - Guardar logo
-app.post('/api/cliente/:usuarioId/logo', (req, res) => {
-  const { usuarioId } = req.params;
-  const { logo } = req.body;
-  
-  const clientes = readJSON(CLIENTES_FILE);
-  if (!clientes[usuarioId]) {
-    clientes[usuarioId] = { logo: '', vendedorId: null };
-  }
-  clientes[usuarioId].logo = logo;
-  writeJSON(CLIENTES_FILE, clientes);
-  
-  res.json({ success: true });
-});
+        <!-- Mano de obra -->
+        <v-card class="pa-4">
+          <v-card-title class="pa-0 mb-3">
+            <v-icon left>mdi-wrench</v-icon>
+            Mano de Obra / Servicios
+          </v-card-title>
+          <v-row dense>
+            <v-col cols="8">
+              <v-text-field
+                v-model="nuevaManoObra.descripcion"
+                label="Descripción"
+                outlined
+                dense
+              ></v-text-field>
+            </v-col>
+            <v-col cols="4">
+              <v-text-field
+                v-model="nuevaManoObra.precioUSD"
+                label="USD"
+                outlined
+                dense
+                type="number"
+                prefix="$"
+              ></v-text-field>
+            </v-col>
+          </v-row>
+          <v-btn 
+            small 
+            color="primary" 
+            @click="agregarManoObra"
+            :disabled="!nuevaManoObra.descripcion"
+          >
+            <v-icon left small>mdi-plus</v-icon>
+            Agregar
+          </v-btn>
+          <v-list dense v-if="itemsManoObra.length > 0" class="mt-3">
+            <v-list-item 
+              v-for="(item, idx) in itemsManoObra" 
+              :key="idx"
+            >
+              <v-list-item-content>
+                <v-list-item-title>
+                  {{ item.descripcion }}
+                </v-list-item-title>
+              </v-list-item-content>
+              <v-list-item-action>
+                <div class="d-flex align-center">
+                  <span class="mr-3">$ {{ item.precioUSD }}</span>
+                  <v-btn 
+                    icon 
+                    x-small 
+                    color="error"
+                    @click="eliminarManoObra(idx)"
+                  >
+                    <v-icon small>mdi-delete</v-icon>
+                  </v-btn>
+                </div>
+              </v-list-item-action>
+            </v-list-item>
+          </v-list>
+        </v-card>
+      </v-col>
+    </v-row>
 
-// POST /api/cliente/:usuarioId/vendedor - Asignar vendedor
-app.post('/api/cliente/:usuarioId/vendedor', (req, res) => {
-  const { usuarioId } = req.params;
-  const { vendedorId } = req.body;
-  
-  const clientes = readJSON(CLIENTES_FILE);
-  if (!clientes[usuarioId]) {
-    clientes[usuarioId] = { logo: '', vendedorId: null };
-  }
-  clientes[usuarioId].vendedorId = vendedorId;
-  writeJSON(CLIENTES_FILE, clientes);
-  
-  res.json({ success: true });
-});
+    <!-- Lista de productos -->
+    <v-row>
+      <v-col cols="12">
+        <v-card>
+          <v-card-title>
+            <v-icon left>mdi-cart</v-icon>
+            Productos en el presupuesto
+            <v-spacer></v-spacer>
+            <v-btn 
+              small 
+              text 
+              color="error" 
+              @click="limpiarPresupuesto"
+              v-if="itemsPresupuesto.length > 0"
+            >
+              <v-icon left small>mdi-delete</v-icon>
+              Limpiar todo
+            </v-btn>
+          </v-card-title>
+          <v-divider></v-divider>
 
-// POST /api/cliente/:usuarioId/sucursal - Guardar sucursal
-app.post('/api/cliente/:usuarioId/sucursal', (req, res) => {
-  const { usuarioId } = req.params;
-  const { sucursalId } = req.body;
-  
-  const clientes = readJSON(CLIENTES_FILE);
-  if (!clientes[usuarioId]) {
-    clientes[usuarioId] = { 
-      logo: '', 
-      vendedorId: null, 
-      sucursalId: 2 
-    };
-  }
-  clientes[usuarioId].sucursalId = sucursalId;
-  writeJSON(CLIENTES_FILE, clientes);
-  
-  res.json({ success: true });
-});
+          <v-card-text v-if="itemsPresupuesto.length === 0">
+            <v-alert type="info" text>
+              No hay productos en el presupuesto. 
+              Agregá productos desde el catálogo.
+            </v-alert>
+          </v-card-text>
 
-// Health check
-app.get('/api/health', (req, res) => {
-  res.json({ status: 'ok', timestamp: new Date().toISOString() });
-});
+          <v-simple-table v-else>
+            <template v-slot:default>
+              <thead>
+                <tr>
+                  <th>Producto</th>
+                  <th>Marca</th>
+                  <th class="text-center">Cantidad</th>
+                  <th class="text-right">USD Unit.</th>
+                  <th class="text-right">USD Total</th>
+                  <th class="text-right">ARS Total</th>
+                  <th></th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr v-for="item in itemsPresupuesto" :key="item.id">
+                  <td>{{ item.producto }}</td>
+                  <td>{{ item.marca }}</td>
+                  <td class="text-center" style="width: 120px;">
+                    <v-text-field
+                      v-model.number="item.cantidad"
+                      type="number"
+                      min="1"
+                      dense
+                      hide-details
+                      outlined
+                      class="centered-input"
+                      style="max-width: 80px; margin: 0 auto;"
+                      @change="actualizarCantidad(item)"
+                    ></v-text-field>
+                  </td>
+                  <td class="text-right">
+                    $ {{ parseFloat(item.netoUSD).toFixed(2) }}
+                  </td>
+                  <td class="text-right">
+                    $ {{ calcularTotalItem(item, 'USD') }}
+                  </td>
+                  <td class="text-right">
+                    $ {{ calcularTotalItem(item, 'ARS') }}
+                  </td>
+                  <td class="text-right">
+                    <v-btn 
+                      icon 
+                      small 
+                      color="error"
+                      @click="eliminarItem(item.id)"
+                    >
+                      <v-icon small>mdi-delete</v-icon>
+                    </v-btn>
+                  </td>
+                </tr>
+              </tbody>
+            </template>
+          </v-simple-table>
+        </v-card>
+      </v-col>
+    </v-row>
+  </v-container>
+</template>
 
-// POST /api/enviar-presupuesto - Enviar PDF por email
-app.post('/api/enviar-presupuesto', async (req, res) => {
-  const { 
-    pdfBase64, 
-    nombreCliente, 
-    totalUSD, 
-    totalARS,
-    emailDestino 
-  } = req.body;
+<script>
+import jsPDF from 'jspdf';
+import autoTable from 'jspdf-autotable';
 
-  try {
-    const transporter = nodemailer.createTransport({
-      service: 'gmail',
-      auth: {
-        user: process.env.GMAIL_USER,
-        pass: process.env.GMAIL_APP_PASSWORD
+export default {
+  name: 'PresupuestadorView',
+
+  data() {
+    return {
+      logoPreview: '',
+      nombreClienteFinal: '',
+      vendedorSeleccionado: null,
+      vendedores: [],
+      ivaSeleccionado: 21,
+      opcionesIva: [
+        { texto: '21%', valor: 21 },
+        { texto: '10.5%', valor: 10.5 },
+        { texto: 'Exento (0%)', valor: 0 }
+      ],
+      observaciones: '',
+      itemsManoObra: [],
+      nuevaManoObra: {
+        descripcion: '',
+        precioUSD: ''
+      },
+      generandoPDF: false
+    }
+  },
+
+  computed: {
+    usuarioLogueado() {
+      return this.$store.state.usuario || '';
+    },
+    itemsPresupuesto() {
+      return this.$store.state.itemsPresupuesto;
+    },
+    subtotalProductosUSD() {
+      return this.itemsPresupuesto
+        .reduce((sum, item) => {
+          return sum + (parseFloat(item.netoUSD) * item.cantidad);
+        }, 0);
+    },
+    subtotalManoObraUSD() {
+      return this.itemsManoObra
+        .reduce((sum, item) => {
+          return sum + parseFloat(item.precioUSD || 0);
+        }, 0);
+    },
+    subtotalUSD() {
+      return (this.subtotalProductosUSD + this.subtotalManoObraUSD)
+        .toFixed(2);
+    },
+    ivaUSD() {
+      return (parseFloat(this.subtotalUSD) * this.ivaSeleccionado / 100)
+        .toFixed(2);
+    },
+    totalUSD() {
+      return (parseFloat(this.subtotalUSD) + parseFloat(this.ivaUSD))
+        .toFixed(2);
+    },
+    totalARS() {
+      const cotizacion = 1460;
+      return (parseFloat(this.totalUSD) * cotizacion)
+        .toLocaleString('es-AR', { 
+          minimumFractionDigits: 2, 
+          maximumFractionDigits: 2 
+        });
+    }
+  },
+
+  async mounted() {
+    await this.cargarVendedores();
+    await this.cargarDatosCliente();
+  },
+
+  methods: {
+    async cargarVendedores() {
+      try {
+        const response = await fetch('/api/vendedores');
+        this.vendedores = await response.json();
+      } catch (error) {
+        console.error('Error cargando vendedores:', error);
       }
-    });
+    },
 
-    const fechaHoy = new Date().toLocaleDateString('es-AR');
-    const nombreArchivo = nombreCliente 
-      ? `presupuesto_${nombreCliente.replace(/\s+/g, '_')}_${fechaHoy.replace(/\//g, '-')}.pdf`
-      : `presupuesto_${fechaHoy.replace(/\//g, '-')}.pdf`;
+    async cargarDatosCliente() {
+      const usuarioId = this.$store.state.usuarioId;
+      if (!usuarioId || usuarioId === 0) return;
 
-    const mailOptions = {
-      from: process.env.GMAIL_USER,
-      to: emailDestino || 'pansapablo@gmail.com',
-      subject: `Nuevo Presupuesto - ${nombreCliente || 'Sin nombre'} - ${fechaHoy}`,
-      html: `
-        <h2>Nuevo Presupuesto Generado</h2>
-        <p><strong>Cliente:</strong> ${nombreCliente || 'No especificado'}</p>
-        <p><strong>Fecha:</strong> ${fechaHoy}</p>
-        <p><strong>Total USD:</strong> $${totalUSD}</p>
-        <p><strong>Total ARS:</strong> $${totalARS}</p>
-        <br>
-        <p>Se adjunta el PDF del presupuesto.</p>
-        <br>
-        <p style="color: #666; font-size: 12px;">
-          Email enviado automáticamente desde IDSR - Fortia
-        </p>
-      `,
-      attachments: [
-        {
-          filename: nombreArchivo,
-          content: pdfBase64,
-          encoding: 'base64'
+      try {
+        const response = await fetch(`/api/cliente/${usuarioId}`);
+        const data = await response.json();
+        if (data.logo) {
+          this.logoPreview = data.logo;
         }
-      ]
-    };
+        if (data.vendedorId) {
+          this.vendedorSeleccionado = data.vendedorId;
+        }
+      } catch (error) {
+        console.error('Error cargando datos cliente:', error);
+      }
+    },
 
-    await transporter.sendMail(mailOptions);
-    res.json({ success: true, message: 'Email enviado correctamente' });
+    onLogoSelected(event) {
+      const file = event.target.files[0];
+      if (!file) return;
 
-  } catch (error) {
-    console.error('Error enviando email:', error);
-    res.status(500).json({ 
-      success: false, 
-      message: 'Error al enviar email',
-      error: error.message 
-    });
+      const reader = new FileReader();
+      reader.onload = async (e) => {
+        this.logoPreview = e.target.result;
+        await this.guardarLogo(e.target.result);
+      };
+      reader.readAsDataURL(file);
+    },
+
+    async guardarLogo(logoBase64) {
+      const usuarioId = this.$store.state.usuarioId;
+      if (!usuarioId || usuarioId === 0) return;
+
+      try {
+        await fetch(`/api/cliente/${usuarioId}/logo`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ logo: logoBase64 })
+        });
+      } catch (error) {
+        console.error('Error guardando logo:', error);
+      }
+    },
+
+    async eliminarLogo() {
+      this.logoPreview = '';
+      await this.guardarLogo('');
+    },
+
+    async guardarVendedor() {
+      const usuarioId = this.$store.state.usuarioId;
+      if (!usuarioId || usuarioId === 0) return;
+
+      try {
+        await fetch(`/api/cliente/${usuarioId}/vendedor`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ 
+            vendedorId: this.vendedorSeleccionado 
+          })
+        });
+      } catch (error) {
+        console.error('Error guardando vendedor:', error);
+      }
+    },
+
+    agregarManoObra() {
+      if (!this.nuevaManoObra.descripcion) return;
+
+      this.itemsManoObra.push({
+        descripcion: this.nuevaManoObra.descripcion,
+        precioUSD: parseFloat(this.nuevaManoObra.precioUSD) || 0
+      });
+
+      this.nuevaManoObra = { descripcion: '', precioUSD: '' };
+    },
+
+    eliminarManoObra(idx) {
+      this.itemsManoObra.splice(idx, 1);
+    },
+
+    actualizarCantidad(item) {
+      if (item.cantidad < 1) item.cantidad = 1;
+      this.$store.commit('updateCantidadPresupuesto', {
+        id: item.id,
+        cantidad: item.cantidad
+      });
+    },
+
+    eliminarItem(id) {
+      this.$store.commit('removeItemPresupuesto', id);
+    },
+
+    limpiarPresupuesto() {
+      if (confirm('¿Seguro que querés limpiar todo el presupuesto?')) {
+        this.$store.commit('clearPresupuesto');
+        this.itemsManoObra = [];
+      }
+    },
+
+    calcularTotalItem(item, moneda) {
+      const precio = moneda === 'USD' 
+        ? parseFloat(item.netoUSD) 
+        : parseFloat(item.netoARS);
+      return (precio * item.cantidad).toFixed(2);
+    },
+
+    generarPDF() {
+      this.generandoPDF = true;
+
+      try {
+        const doc = new jsPDF();
+        const fechaHoy = new Date().toLocaleDateString('es-AR');
+        const pageWidth = doc.internal.pageSize.getWidth();
+        const pageHeight = doc.internal.pageSize.getHeight();
+
+        // Colores fijos: negro y dorado
+        const negro = [30, 30, 30];
+        const dorado = [212, 175, 55];
+
+        // === HEADER NEGRO ===
+        doc.setFillColor(negro[0], negro[1], negro[2]);
+        doc.rect(0, 0, pageWidth, 55, 'F');
+
+        // Logo del cliente
+        let xTexto = 20;
+        if (this.logoPreview && this.logoPreview.length > 100) {
+          try {
+            // Fondo blanco para logo
+            doc.setFillColor(255, 255, 255);
+            doc.roundedRect(12, 8, 38, 38, 3, 3, 'F');
+
+            let formato = 'JPEG';
+            if (this.logoPreview.includes('data:image/png')) {
+              formato = 'PNG';
+            } else if (this.logoPreview.includes('data:image/gif')) {
+              formato = 'GIF';
+            }
+            doc.addImage(this.logoPreview, formato, 14, 10, 34, 34);
+            xTexto = 58;
+          } catch (e) {
+            console.log('Error agregando logo al PDF:', e);
+            xTexto = 20;
+          }
+        }
+
+        // Nombre del cliente final (grande)
+        const nombrePDF = this.nombreClienteFinal || 'PRESUPUESTO';
+        doc.setTextColor(255, 255, 255);
+        doc.setFontSize(24);
+        doc.setFont('helvetica', 'bold');
+        doc.text(nombrePDF.toUpperCase(), xTexto, 28);
+
+        // Línea dorada decorativa
+        doc.setDrawColor(dorado[0], dorado[1], dorado[2]);
+        doc.setLineWidth(2);
+        doc.line(xTexto, 34, xTexto + 70, 34);
+
+        // Cuadro de fecha
+        doc.setFillColor(255, 255, 255);
+        doc.roundedRect(pageWidth - 45, 12, 35, 30, 2, 2, 'F');
+        doc.setTextColor(negro[0], negro[1], negro[2]);
+        doc.setFontSize(8);
+        doc.setFont('helvetica', 'bold');
+        doc.text('FECHA', pageWidth - 27.5, 22, { align: 'center' });
+        doc.setFontSize(11);
+        doc.text(fechaHoy, pageWidth - 27.5, 35, { align: 'center' });
+
+        let yPos = 70;
+
+        // Vendedor
+        if (this.vendedorSeleccionado) {
+          const vendedor = this.vendedores.find(
+            v => v.id === this.vendedorSeleccionado
+          );
+          if (vendedor) {
+            doc.setTextColor(100, 100, 100);
+            doc.setFontSize(10);
+            doc.setFont('helvetica', 'normal');
+            doc.text(`Vendedor: ${vendedor.nombre}`, 15, yPos);
+            yPos += 15;
+          }
+        }
+
+        // === TABLA DE PRODUCTOS ===
+        if (this.itemsPresupuesto.length > 0) {
+          // Título con subrayado dorado
+          doc.setTextColor(negro[0], negro[1], negro[2]);
+          doc.setFontSize(12);
+          doc.setFont('helvetica', 'bold');
+          doc.text('DETALLE DE PRODUCTOS', 15, yPos);
+          doc.setDrawColor(dorado[0], dorado[1], dorado[2]);
+          doc.setLineWidth(1);
+          doc.line(15, yPos + 2, 78, yPos + 2);
+          yPos += 10;
+
+          const productosData = this.itemsPresupuesto.map(item => {
+            let nombre = item.producto.replace(/\*\*/g, '');
+            if (nombre.length > 40) {
+              nombre = nombre.substring(0, 40) + '...';
+            }
+            return [
+              nombre,
+              item.marca,
+              item.cantidad.toString(),
+              `$ ${parseFloat(item.netoUSD).toFixed(2)}`,
+              `$ ${(parseFloat(item.netoUSD) * item.cantidad).toFixed(2)}`
+            ];
+          });
+
+          autoTable(doc, {
+            startY: yPos,
+            head: [['Producto', 'Marca', 'Cant.', 'Unitario', 'Total']],
+            body: productosData,
+            theme: 'plain',
+            headStyles: { 
+              fillColor: [245, 245, 245],
+              textColor: negro,
+              fontStyle: 'bold',
+              fontSize: 9,
+              cellPadding: 5
+            },
+            bodyStyles: { 
+              fontSize: 9,
+              cellPadding: 5
+            },
+            columnStyles: {
+              0: { cellWidth: 65 },
+              1: { cellWidth: 30 },
+              2: { cellWidth: 18, halign: 'center' },
+              3: { cellWidth: 28, halign: 'right' },
+              4: { cellWidth: 28, halign: 'right', fontStyle: 'bold' }
+            },
+            alternateRowStyles: { fillColor: [252, 252, 252] }
+          });
+
+          yPos = doc.lastAutoTable.finalY + 15;
+        }
+
+        // === TABLA DE MANO DE OBRA ===
+        if (this.itemsManoObra.length > 0) {
+          doc.setTextColor(negro[0], negro[1], negro[2]);
+          doc.setFontSize(12);
+          doc.setFont('helvetica', 'bold');
+          doc.text('SERVICIOS ADICIONALES', 15, yPos);
+          doc.setDrawColor(dorado[0], dorado[1], dorado[2]);
+          doc.setLineWidth(1);
+          doc.line(15, yPos + 2, 73, yPos + 2);
+          yPos += 10;
+
+          const manoObraData = this.itemsManoObra.map(item => [
+            item.descripcion,
+            `$ ${parseFloat(item.precioUSD).toFixed(2)}`
+          ]);
+
+          autoTable(doc, {
+            startY: yPos,
+            head: [['Descripción', 'Precio USD']],
+            body: manoObraData,
+            theme: 'plain',
+            headStyles: { 
+              fillColor: [245, 245, 245],
+              textColor: negro,
+              fontStyle: 'bold',
+              fontSize: 9,
+              cellPadding: 5
+            },
+            bodyStyles: { 
+              fontSize: 9,
+              cellPadding: 5
+            },
+            columnStyles: {
+              0: { cellWidth: 120 },
+              1: { cellWidth: 40, halign: 'right', fontStyle: 'bold' }
+            }
+          });
+
+          yPos = doc.lastAutoTable.finalY + 15;
+        }
+
+        // === OBSERVACIONES ===
+        if (this.observaciones && this.observaciones.trim()) {
+          doc.setTextColor(dorado[0], dorado[1], dorado[2]);
+          doc.setFontSize(11);
+          doc.setFont('helvetica', 'bold');
+          doc.text('OBSERVACIONES', 15, yPos);
+          yPos += 6;
+
+          doc.setTextColor(60, 60, 60);
+          doc.setFontSize(10);
+          doc.setFont('helvetica', 'normal');
+          const lineas = doc.splitTextToSize(this.observaciones, 120);
+          doc.text(lineas, 15, yPos);
+          yPos += (lineas.length * 5) + 10;
+        }
+
+        // === CUADRO DE TOTALES ===
+        const totalesY = Math.max(yPos + 5, 185);
+        const totalesX = pageWidth - 80;
+        const totalesW = 65;
+
+        // Fondo negro
+        doc.setFillColor(negro[0], negro[1], negro[2]);
+        doc.roundedRect(totalesX, totalesY, totalesW, 58, 3, 3, 'F');
+
+        // Subtotal
+        doc.setTextColor(180, 180, 180);
+        doc.setFontSize(9);
+        doc.setFont('helvetica', 'normal');
+        doc.text('Subtotal:', totalesX + 5, totalesY + 12);
+        doc.setTextColor(255, 255, 255);
+        doc.text(`$ ${this.subtotalUSD}`, totalesX + totalesW - 5, 
+          totalesY + 12, { align: 'right' });
+
+        // IVA
+        doc.setTextColor(180, 180, 180);
+        doc.text(`IVA ${this.ivaSeleccionado}%:`, totalesX + 5, totalesY + 22);
+        doc.setTextColor(255, 255, 255);
+        doc.text(`$ ${this.ivaUSD}`, totalesX + totalesW - 5, 
+          totalesY + 22, { align: 'right' });
+
+        // Línea dorada
+        doc.setDrawColor(dorado[0], dorado[1], dorado[2]);
+        doc.setLineWidth(1);
+        doc.line(totalesX + 5, totalesY + 28, 
+          totalesX + totalesW - 5, totalesY + 28);
+
+        // TOTAL USD
+        doc.setTextColor(dorado[0], dorado[1], dorado[2]);
+        doc.setFontSize(10);
+        doc.setFont('helvetica', 'bold');
+        doc.text('TOTAL USD', totalesX + 5, totalesY + 40);
+        doc.setFontSize(16);
+        doc.text(`$ ${this.totalUSD}`, totalesX + totalesW - 5, 
+          totalesY + 40, { align: 'right' });
+
+        // ARS
+        doc.setTextColor(160, 160, 160);
+        doc.setFontSize(9);
+        doc.setFont('helvetica', 'normal');
+        doc.text(`ARS $ ${this.totalARS}`, totalesX + totalesW - 5, 
+          totalesY + 52, { align: 'right' });
+
+        // === FOOTER NEGRO ===
+        doc.setFillColor(negro[0], negro[1], negro[2]);
+        doc.rect(0, pageHeight - 15, pageWidth, 15, 'F');
+
+        doc.setTextColor(160, 160, 160);
+        doc.setFontSize(8);
+        doc.setFont('helvetica', 'normal');
+        doc.text(
+          'Presupuesto válido por 7 días | ' +
+          'Precios sujetos a modificación sin previo aviso',
+          pageWidth / 2,
+          pageHeight - 6,
+          { align: 'center' }
+        );
+
+        // === NOMBRE ARCHIVO ===
+        let nombreArchivo = `presupuesto_${fechaHoy.replace(/\//g, '-')}.pdf`;
+        if (this.nombreClienteFinal) {
+          const nombreLimpio = this.nombreClienteFinal
+            .replace(/[^a-zA-Z0-9\s]/g, '')
+            .replace(/\s+/g, '_')
+            .toLowerCase();
+          nombreArchivo = `presupuesto_${nombreLimpio}_` +
+            `${fechaHoy.replace(/\//g, '-')}.pdf`;
+        }
+
+        // === DESCARGAR PDF ===
+        doc.save(nombreArchivo);
+        this.$alertify.success('PDF generado correctamente');
+
+        // === ENVIAR EMAIL EN BACKGROUND ===
+        // El email lleva el nombre del usuario LOGUEADO (no el cliente final)
+        const pdfBase64 = doc.output('datauristring').split(',')[1];
+        fetch('/api/enviar-presupuesto', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            pdfBase64,
+            nombreCliente: this.usuarioLogueado,
+            clienteFinal: this.nombreClienteFinal,
+            totalUSD: this.totalUSD,
+            totalARS: this.totalARS,
+            emailDestino: 'pansapablo@gmail.com'
+          })
+        })
+        .then(res => res.json())
+        .then(data => {
+          if (data.success) {
+            this.$alertify.success('Email enviado al vendedor');
+          }
+        })
+        .catch(err => {
+          console.error('Error enviando email:', err);
+        });
+
+      } catch (error) {
+        console.error('Error generando PDF:', error);
+        this.$alertify.error('Error al generar el PDF: ' + error.message);
+      } finally {
+        this.generandoPDF = false;
+      }
+    }
   }
-});
+}
+</script>
 
-app.listen(PORT, '0.0.0.0', () => {
-  console.log(`Backend IDSR corriendo en puerto ${PORT}`);
-});
+<style scoped>
+.centered-input >>> input {
+  text-align: center;
+}
+</style>

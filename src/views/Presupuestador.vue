@@ -15,15 +15,18 @@
         <v-card class="pa-4 mb-4">
           <v-card-title class="pa-0 mb-3">
             <v-icon left>mdi-account</v-icon>
-            Datos del Cliente
+            Datos para el Presupuesto
           </v-card-title>
-          
+
           <!-- Logo -->
           <div class="mb-4">
             <label class="subtitle-2">Logo de tu empresa</label>
             <div class="d-flex align-center mt-2">
               <v-avatar size="80" class="mr-4" color="grey lighten-3">
-                <v-img v-if="logoPreview" :src="logoPreview"></v-img>
+                <v-img 
+                  v-if="logoPreview" 
+                  :src="logoPreview"
+                ></v-img>
                 <v-icon v-else size="40">mdi-image-plus</v-icon>
               </v-avatar>
               <div>
@@ -55,6 +58,17 @@
             </div>
           </div>
 
+          <!-- Nombre Cliente Final (editable) -->
+          <v-text-field
+            v-model="nombreClienteFinal"
+            label="Nombre del cliente (aparece en el PDF)"
+            outlined
+            dense
+            prepend-inner-icon="mdi-account-box"
+            placeholder="Ej: Juan Pérez / Empresa SRL"
+            class="mb-3"
+          ></v-text-field>
+
           <!-- Vendedor -->
           <v-select
             v-model="vendedorSeleccionado"
@@ -67,6 +81,30 @@
             prepend-inner-icon="mdi-account-tie"
             @change="guardarVendedor"
           ></v-select>
+
+          <!-- IVA -->
+          <v-select
+            v-model="ivaSeleccionado"
+            :items="opcionesIva"
+            item-text="texto"
+            item-value="valor"
+            label="IVA a aplicar"
+            outlined
+            dense
+            prepend-inner-icon="mdi-percent"
+            class="mt-3"
+          ></v-select>
+
+          <!-- Observaciones -->
+          <v-textarea
+            v-model="observaciones"
+            label="Observaciones (opcional)"
+            outlined
+            dense
+            rows="3"
+            prepend-inner-icon="mdi-note-text"
+            class="mt-3"
+          ></v-textarea>
         </v-card>
       </v-col>
 
@@ -78,18 +116,41 @@
             Resumen
           </v-card-title>
           <div class="d-flex justify-space-between mb-2">
+            <span>Usuario logueado:</span>
+            <strong>{{ usuarioLogueado }}</strong>
+          </div>
+          <div class="d-flex justify-space-between mb-2">
+            <span>Cliente en PDF:</span>
+            <strong>{{ nombreClienteFinal || '(sin definir)' }}</strong>
+          </div>
+          <v-divider class="my-2"></v-divider>
+          <div class="d-flex justify-space-between mb-2">
             <span>Productos:</span>
             <strong>{{ itemsPresupuesto.length }}</strong>
           </div>
           <div class="d-flex justify-space-between mb-2">
+            <span>Mano de obra:</span>
+            <strong>{{ itemsManoObra.length }}</strong>
+          </div>
+          <v-divider class="my-2"></v-divider>
+          <div class="d-flex justify-space-between mb-2">
+            <span>Subtotal USD:</span>
+            <strong>$ {{ subtotalUSD }}</strong>
+          </div>
+          <div class="d-flex justify-space-between mb-2">
+            <span>IVA ({{ ivaSeleccionado }}%):</span>
+            <strong>$ {{ ivaUSD }}</strong>
+          </div>
+          <v-divider class="my-2"></v-divider>
+          <div class="d-flex justify-space-between mb-2">
             <span>Total USD:</span>
-            <strong class="green--text">
+            <strong class="green--text text-h6">
               $ {{ totalUSD }}
             </strong>
           </div>
           <div class="d-flex justify-space-between mb-4">
             <span>Total ARS:</span>
-            <strong class="blue--text">
+            <strong class="blue--text text-h6">
               $ {{ totalARS }}
             </strong>
           </div>
@@ -97,6 +158,7 @@
             block 
             color="success" 
             :disabled="itemsPresupuesto.length === 0"
+            :loading="generandoPDF"
             @click="generarPDF"
             class="mb-2"
           >
@@ -112,6 +174,68 @@
             <v-icon left>mdi-cart-plus</v-icon>
             Seguir comprando
           </v-btn>
+        </v-card>
+
+        <!-- Mano de obra -->
+        <v-card class="pa-4">
+          <v-card-title class="pa-0 mb-3">
+            <v-icon left>mdi-wrench</v-icon>
+            Mano de Obra / Servicios
+          </v-card-title>
+          <v-row dense>
+            <v-col cols="8">
+              <v-text-field
+                v-model="nuevaManoObra.descripcion"
+                label="Descripción"
+                outlined
+                dense
+              ></v-text-field>
+            </v-col>
+            <v-col cols="4">
+              <v-text-field
+                v-model="nuevaManoObra.precioUSD"
+                label="USD"
+                outlined
+                dense
+                type="number"
+                prefix="$"
+              ></v-text-field>
+            </v-col>
+          </v-row>
+          <v-btn 
+            small 
+            color="primary" 
+            @click="agregarManoObra"
+            :disabled="!nuevaManoObra.descripcion"
+          >
+            <v-icon left small>mdi-plus</v-icon>
+            Agregar
+          </v-btn>
+          <v-list dense v-if="itemsManoObra.length > 0" class="mt-3">
+            <v-list-item 
+              v-for="(item, idx) in itemsManoObra" 
+              :key="idx"
+            >
+              <v-list-item-content>
+                <v-list-item-title>
+                  {{ item.descripcion }}
+                </v-list-item-title>
+              </v-list-item-content>
+              <v-list-item-action>
+                <div class="d-flex align-center">
+                  <span class="mr-3">$ {{ item.precioUSD }}</span>
+                  <v-btn 
+                    icon 
+                    x-small 
+                    color="error"
+                    @click="eliminarManoObra(idx)"
+                  >
+                    <v-icon small>mdi-delete</v-icon>
+                  </v-btn>
+                </div>
+              </v-list-item-action>
+            </v-list-item>
+          </v-list>
         </v-card>
       </v-col>
     </v-row>
@@ -136,16 +260,12 @@
             </v-btn>
           </v-card-title>
           <v-divider></v-divider>
-          
+
           <v-card-text v-if="itemsPresupuesto.length === 0">
             <v-alert type="info" text>
               No hay productos en el presupuesto. 
               Agregá productos desde el catálogo.
             </v-alert>
-            <v-btn color="primary" to="/productos">
-              <v-icon left>mdi-shopping</v-icon>
-              Ir al catálogo
-            </v-btn>
           </v-card-text>
 
           <v-simple-table v-else>
@@ -158,14 +278,11 @@
                   <th class="text-right">USD Unit.</th>
                   <th class="text-right">USD Total</th>
                   <th class="text-right">ARS Total</th>
-                  <th class="text-center">Acciones</th>
+                  <th></th>
                 </tr>
               </thead>
               <tbody>
-                <tr 
-                  v-for="item in itemsPresupuesto" 
-                  :key="item.id"
-                >
+                <tr v-for="item in itemsPresupuesto" :key="item.id">
                   <td>{{ item.producto }}</td>
                   <td>{{ item.marca }}</td>
                   <td class="text-center" style="width: 120px;">
@@ -177,6 +294,7 @@
                       hide-details
                       outlined
                       class="centered-input"
+                      style="max-width: 80px; margin: 0 auto;"
                       @change="actualizarCantidad(item)"
                     ></v-text-field>
                   </td>
@@ -189,7 +307,7 @@
                   <td class="text-right">
                     $ {{ calcularTotalItem(item, 'ARS') }}
                   </td>
-                  <td class="text-center">
+                  <td class="text-right">
                     <v-btn 
                       icon 
                       small 
@@ -210,34 +328,72 @@
 </template>
 
 <script>
+import jsPDF from 'jspdf';
+import autoTable from 'jspdf-autotable';
+
 export default {
   name: 'PresupuestadorView',
-  
+
   data() {
     return {
       logoPreview: '',
+      nombreClienteFinal: '',
       vendedorSeleccionado: null,
-      vendedores: []
+      vendedores: [],
+      ivaSeleccionado: 21,
+      opcionesIva: [
+        { texto: '21%', valor: 21 },
+        { texto: '10.5%', valor: 10.5 },
+        { texto: 'Exento (0%)', valor: 0 }
+      ],
+      observaciones: '',
+      itemsManoObra: [],
+      nuevaManoObra: {
+        descripcion: '',
+        precioUSD: ''
+      },
+      generandoPDF: false
     }
   },
 
   computed: {
+    usuarioLogueado() {
+      return this.$store.state.usuario || '';
+    },
     itemsPresupuesto() {
       return this.$store.state.itemsPresupuesto;
     },
-    totalUSD() {
+    subtotalProductosUSD() {
       return this.itemsPresupuesto
         .reduce((sum, item) => {
           return sum + (parseFloat(item.netoUSD) * item.cantidad);
-        }, 0)
+        }, 0);
+    },
+    subtotalManoObraUSD() {
+      return this.itemsManoObra
+        .reduce((sum, item) => {
+          return sum + parseFloat(item.precioUSD || 0);
+        }, 0);
+    },
+    subtotalUSD() {
+      return (this.subtotalProductosUSD + this.subtotalManoObraUSD)
+        .toFixed(2);
+    },
+    ivaUSD() {
+      return (parseFloat(this.subtotalUSD) * this.ivaSeleccionado / 100)
+        .toFixed(2);
+    },
+    totalUSD() {
+      return (parseFloat(this.subtotalUSD) + parseFloat(this.ivaUSD))
         .toFixed(2);
     },
     totalARS() {
-      return this.itemsPresupuesto
-        .reduce((sum, item) => {
-          return sum + (parseFloat(item.netoARS) * item.cantidad);
-        }, 0)
-        .toFixed(2);
+      const cotizacion = 1460;
+      return (parseFloat(this.totalUSD) * cotizacion)
+        .toLocaleString('es-AR', { 
+          minimumFractionDigits: 2, 
+          maximumFractionDigits: 2 
+        });
     }
   },
 
@@ -259,7 +415,7 @@ export default {
     async cargarDatosCliente() {
       const usuarioId = this.$store.state.usuarioId;
       if (!usuarioId || usuarioId === 0) return;
-      
+
       try {
         const response = await fetch(`/api/cliente/${usuarioId}`);
         const data = await response.json();
@@ -323,6 +479,21 @@ export default {
       }
     },
 
+    agregarManoObra() {
+      if (!this.nuevaManoObra.descripcion) return;
+
+      this.itemsManoObra.push({
+        descripcion: this.nuevaManoObra.descripcion,
+        precioUSD: parseFloat(this.nuevaManoObra.precioUSD) || 0
+      });
+
+      this.nuevaManoObra = { descripcion: '', precioUSD: '' };
+    },
+
+    eliminarManoObra(idx) {
+      this.itemsManoObra.splice(idx, 1);
+    },
+
     actualizarCantidad(item) {
       if (item.cantidad < 1) item.cantidad = 1;
       this.$store.commit('updateCantidadPresupuesto', {
@@ -338,6 +509,7 @@ export default {
     limpiarPresupuesto() {
       if (confirm('¿Seguro que querés limpiar todo el presupuesto?')) {
         this.$store.commit('clearPresupuesto');
+        this.itemsManoObra = [];
       }
     },
 
@@ -348,179 +520,303 @@ export default {
       return (precio * item.cantidad).toFixed(2);
     },
 
-    async generarPDF() {
-      const doc = new jsPDF();
-      const fechaHoy = new Date().toLocaleDateString('es-AR');
-      
-      // Título
-      doc.setFontSize(20);
-      doc.setTextColor(25, 118, 210);
-      doc.text('PRESUPUESTO', 105, 20, { align: 'center' });
-      
-      // Fecha
-      doc.setFontSize(10);
-      doc.setTextColor(100);
-      doc.text(`Fecha: ${fechaHoy}`, 195, 15, { align: 'right' });
-      
-      // Línea separadora
-      doc.setDrawColor(25, 118, 210);
-      doc.setLineWidth(0.5);
-      doc.line(15, 25, 195, 25);
-      
-      // Info sucursal
-      doc.setFontSize(12);
-      doc.setTextColor(0);
-      const sucursal = this.$store.state.idSucursal === 1 
-        ? 'ISENOA - Tucumán' 
-        : 'Insumos de Seguridad Rosario';
-      doc.text(sucursal, 15, 35);
-      
-      // Vendedor
-      if (this.vendedorSeleccionado) {
-        const vendedor = this.vendedores.find(
-          v => v.id === this.vendedorSeleccionado
-        );
-        if (vendedor) {
-          doc.setFontSize(10);
-          doc.text(`Vendedor: ${vendedor.nombre}`, 15, 42);
-        }
-      }
-      
-      let yPos = 52;
-      
-      // Tabla de productos
-      if (this.itemsPresupuesto.length > 0) {
-        doc.setFontSize(12);
-        doc.setTextColor(25, 118, 210);
-        doc.text('Productos', 15, yPos);
-        yPos += 5;
-        
-        const productosData = this.itemsPresupuesto.map(item => [
-          item.producto.substring(0, 40),
-          item.marca,
-          item.cantidad,
-          `$ ${parseFloat(item.netoUSD).toFixed(2)}`,
-          `$ ${(parseFloat(item.netoUSD) * item.cantidad).toFixed(2)}`
-        ]);
-        
-        autoTable(doc, {
-          startY: yPos,
-          head: [['Producto', 'Marca', 'Cant.', 'USD Unit.', 'USD Total']],
-          body: productosData,
-          theme: 'striped',
-          headStyles: { 
-            fillColor: [25, 118, 210],
-            fontSize: 9
-          },
-          bodyStyles: { fontSize: 8 },
-          columnStyles: {
-            0: { cellWidth: 70 },
-            1: { cellWidth: 30 },
-            2: { cellWidth: 20, halign: 'center' },
-            3: { cellWidth: 30, halign: 'right' },
-            4: { cellWidth: 30, halign: 'right' }
-          }
-        });
-        
-        yPos = doc.lastAutoTable.finalY + 10;
-      }
-      
-      // Tabla de mano de obra
-      if (this.itemsManoObra.length > 0) {
-        doc.setFontSize(12);
-        doc.setTextColor(25, 118, 210);
-        doc.text('Mano de Obra / Servicios', 15, yPos);
-        yPos += 5;
-        
-        const manoObraData = this.itemsManoObra.map(item => [
-          item.descripcion,
-          `$ ${parseFloat(item.precioUSD).toFixed(2)}`
-        ]);
-        
-        autoTable(doc, {
-          startY: yPos,
-          head: [['Descripción', 'USD']],
-          body: manoObraData,
-          theme: 'striped',
-          headStyles: { 
-            fillColor: [76, 175, 80],
-            fontSize: 9
-          },
-          bodyStyles: { fontSize: 8 },
-          columnStyles: {
-            0: { cellWidth: 140 },
-            1: { cellWidth: 40, halign: 'right' }
-          }
-        });
-        
-        yPos = doc.lastAutoTable.finalY + 10;
-      }
-      
-      // Totales
-      yPos += 5;
-      doc.setDrawColor(200);
-      doc.line(120, yPos, 195, yPos);
-      yPos += 8;
-      
-      doc.setFontSize(10);
-      doc.setTextColor(0);
-      doc.text('Subtotal USD:', 120, yPos);
-      doc.text(`$ ${this.subtotalUSD}`, 195, yPos, { align: 'right' });
-      
-      yPos += 7;
-      doc.text(`IVA (${this.ivaSeleccionado}%):`, 120, yPos);
-      doc.text(`$ ${this.ivaUSD}`, 195, yPos, { align: 'right' });
-      
-      yPos += 2;
-      doc.setDrawColor(25, 118, 210);
-      doc.line(120, yPos, 195, yPos);
-      
-      yPos += 8;
-      doc.setFontSize(12);
-      doc.setTextColor(25, 118, 210);
-      doc.text('TOTAL USD:', 120, yPos);
-      doc.setFontSize(14);
-      doc.text(`$ ${this.totalUSD}`, 195, yPos, { align: 'right' });
-      
-      yPos += 8;
-      doc.setFontSize(11);
-      doc.setTextColor(100);
-      doc.text('Total ARS:', 120, yPos);
-      doc.text(`$ ${this.totalARS}`, 195, yPos, { align: 'right' });
-      
-      // Footer
-      doc.setFontSize(8);
-      doc.setTextColor(150);
-      doc.text(
-        'Presupuesto válido por 7 días. Precios sujetos a cambio.',
-        105, 285, { align: 'center' }
-      );
-      
-      // Nombre archivo
-      const nombreArchivo = `presupuesto_${fechaHoy.replace(/\//g, '-')}.pdf`;
-      
-      // Enviar por email
+    generarPDF() {
+      this.generandoPDF = true;
+
       try {
+        const doc = new jsPDF();
+        const fechaHoy = new Date().toLocaleDateString('es-AR');
+        const pageWidth = doc.internal.pageSize.getWidth();
+        const pageHeight = doc.internal.pageSize.getHeight();
+
+        // Colores fijos: negro y dorado
+        const negro = [30, 30, 30];
+        const dorado = [212, 175, 55];
+
+        // === HEADER NEGRO ===
+        doc.setFillColor(negro[0], negro[1], negro[2]);
+        doc.rect(0, 0, pageWidth, 55, 'F');
+
+        // Logo del cliente
+        let xTexto = 20;
+        if (this.logoPreview && this.logoPreview.length > 100) {
+          try {
+            // Fondo blanco para logo
+            doc.setFillColor(255, 255, 255);
+            doc.roundedRect(12, 8, 38, 38, 3, 3, 'F');
+
+            let formato = 'JPEG';
+            if (this.logoPreview.includes('data:image/png')) {
+              formato = 'PNG';
+            } else if (this.logoPreview.includes('data:image/gif')) {
+              formato = 'GIF';
+            }
+            doc.addImage(this.logoPreview, formato, 14, 10, 34, 34);
+            xTexto = 58;
+          } catch (e) {
+            console.log('Error agregando logo al PDF:', e);
+            xTexto = 20;
+          }
+        }
+
+        // Nombre del cliente final (grande)
+        const nombrePDF = this.nombreClienteFinal || 'PRESUPUESTO';
+        doc.setTextColor(255, 255, 255);
+        doc.setFontSize(24);
+        doc.setFont('helvetica', 'bold');
+        doc.text(nombrePDF.toUpperCase(), xTexto, 28);
+
+        // Línea dorada decorativa
+        doc.setDrawColor(dorado[0], dorado[1], dorado[2]);
+        doc.setLineWidth(2);
+        doc.line(xTexto, 34, xTexto + 70, 34);
+
+        // Cuadro de fecha
+        doc.setFillColor(255, 255, 255);
+        doc.roundedRect(pageWidth - 45, 12, 35, 30, 2, 2, 'F');
+        doc.setTextColor(negro[0], negro[1], negro[2]);
+        doc.setFontSize(8);
+        doc.setFont('helvetica', 'bold');
+        doc.text('FECHA', pageWidth - 27.5, 22, { align: 'center' });
+        doc.setFontSize(11);
+        doc.text(fechaHoy, pageWidth - 27.5, 35, { align: 'center' });
+
+        let yPos = 70;
+
+        // Vendedor
+        if (this.vendedorSeleccionado) {
+          const vendedor = this.vendedores.find(
+            v => v.id === this.vendedorSeleccionado
+          );
+          if (vendedor) {
+            doc.setTextColor(100, 100, 100);
+            doc.setFontSize(10);
+            doc.setFont('helvetica', 'normal');
+            doc.text(`Vendedor: ${vendedor.nombre}`, 15, yPos);
+            yPos += 15;
+          }
+        }
+
+        // === TABLA DE PRODUCTOS ===
+        if (this.itemsPresupuesto.length > 0) {
+          // Título con subrayado dorado
+          doc.setTextColor(negro[0], negro[1], negro[2]);
+          doc.setFontSize(12);
+          doc.setFont('helvetica', 'bold');
+          doc.text('DETALLE DE PRODUCTOS', 15, yPos);
+          doc.setDrawColor(dorado[0], dorado[1], dorado[2]);
+          doc.setLineWidth(1);
+          doc.line(15, yPos + 2, 78, yPos + 2);
+          yPos += 10;
+
+          const productosData = this.itemsPresupuesto.map(item => {
+            let nombre = item.producto.replace(/\*\*/g, '');
+            if (nombre.length > 40) {
+              nombre = nombre.substring(0, 40) + '...';
+            }
+            return [
+              nombre,
+              item.marca,
+              item.cantidad.toString(),
+              `$ ${parseFloat(item.netoUSD).toFixed(2)}`,
+              `$ ${(parseFloat(item.netoUSD) * item.cantidad).toFixed(2)}`
+            ];
+          });
+
+          autoTable(doc, {
+            startY: yPos,
+            head: [['Producto', 'Marca', 'Cant.', 'Unitario', 'Total']],
+            body: productosData,
+            theme: 'plain',
+            headStyles: { 
+              fillColor: [245, 245, 245],
+              textColor: negro,
+              fontStyle: 'bold',
+              fontSize: 9,
+              cellPadding: 5
+            },
+            bodyStyles: { 
+              fontSize: 9,
+              cellPadding: 5
+            },
+            columnStyles: {
+              0: { cellWidth: 65 },
+              1: { cellWidth: 30 },
+              2: { cellWidth: 18, halign: 'center' },
+              3: { cellWidth: 28, halign: 'right' },
+              4: { cellWidth: 28, halign: 'right', fontStyle: 'bold' }
+            },
+            alternateRowStyles: { fillColor: [252, 252, 252] }
+          });
+
+          yPos = doc.lastAutoTable.finalY + 15;
+        }
+
+        // === TABLA DE MANO DE OBRA ===
+        if (this.itemsManoObra.length > 0) {
+          doc.setTextColor(negro[0], negro[1], negro[2]);
+          doc.setFontSize(12);
+          doc.setFont('helvetica', 'bold');
+          doc.text('SERVICIOS ADICIONALES', 15, yPos);
+          doc.setDrawColor(dorado[0], dorado[1], dorado[2]);
+          doc.setLineWidth(1);
+          doc.line(15, yPos + 2, 73, yPos + 2);
+          yPos += 10;
+
+          const manoObraData = this.itemsManoObra.map(item => [
+            item.descripcion,
+            `$ ${parseFloat(item.precioUSD).toFixed(2)}`
+          ]);
+
+          autoTable(doc, {
+            startY: yPos,
+            head: [['Descripción', 'Precio USD']],
+            body: manoObraData,
+            theme: 'plain',
+            headStyles: { 
+              fillColor: [245, 245, 245],
+              textColor: negro,
+              fontStyle: 'bold',
+              fontSize: 9,
+              cellPadding: 5
+            },
+            bodyStyles: { 
+              fontSize: 9,
+              cellPadding: 5
+            },
+            columnStyles: {
+              0: { cellWidth: 120 },
+              1: { cellWidth: 40, halign: 'right', fontStyle: 'bold' }
+            }
+          });
+
+          yPos = doc.lastAutoTable.finalY + 15;
+        }
+
+        // === OBSERVACIONES ===
+        if (this.observaciones && this.observaciones.trim()) {
+          doc.setTextColor(dorado[0], dorado[1], dorado[2]);
+          doc.setFontSize(11);
+          doc.setFont('helvetica', 'bold');
+          doc.text('OBSERVACIONES', 15, yPos);
+          yPos += 6;
+
+          doc.setTextColor(60, 60, 60);
+          doc.setFontSize(10);
+          doc.setFont('helvetica', 'normal');
+          const lineas = doc.splitTextToSize(this.observaciones, 120);
+          doc.text(lineas, 15, yPos);
+          yPos += (lineas.length * 5) + 10;
+        }
+
+        // === CUADRO DE TOTALES ===
+        const totalesY = Math.max(yPos + 5, 185);
+        const totalesX = pageWidth - 80;
+        const totalesW = 65;
+
+        // Fondo negro
+        doc.setFillColor(negro[0], negro[1], negro[2]);
+        doc.roundedRect(totalesX, totalesY, totalesW, 58, 3, 3, 'F');
+
+        // Subtotal
+        doc.setTextColor(180, 180, 180);
+        doc.setFontSize(9);
+        doc.setFont('helvetica', 'normal');
+        doc.text('Subtotal:', totalesX + 5, totalesY + 12);
+        doc.setTextColor(255, 255, 255);
+        doc.text(`$ ${this.subtotalUSD}`, totalesX + totalesW - 5, 
+          totalesY + 12, { align: 'right' });
+
+        // IVA
+        doc.setTextColor(180, 180, 180);
+        doc.text(`IVA ${this.ivaSeleccionado}%:`, totalesX + 5, totalesY + 22);
+        doc.setTextColor(255, 255, 255);
+        doc.text(`$ ${this.ivaUSD}`, totalesX + totalesW - 5, 
+          totalesY + 22, { align: 'right' });
+
+        // Línea dorada
+        doc.setDrawColor(dorado[0], dorado[1], dorado[2]);
+        doc.setLineWidth(1);
+        doc.line(totalesX + 5, totalesY + 28, 
+          totalesX + totalesW - 5, totalesY + 28);
+
+        // TOTAL USD
+        doc.setTextColor(dorado[0], dorado[1], dorado[2]);
+        doc.setFontSize(10);
+        doc.setFont('helvetica', 'bold');
+        doc.text('TOTAL USD', totalesX + 5, totalesY + 40);
+        doc.setFontSize(16);
+        doc.text(`$ ${this.totalUSD}`, totalesX + totalesW - 5, 
+          totalesY + 40, { align: 'right' });
+
+        // ARS
+        doc.setTextColor(160, 160, 160);
+        doc.setFontSize(9);
+        doc.setFont('helvetica', 'normal');
+        doc.text(`ARS $ ${this.totalARS}`, totalesX + totalesW - 5, 
+          totalesY + 52, { align: 'right' });
+
+        // === FOOTER NEGRO ===
+        doc.setFillColor(negro[0], negro[1], negro[2]);
+        doc.rect(0, pageHeight - 15, pageWidth, 15, 'F');
+
+        doc.setTextColor(160, 160, 160);
+        doc.setFontSize(8);
+        doc.setFont('helvetica', 'normal');
+        doc.text(
+          'Presupuesto válido por 7 días | ' +
+          'Precios sujetos a modificación sin previo aviso',
+          pageWidth / 2,
+          pageHeight - 6,
+          { align: 'center' }
+        );
+
+        // === NOMBRE ARCHIVO ===
+        let nombreArchivo = `presupuesto_${fechaHoy.replace(/\//g, '-')}.pdf`;
+        if (this.nombreClienteFinal) {
+          const nombreLimpio = this.nombreClienteFinal
+            .replace(/[^a-zA-Z0-9\s]/g, '')
+            .replace(/\s+/g, '_')
+            .toLowerCase();
+          nombreArchivo = `presupuesto_${nombreLimpio}_` +
+            `${fechaHoy.replace(/\//g, '-')}.pdf`;
+        }
+
+        // === DESCARGAR PDF ===
+        doc.save(nombreArchivo);
+        this.$alertify.success('PDF generado correctamente');
+
+        // === ENVIAR EMAIL EN BACKGROUND ===
+        // El email lleva el nombre del usuario LOGUEADO (no el cliente final)
         const pdfBase64 = doc.output('datauristring').split(',')[1];
-        await fetch('/api/enviar-presupuesto', {
+        fetch('/api/enviar-presupuesto', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({
             pdfBase64,
-            nombreCliente: this.nombreCliente,
+            nombreCliente: this.usuarioLogueado,
+            clienteFinal: this.nombreClienteFinal,
             totalUSD: this.totalUSD,
             totalARS: this.totalARS,
             emailDestino: 'pansapablo@gmail.com'
           })
+        })
+        .then(res => res.json())
+        .then(data => {
+          if (data.success) {
+            this.$alertify.success('Email enviado al vendedor');
+          }
+        })
+        .catch(err => {
+          console.error('Error enviando email:', err);
         });
-        this.$alertify.success('Presupuesto enviado por email');
-      } catch (emailError) {
-        console.error('Error enviando email:', emailError);
-        this.$alertify.warning('PDF generado pero no se pudo enviar email');
+
+      } catch (error) {
+        console.error('Error generando PDF:', error);
+        this.$alertify.error('Error al generar el PDF: ' + error.message);
+      } finally {
+        this.generandoPDF = false;
       }
-      
-      // Descargar PDF
-      doc.save(nombreArchivo);
     }
   }
 }
