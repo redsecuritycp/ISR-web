@@ -21,6 +21,9 @@
           <!-- Logo -->
           <div class="mb-4">
             <label class="subtitle-2">Logo de tu empresa</label>
+            <p class="caption grey--text mb-1">
+              Formato: PNG o JPG, ideal 200x200px
+            </p>
             <div class="d-flex align-center mt-2">
               <v-avatar size="80" class="mr-4" color="grey lighten-3">
                 <v-img 
@@ -67,8 +70,6 @@
             prepend-inner-icon="mdi-account-box"
             placeholder="Se autocompleta o escribí manualmente"
             class="mb-3"
-            @change="localStorage.setItem('nombreClienteFinal', 
-                      nombreClienteFinal)"
           ></v-text-field>
 
           <!-- Datos opcionales del emisor -->
@@ -114,6 +115,20 @@
             class="mb-3"
             clearable
           ></v-select>
+
+          <v-text-field
+            v-model.number="porcentajeGanancia"
+            label="% Ganancia sobre productos"
+            outlined
+            dense
+            type="number"
+            min="0"
+            max="100"
+            prepend-inner-icon="mdi-percent-outline"
+            hint="Se aplica solo en el PDF, no en pantalla"
+            persistent-hint
+            class="mb-3"
+          ></v-text-field>
 
           <!-- IVA para Mano de Obra -->
           <v-select
@@ -168,23 +183,23 @@
           <v-divider class="my-2"></v-divider>
           <div class="d-flex justify-space-between mb-2">
             <span>Subtotal USD:</span>
-            <strong>$ {{ subtotalUSD }}</strong>
+            <strong>$ {{ subtotalConGananciaUSD }}</strong>
           </div>
           <div class="d-flex justify-space-between mb-2">
-            <span>IVA ({{ ivaSeleccionado }}%):</span>
-            <strong>$ {{ ivaUSD }}</strong>
+            <span>IVA:</span>
+            <strong>$ {{ ivaConGananciaUSD }}</strong>
           </div>
           <v-divider class="my-2"></v-divider>
           <div class="d-flex justify-space-between mb-2">
             <span>Total USD:</span>
             <strong class="green--text text-h6">
-              $ {{ totalUSD }}
+              $ {{ totalConGananciaUSD }}
             </strong>
           </div>
           <div class="d-flex justify-space-between mb-4">
             <span>Total ARS:</span>
             <strong class="blue--text text-h6">
-              $ {{ totalARS }}
+              $ {{ totalConGananciaARS }}
             </strong>
           </div>
           <v-btn 
@@ -403,7 +418,10 @@ export default {
       localidadEmisor: localStorage.getItem('localidadEmisor') || '',
       // Vendedor
       vendedores: [],
-      vendedorSeleccionado: localStorage.getItem('vendedorSeleccionado') || ''
+      vendedorSeleccionado: localStorage.getItem('vendedorSeleccionado') || '',
+      porcentajeGanancia: parseFloat(
+        localStorage.getItem('porcentajeGanancia')
+      ) || 0
     }
   },
 
@@ -452,6 +470,35 @@ export default {
     totalARS() {
       const cotizacion = 1460;
       return (parseFloat(this.totalUSD) * cotizacion)
+        .toLocaleString('es-AR', { 
+          minimumFractionDigits: 2, 
+          maximumFractionDigits: 2 
+        });
+    },
+    factorGanancia() {
+      return 1 + (this.porcentajeGanancia / 100);
+    },
+    subtotalConGananciaUSD() {
+      const subtotalProductos = this.subtotalProductosUSD * 
+        this.factorGanancia;
+      return (subtotalProductos + this.subtotalManoObraUSD).toFixed(2);
+    },
+    ivaConGananciaUSD() {
+      const ivaProductos = this.itemsPresupuesto.reduce((sum, item) => {
+        const ivaPercent = item.ivaPercent || 21;
+        const subtotalItem = parseFloat(item.netoUSD) * 
+          item.cantidad * this.factorGanancia;
+        return sum + (subtotalItem * ivaPercent / 100);
+      }, 0);
+      return (ivaProductos + this.ivaManoObraUSD).toFixed(2);
+    },
+    totalConGananciaUSD() {
+      return (parseFloat(this.subtotalConGananciaUSD) + 
+        parseFloat(this.ivaConGananciaUSD)).toFixed(2);
+    },
+    totalConGananciaARS() {
+      const cotizacion = 1460;
+      return (parseFloat(this.totalConGananciaUSD) * cotizacion)
         .toLocaleString('es-AR', { 
           minimumFractionDigits: 2, 
           maximumFractionDigits: 2 
@@ -686,12 +733,13 @@ export default {
         doc.setTextColor(255, 255, 255);
         doc.setFontSize(24);
         doc.setFont('helvetica', 'bold');
-        doc.text(nombrePDF.toUpperCase(), xTexto, 28);
+        doc.text(nombrePDF.toUpperCase(), pageWidth / 2, 28, 
+          { align: 'center' });
 
         // Línea dorada decorativa
         doc.setDrawColor(dorado[0], dorado[1], dorado[2]);
         doc.setLineWidth(2);
-        doc.line(xTexto, 34, xTexto + 70, 34);
+        doc.line(pageWidth / 2 - 35, 34, pageWidth / 2 + 35, 34);
 
         // Cuadro de fecha
         doc.setFillColor(255, 255, 255);
@@ -745,12 +793,14 @@ export default {
             if (nombre.length > 40) {
               nombre = nombre.substring(0, 40) + '...';
             }
+            const precioUnitario = parseFloat(item.netoUSD) * this.factorGanancia;
+            const totalItem = precioUnitario * item.cantidad;
             return [
               nombre,
               item.marca,
               item.cantidad.toString(),
-              `$ ${parseFloat(item.netoUSD).toFixed(2)}`,
-              `$ ${(parseFloat(item.netoUSD) * item.cantidad).toFixed(2)}`
+              `$ ${precioUnitario.toFixed(2)}`,
+              `$ ${totalItem.toFixed(2)}`
             ];
           });
 
@@ -855,14 +905,14 @@ export default {
         doc.setFont('helvetica', 'normal');
         doc.text('Subtotal:', totalesX + 5, totalesY + 12);
         doc.setTextColor(255, 255, 255);
-        doc.text(`$ ${this.subtotalUSD}`, totalesX + totalesW - 5, 
+        doc.text(`$ ${this.subtotalConGananciaUSD}`, totalesX + totalesW - 5, 
           totalesY + 12, { align: 'right' });
 
         // IVA
         doc.setTextColor(180, 180, 180);
         doc.text(`IVA ${this.ivaSeleccionado}%:`, totalesX + 5, totalesY + 22);
         doc.setTextColor(255, 255, 255);
-        doc.text(`$ ${this.ivaUSD}`, totalesX + totalesW - 5, 
+        doc.text(`$ ${this.ivaConGananciaUSD}`, totalesX + totalesW - 5, 
           totalesY + 22, { align: 'right' });
 
         // Línea dorada
@@ -877,14 +927,14 @@ export default {
         doc.setFont('helvetica', 'bold');
         doc.text('TOTAL USD', totalesX + 5, totalesY + 40);
         doc.setFontSize(16);
-        doc.text(`$ ${this.totalUSD}`, totalesX + totalesW - 5, 
+        doc.text(`$ ${this.totalConGananciaUSD}`, totalesX + totalesW - 5, 
           totalesY + 40, { align: 'right' });
 
         // ARS
         doc.setTextColor(160, 160, 160);
         doc.setFontSize(9);
         doc.setFont('helvetica', 'normal');
-        doc.text(`ARS $ ${this.totalARS}`, totalesX + totalesW - 5, 
+        doc.text(`ARS $ ${this.totalConGananciaARS}`, totalesX + totalesW - 5, 
           totalesY + 52, { align: 'right' });
 
         // === FOOTER NEGRO ===
@@ -913,13 +963,214 @@ export default {
             `${fechaHoy.replace(/\//g, '-')}.pdf`;
         }
 
-        // === DESCARGAR PDF ===
+        // === DESCARGAR PDF (con ganancia para cliente) ===
         doc.save(nombreArchivo);
         this.$alertify.success('PDF generado correctamente');
 
-        // === ENVIAR EMAIL EN BACKGROUND ===
-        // El email lleva el nombre del usuario LOGUEADO (no el cliente final)
-        const pdfBase64 = doc.output('datauristring').split(',')[1];
+        // === GENERAR PDF PARA VENDEDOR (sin ganancia) ===
+        const docVendedor = new jsPDF();
+        const pageWidthV = docVendedor.internal.pageSize.getWidth();
+        const pageHeightV = docVendedor.internal.pageSize.getHeight();
+
+        // Header negro
+        docVendedor.setFillColor(negro[0], negro[1], negro[2]);
+        docVendedor.rect(0, 0, pageWidthV, 55, 'F');
+
+        let xTextoV = 20;
+        if (this.logoPreview && this.logoPreview.length > 50) {
+          try {
+            docVendedor.setFillColor(255, 255, 255);
+            docVendedor.roundedRect(12, 8, 38, 38, 3, 3, 'F');
+            docVendedor.addImage(
+              this.logoPreview, 'JPEG', 14, 10, 34, 34
+            );
+            xTextoV = 58;
+          } catch (e) {
+            xTextoV = 20;
+          }
+        }
+
+        docVendedor.setTextColor(255, 255, 255);
+        docVendedor.setFontSize(24);
+        docVendedor.setFont('helvetica', 'bold');
+        docVendedor.text(nombrePDF.toUpperCase(), pageWidthV / 2, 28, 
+          { align: 'center' });
+
+        docVendedor.setDrawColor(dorado[0], dorado[1], dorado[2]);
+        docVendedor.setLineWidth(2);
+        docVendedor.line(pageWidthV / 2 - 35, 34, pageWidthV / 2 + 35, 34);
+
+        docVendedor.setFillColor(255, 255, 255);
+        docVendedor.roundedRect(pageWidthV - 45, 12, 35, 30, 2, 2, 'F');
+        docVendedor.setTextColor(negro[0], negro[1], negro[2]);
+        docVendedor.setFontSize(8);
+        docVendedor.setFont('helvetica', 'bold');
+        docVendedor.text('FECHA', pageWidthV - 27.5, 22, { align: 'center' });
+        docVendedor.setFontSize(11);
+        docVendedor.text(fechaHoy, pageWidthV - 27.5, 35, { align: 'center' });
+
+        let yPosV = 70;
+
+        // Datos emisor
+        if (tieneDataEmisor) {
+          docVendedor.setTextColor(80, 80, 80);
+          docVendedor.setFontSize(9);
+          docVendedor.setFont('helvetica', 'normal');
+          if (this.cuitEmisor) {
+            docVendedor.text(`CUIT: ${this.cuitEmisor}`, 15, yPosV);
+            yPosV += 5;
+          }
+          if (this.domicilioEmisor) {
+            docVendedor.text(`Domicilio: ${this.domicilioEmisor}`, 15, yPosV);
+            yPosV += 5;
+          }
+          if (this.localidadEmisor) {
+            docVendedor.text(`Localidad: ${this.localidadEmisor}`, 15, yPosV);
+            yPosV += 5;
+          }
+          yPosV += 5;
+        }
+
+        // Tabla productos SIN ganancia
+        if (this.itemsPresupuesto.length > 0) {
+          docVendedor.setTextColor(negro[0], negro[1], negro[2]);
+          docVendedor.setFontSize(12);
+          docVendedor.setFont('helvetica', 'bold');
+          docVendedor.text('DETALLE DE PRODUCTOS', 15, yPosV);
+          docVendedor.setDrawColor(dorado[0], dorado[1], dorado[2]);
+          docVendedor.setLineWidth(1);
+          docVendedor.line(15, yPosV + 2, 78, yPosV + 2);
+          yPosV += 10;
+
+          const productosDataV = this.itemsPresupuesto.map(item => {
+            let nombre = item.producto.replace(/\*\*/g, '');
+            if (nombre.length > 40) {
+              nombre = nombre.substring(0, 40) + '...';
+            }
+            // Precio SIN ganancia
+            const precioNeto = parseFloat(item.netoUSD);
+            const totalNeto = precioNeto * item.cantidad;
+            return [
+              nombre,
+              item.marca,
+              item.cantidad.toString(),
+              `$ ${precioNeto.toFixed(2)}`,
+              `$ ${totalNeto.toFixed(2)}`
+            ];
+          });
+
+          autoTable(docVendedor, {
+            startY: yPosV,
+            head: [['Producto', 'Marca', 'Cant.', 'Unitario', 'Total']],
+            body: productosDataV,
+            theme: 'plain',
+            headStyles: { 
+              fillColor: [245, 245, 245],
+              textColor: negro,
+              fontStyle: 'bold',
+              fontSize: 9,
+              cellPadding: 5
+            },
+            bodyStyles: { fontSize: 9, cellPadding: 5 },
+            columnStyles: {
+              0: { cellWidth: 65 },
+              1: { cellWidth: 30 },
+              2: { cellWidth: 18, halign: 'center' },
+              3: { cellWidth: 28, halign: 'right' },
+              4: { cellWidth: 28, halign: 'right', fontStyle: 'bold' }
+            },
+            alternateRowStyles: { fillColor: [252, 252, 252] }
+          });
+
+          yPosV = docVendedor.lastAutoTable.finalY + 15;
+        }
+
+        // Cuadro totales SIN ganancia (solo productos)
+        const totalesYV = Math.max(yPosV + 5, 185);
+        const totalesXV = pageWidthV - 80;
+        const totalesWV = 65;
+
+        docVendedor.setFillColor(negro[0], negro[1], negro[2]);
+        docVendedor.roundedRect(
+          totalesXV, totalesYV, totalesWV, 58, 3, 3, 'F'
+        );
+
+        docVendedor.setTextColor(180, 180, 180);
+        docVendedor.setFontSize(9);
+        docVendedor.setFont('helvetica', 'normal');
+        docVendedor.text('Subtotal:', totalesXV + 5, totalesYV + 12);
+        docVendedor.setTextColor(255, 255, 255);
+        docVendedor.text(
+          `$ ${this.subtotalProductosUSD.toFixed(2)}`, 
+          totalesXV + totalesWV - 5, 
+          totalesYV + 12, 
+          { align: 'right' }
+        );
+
+        docVendedor.setTextColor(180, 180, 180);
+        docVendedor.text('IVA:', totalesXV + 5, totalesYV + 22);
+        docVendedor.setTextColor(255, 255, 255);
+        docVendedor.text(
+          `$ ${this.ivaProductosUSD.toFixed(2)}`, 
+          totalesXV + totalesWV - 5, 
+          totalesYV + 22, 
+          { align: 'right' }
+        );
+
+        docVendedor.setDrawColor(dorado[0], dorado[1], dorado[2]);
+        docVendedor.setLineWidth(1);
+        docVendedor.line(
+          totalesXV + 5, totalesYV + 28, 
+          totalesXV + totalesWV - 5, totalesYV + 28
+        );
+
+        const totalProductosUSD = (
+          this.subtotalProductosUSD + this.ivaProductosUSD
+        ).toFixed(2);
+        const totalProductosARS = (
+          parseFloat(totalProductosUSD) * 1460
+        ).toLocaleString('es-AR', { 
+          minimumFractionDigits: 2, 
+          maximumFractionDigits: 2 
+        });
+
+        docVendedor.setTextColor(dorado[0], dorado[1], dorado[2]);
+        docVendedor.setFontSize(10);
+        docVendedor.setFont('helvetica', 'bold');
+        docVendedor.text('TOTAL USD', totalesXV + 5, totalesYV + 40);
+        docVendedor.setFontSize(16);
+        docVendedor.text(
+          `$ ${totalProductosUSD}`, 
+          totalesXV + totalesWV - 5, 
+          totalesYV + 40, 
+          { align: 'right' }
+        );
+
+        docVendedor.setTextColor(160, 160, 160);
+        docVendedor.setFontSize(9);
+        docVendedor.setFont('helvetica', 'normal');
+        docVendedor.text(
+          `ARS $ ${totalProductosARS}`, 
+          totalesXV + totalesWV - 5, 
+          totalesYV + 52, 
+          { align: 'right' }
+        );
+
+        // Footer
+        docVendedor.setFillColor(negro[0], negro[1], negro[2]);
+        docVendedor.rect(0, pageHeightV - 15, pageWidthV, 15, 'F');
+        docVendedor.setTextColor(160, 160, 160);
+        docVendedor.setFontSize(8);
+        docVendedor.setFont('helvetica', 'normal');
+        docVendedor.text(
+          'PDF para uso interno - Precios sin margen',
+          pageWidthV / 2,
+          pageHeightV - 6,
+          { align: 'center' }
+        );
+
+        // === ENVIAR EMAIL CON PDF SIN GANANCIA ===
+        const pdfBase64 = docVendedor.output('datauristring').split(',')[1];
         fetch('/api/enviar-presupuesto', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
@@ -934,12 +1185,17 @@ export default {
         })
         .then(res => res.json())
         .then(data => {
+          console.log('Respuesta email:', data);
           if (data.success) {
             this.$alertify.success('Email enviado al vendedor');
+          } else {
+            this.$alertify.error('Email no enviado: ' + 
+              (data.error || 'error desconocido'));
           }
         })
         .catch(err => {
           console.error('Error enviando email:', err);
+          this.$alertify.error('Error enviando email');
         });
 
       } catch (error) {
@@ -975,6 +1231,9 @@ export default {
     },
     localidadEmisor(val) {
       localStorage.setItem('localidadEmisor', val || '');
+    },
+    porcentajeGanancia(val) {
+      localStorage.setItem('porcentajeGanancia', val || 0);
     }
   }
 }

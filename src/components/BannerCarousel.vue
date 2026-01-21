@@ -6,7 +6,7 @@
       show-arrows-on-hover
       :interval="5000"
       class="banner-carousel"
-      height="220"
+      :height="carouselHeight"
     >
       <v-carousel-item
         v-for="(banner, i) in banners"
@@ -14,7 +14,7 @@
       >
         <v-img
           :src="banner.imagen"
-          height="220"
+          :height="carouselHeight"
           cover
           class="banner-img"
         ></v-img>
@@ -29,10 +29,41 @@ export default {
   
   data() {
     return {
-      banners: [
+      bannersDesktop: [
         { imagen: '/banners/1.png' },
-        { imagen: '/banners/2.png' }
-      ]
+        { imagen: '/banners/2.png' },
+        { imagen: '/banners/3.png' }
+      ],
+      bannersMobile: [
+        { imagen: '/banners/1m.png' },
+        { imagen: '/banners/2m.png' },
+        { imagen: '/banners/3m.png' }
+      ],
+      isMobile: false
+    }
+  },
+  
+  computed: {
+    banners() {
+      return this.isMobile ? this.bannersMobile : this.bannersDesktop;
+    },
+    carouselHeight() {
+      return this.isMobile ? 180 : 300;
+    }
+  },
+  
+  mounted() {
+    this.checkMobile();
+    window.addEventListener('resize', this.checkMobile);
+  },
+  
+  beforeDestroy() {
+    window.removeEventListener('resize', this.checkMobile);
+  },
+  
+  methods: {
+    checkMobile() {
+      this.isMobile = window.innerWidth <= 600;
     }
   }
 }
@@ -50,15 +81,5 @@ export default {
 
 .banner-img {
   background: #1a1a2e;
-}
-
-@media (max-width: 600px) {
-  .banner-carousel-container {
-    height: 150px;
-  }
-  
-  .banner-carousel {
-    height: 150px !important;
-  }
 }
 </style>
