@@ -8,7 +8,8 @@ const cheerio = require("cheerio");
 
 const app = express();
 app.use(cors());
-app.use(express.json({ limit: "50mb" }));
+app.use(express.json({ limit: "100mb" }));
+app.use(express.urlencoded({ limit: "100mb", extended: true }));
 
 const DATA_DIR = path.join(__dirname, "data");
 
@@ -379,6 +380,8 @@ app.post("/api/cliente/:id/sucursal", (req, res) => {
 
 // Enviar presupuesto por email
 app.post("/api/enviar-presupuesto", async (req, res) => {
+  console.log('=== RECIBIDO PEDIDO EMAIL ===');
+  console.log('Tamaño body:', JSON.stringify(req.body).length);
   try {
     const {
       pdfBase64,
