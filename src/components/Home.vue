@@ -132,22 +132,33 @@
                                 target="_blank"
                                 class="phone-item"
                             >
-                                <v-icon 
-                                    color="green darken-1" 
-                                    small 
+                                <v-avatar 
+                                    size="36" 
                                     class="mr-2"
                                 >
-                                    mdi-whatsapp
-                                </v-icon>
-                                <span class="phone-text">
-                                    {{ tel.display }}
-                                </span>
-                                <span 
-                                    v-if="tel.nombre"
-                                    class="phone-name"
-                                >
-                                    {{ tel.nombre }}
-                                </span>
+                                    <v-img 
+                                        v-if="tel.foto" 
+                                        :src="tel.foto"
+                                    />
+                                    <span v-else style="font-size: 20px;">
+                                        🐸
+                                    </span>
+                                </v-avatar>
+                                <div class="phone-info">
+                                    <span class="phone-name">
+                                        {{ tel.nombre }}
+                                    </span>
+                                    <span class="phone-text">
+                                        <v-icon 
+                                            color="green darken-1" 
+                                            x-small 
+                                            class="mr-1"
+                                        >
+                                            mdi-whatsapp
+                                        </v-icon>
+                                        {{ tel.display }}
+                                    </span>
+                                </div>
                             </a>
                         </div>
                     </v-card-text>
@@ -177,32 +188,38 @@ export default {
                     { 
                         numero: '5493417077180', 
                         display: '+54 9 3417 07-7180',
-                        nombre: 'Agustina'
+                        nombre: 'Agustina',
+                        foto: ''
                     },
                     { 
                         numero: '5493417479394', 
                         display: '+54 9 3417 47-9394',
-                        nombre: ''
+                        nombre: 'Mario Szemruch',
+                        foto: '/vendedores/Mario Szemruch.jpeg'
                     },
                     { 
                         numero: '5493413566461', 
                         display: '+54 9 341 356-6461',
-                        nombre: ''
+                        nombre: 'Maximiliano Puebla',
+                        foto: '/vendedores/Maxi.jpeg'
                     },
                     { 
                         numero: '5493413389611', 
                         display: '+54 9 341 338-9611',
-                        nombre: ''
+                        nombre: 'Estefania',
+                        foto: ''
                     },
                     { 
                         numero: '5493415520646', 
                         display: '+54 9 341 552-0646',
-                        nombre: ''
+                        nombre: 'Luciano Balonchar',
+                        foto: '/vendedores/Luciano.png'
                     },
                     { 
                         numero: '5493417544843', 
                         display: '+54 9 341 754-4843',
-                        nombre: ''
+                        nombre: 'Facundo Galeano',
+                        foto: ''
                     }
                 ]
             },
@@ -220,12 +237,14 @@ export default {
                     { 
                         numero: '5493813387990', 
                         display: '+54 9 3813 38-7990',
-                        nombre: 'Ventas'
+                        nombre: 'Ventas',
+                        foto: ''
                     },
                     { 
                         numero: '5493816073997', 
                         display: '+54 9 3816 07-3997',
-                        nombre: 'Milesi German'
+                        nombre: 'Milesi German',
+                        foto: ''
                     }
                 ]
             }
@@ -303,5 +322,25 @@ export default {
     color: #666;
     width: 100%;
     text-align: center;
+}
+
+.phone-info {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+}
+
+.phone-item .phone-name {
+    font-weight: 600;
+    font-size: 0.95em;
+    color: #333;
+    width: auto;
+}
+
+.phone-item .phone-text {
+    font-size: 0.85em;
+    color: #666;
+    display: flex;
+    align-items: center;
 }
 </style>
