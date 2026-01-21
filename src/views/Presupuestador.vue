@@ -80,7 +80,6 @@
             prepend-inner-icon="mdi-card-account-details"
             placeholder="Ej: 30-12345678-9"
             class="mb-2"
-            @change="localStorage.setItem('cuitEmisor', cuitEmisor)"
           ></v-text-field>
 
           <v-text-field
@@ -91,7 +90,6 @@
             prepend-inner-icon="mdi-map-marker"
             placeholder="Ej: Av. Córdoba 1234"
             class="mb-2"
-            @change="localStorage.setItem('domicilioEmisor', domicilioEmisor)"
           ></v-text-field>
 
           <v-text-field
@@ -102,8 +100,20 @@
             prepend-inner-icon="mdi-city"
             placeholder="Ej: Rosario, Santa Fe"
             class="mb-3"
-            @change="localStorage.setItem('localidadEmisor', localidadEmisor)"
           ></v-text-field>
+
+          <!-- Vendedor -->
+          <v-select
+            v-model="vendedorSeleccionado"
+            :items="vendedores"
+            label="Tu vendedor en IDSR"
+            outlined
+            dense
+            prepend-inner-icon="mdi-account-tie"
+            placeholder="Seleccioná tu vendedor"
+            class="mb-3"
+            clearable
+          ></v-select>
 
           <!-- IVA para Mano de Obra -->
           <v-select
@@ -375,8 +385,8 @@ export default {
         { texto: '10.5%', valor: 10.5 },
         { texto: 'Exento (0%)', valor: 0 }
       ],
-      observaciones: '',
-      itemsManoObra: [],
+      observaciones: localStorage.getItem('observacionesPresupuesto') || '',
+      itemsManoObra: JSON.parse(localStorage.getItem('itemsManoObra') || '[]'),
       nuevaManoObra: {
         descripcion: '',
         precioUSD: ''
@@ -390,7 +400,10 @@ export default {
       // Datos opcionales del emisor (para el PDF)
       cuitEmisor: localStorage.getItem('cuitEmisor') || '',
       domicilioEmisor: localStorage.getItem('domicilioEmisor') || '',
-      localidadEmisor: localStorage.getItem('localidadEmisor') || ''
+      localidadEmisor: localStorage.getItem('localidadEmisor') || '',
+      // Vendedor
+      vendedores: [],
+      vendedorSeleccionado: localStorage.getItem('vendedorSeleccionado') || ''
     }
   },
 
@@ -449,6 +462,7 @@ export default {
   async mounted() {
     await this.cargarDatosCliente();
     await this.cargarMapaIvas();
+    await this.cargarVendedores();
   },
 
   methods: {
@@ -489,6 +503,20 @@ export default {
         console.error('Error cargando mapa IVAs:', error);
       }
       this.loadingIvas = false;
+    },
+
+    async cargarVendedores() {
+      try {
+        const response = await fetch('/api/cianbox/clientes-vendedor');
+        const data = await response.json();
+        if (data.success && data.resumenVendedores) {
+          this.vendedores = data.resumenVendedores
+            .filter(v => v.vendedor !== 'Sin asignar')
+            .map(v => v.vendedor);
+        }
+      } catch (error) {
+        console.error('Error cargando vendedores:', error);
+      }
     },
 
     actualizarIvasPresupuesto() {
@@ -580,12 +608,14 @@ export default {
         descripcion: this.nuevaManoObra.descripcion,
         precioUSD: parseFloat(this.nuevaManoObra.precioUSD) || 0
       });
+      localStorage.setItem('itemsManoObra', JSON.stringify(this.itemsManoObra));
 
       this.nuevaManoObra = { descripcion: '', precioUSD: '' };
     },
 
     eliminarManoObra(idx) {
       this.itemsManoObra.splice(idx, 1);
+      localStorage.setItem('itemsManoObra', JSON.stringify(this.itemsManoObra));
     },
 
     actualizarCantidad(item) {
@@ -604,6 +634,7 @@ export default {
       if (confirm('¿Seguro que querés limpiar todo el presupuesto?')) {
         this.$store.commit('clearPresupuesto');
         this.itemsManoObra = [];
+        localStorage.removeItem('itemsManoObra');
       }
     },
 
@@ -923,6 +954,27 @@ export default {
   watch: {
     nombreClienteFinal(val) {
       localStorage.setItem('nombreClienteFinal', val || '');
+    },
+    observaciones(val) {
+      localStorage.setItem('observacionesPresupuesto', val || '');
+    },
+    itemsManoObra: {
+      handler(val) {
+        localStorage.setItem('itemsManoObra', JSON.stringify(val));
+      },
+      deep: true
+    },
+    vendedorSeleccionado(val) {
+      localStorage.setItem('vendedorSeleccionado', val || '');
+    },
+    cuitEmisor(val) {
+      localStorage.setItem('cuitEmisor', val || '');
+    },
+    domicilioEmisor(val) {
+      localStorage.setItem('domicilioEmisor', val || '');
+    },
+    localidadEmisor(val) {
+      localStorage.setItem('localidadEmisor', val || '');
     }
   }
 }
