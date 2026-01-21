@@ -15,18 +15,20 @@
             <v-img 
                 alt="IDSR Logo" 
                 src="@/assets/img/IDSRLogo.svg" 
-                width="50" 
+                width="40"
+                class="logo-img"
             />
             <v-img 
                 alt="IDSR Texto" 
                 src="@/assets/img/IDSRTexto.svg" 
-                width="90" 
+                width="70"
+                class="hidden-sm-and-down logo-img"
             />
         </div>
 
         <!-- Logo ISENOA - Click selecciona sucursal ISENOA -->
         <div
-            class="pointer ml-6 d-flex align-center"
+            class="pointer ml-2 ml-md-6 d-flex align-center"
             @click="cambiarSucursal(1)"
             :class="{ 'logo-activo': sucursalSeleccionada === 1 }"
             title="ISENOA"
@@ -34,21 +36,32 @@
             <v-img 
                 alt="ISENOA" 
                 src="@/assets/img/logo_isenoa.png" 
-                width="150"
+                class="logo-isenoa"
                 contain
             />
         </div>
 
+        <!-- Botón INICIO - Desktop con texto -->
         <v-btn
           color="primary"
           rounded
           elevation="2"
           @click="$router.push('/')"
-          class="mx-4 px-5"
+          class="mx-2 mx-md-4 px-md-5 hidden-sm-and-down"
           height="42"
         >
           <v-icon left size="24">mdi-home-circle</v-icon>
           <span class="font-weight-bold" style="font-size: 15px;">INICIO</span>
+        </v-btn>
+        <!-- Botón INICIO - Mobile solo icono -->
+        <v-btn
+          color="primary"
+          icon
+          small
+          @click="$router.push('/')"
+          class="mx-1 hidden-md-and-up"
+        >
+          <v-icon>mdi-home</v-icon>
         </v-btn>
 
         <v-spacer></v-spacer>
@@ -80,11 +93,11 @@
             </v-menu>
         </div>
 
-        <!-- Acceso al Presupuestador -->
+        <!-- Acceso al Presupuestador - Desktop con texto -->
         <v-btn 
           small
           color="primary"
-          class="mr-3" 
+          class="mr-3 hidden-sm-and-down" 
           v-if="$store.state.usuario != ''" 
           @click="goTo('/presupuestador')"
         >
@@ -98,9 +111,34 @@
             class="ml-2 font-weight-bold"
           >{{ cantItemsPresupuesto }}</v-chip>
         </v-btn>
+        <!-- Acceso al Presupuestador - Mobile solo icono -->
+        <v-btn 
+          icon
+          small
+          color="primary"
+          class="mr-1 hidden-md-and-up" 
+          v-if="$store.state.usuario != ''" 
+          @click="goTo('/presupuestador')"
+        >
+          <v-badge
+            v-if="cantItemsPresupuesto > 0"
+            :content="cantItemsPresupuesto"
+            color="red"
+            overlap
+          >
+            <v-icon>mdi-cart-outline</v-icon>
+          </v-badge>
+          <v-icon v-else>mdi-cart-outline</v-icon>
+        </v-btn>
 
-        <!-- Valor del dólar oficial -->
-        <div class="pe-4" v-if="$store.state.usuario != ''">Dólar oficial: <b>{{ dolar }}</b></div>
+        <!-- Valor del dólar oficial - Desktop con texto -->
+        <div class="pe-4 hidden-sm-and-down" v-if="$store.state.usuario != ''">
+          Dólar oficial: <b>{{ dolar }}</b>
+        </div>
+        <!-- Valor del dólar oficial - Mobile solo precio -->
+        <div class="pe-2 hidden-md-and-up caption" v-if="$store.state.usuario != ''">
+          <b>${{ dolar }}</b>
+        </div>
 
         <!-- Opciones si el usuario está logueado -->
         <div>
@@ -282,16 +320,10 @@ export default {
     opacity: 1;
     border-bottom: 3px solid #1976D2;
     padding-bottom: 4px;
-    height: 50px;
-    display: flex;
-    align-items: center;
 }
 
 .pointer {
     transition: opacity 0.2s ease;
-    height: 50px;
-    display: flex;
-    align-items: center;
 }
 
 .pointer:not(.logo-activo) {
@@ -300,5 +332,28 @@ export default {
 
 .pointer:hover {
     opacity: 1;
+}
+
+/* Responsive logos */
+.logo-isenoa {
+    width: 150px;
+}
+
+@media (max-width: 960px) {
+    .logo-isenoa {
+        width: 80px;
+    }
+    .logo-img {
+        max-width: 35px;
+    }
+}
+
+@media (max-width: 600px) {
+    .logo-isenoa {
+        width: 60px;
+    }
+    .logo-img {
+        max-width: 30px;
+    }
 }
 </style>
