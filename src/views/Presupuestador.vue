@@ -61,34 +61,57 @@
           <!-- Nombre Cliente Final (editable) -->
           <v-text-field
             v-model="nombreClienteFinal"
-            label="Nombre del cliente (aparece en el PDF)"
+            label="Nombre en el PDF (editable)"
             outlined
             dense
             prepend-inner-icon="mdi-account-box"
-            placeholder="Ej: Juan Pérez / Empresa SRL"
+            placeholder="Se autocompleta o escribí manualmente"
             class="mb-3"
+            @change="localStorage.setItem('nombreClienteFinal', 
+                      nombreClienteFinal)"
           ></v-text-field>
 
-          <!-- Vendedor -->
-          <v-select
-            v-model="vendedorSeleccionado"
-            :items="vendedores"
-            item-text="nombre"
-            item-value="id"
-            label="Vendedor asignado"
+          <!-- Datos opcionales del emisor -->
+          <v-text-field
+            v-model="cuitEmisor"
+            label="CUIT (opcional)"
             outlined
             dense
-            prepend-inner-icon="mdi-account-tie"
-            @change="guardarVendedor"
-          ></v-select>
+            prepend-inner-icon="mdi-card-account-details"
+            placeholder="Ej: 30-12345678-9"
+            class="mb-2"
+            @change="localStorage.setItem('cuitEmisor', cuitEmisor)"
+          ></v-text-field>
 
-          <!-- IVA -->
+          <v-text-field
+            v-model="domicilioEmisor"
+            label="Domicilio (opcional)"
+            outlined
+            dense
+            prepend-inner-icon="mdi-map-marker"
+            placeholder="Ej: Av. Córdoba 1234"
+            class="mb-2"
+            @change="localStorage.setItem('domicilioEmisor', domicilioEmisor)"
+          ></v-text-field>
+
+          <v-text-field
+            v-model="localidadEmisor"
+            label="Localidad (opcional)"
+            outlined
+            dense
+            prepend-inner-icon="mdi-city"
+            placeholder="Ej: Rosario, Santa Fe"
+            class="mb-3"
+            @change="localStorage.setItem('localidadEmisor', localidadEmisor)"
+          ></v-text-field>
+
+          <!-- IVA para Mano de Obra -->
           <v-select
             v-model="ivaSeleccionado"
             :items="opcionesIva"
             item-text="texto"
             item-value="valor"
-            label="IVA a aplicar"
+            label="IVA para Mano de Obra"
             outlined
             dense
             prepend-inner-icon="mdi-percent"
@@ -274,10 +297,10 @@
                 <tr>
                   <th>Producto</th>
                   <th>Marca</th>
-                  <th class="text-center">Cantidad</th>
+                  <th class="text-center">Cant.</th>
+                  <th class="text-center">IVA</th>
                   <th class="text-right">USD Unit.</th>
                   <th class="text-right">USD Total</th>
-                  <th class="text-right">ARS Total</th>
                   <th></th>
                 </tr>
               </thead>
@@ -285,7 +308,7 @@
                 <tr v-for="item in itemsPresupuesto" :key="item.id">
                   <td>{{ item.producto }}</td>
                   <td>{{ item.marca }}</td>
-                  <td class="text-center" style="width: 120px;">
+                  <td class="text-center" style="width: 100px;">
                     <v-text-field
                       v-model.number="item.cantidad"
                       type="number"
@@ -294,18 +317,25 @@
                       hide-details
                       outlined
                       class="centered-input"
-                      style="max-width: 80px; margin: 0 auto;"
+                      style="max-width: 70px; margin: 0 auto;"
                       @change="actualizarCantidad(item)"
                     ></v-text-field>
+                  </td>
+                  <td class="text-center">
+                    <v-chip 
+                      x-small 
+                      :color="item.ivaPercent === 10.5 
+                        ? 'orange' : 'grey'"
+                      dark
+                    >
+                      {{ item.ivaPercent || 21 }}%
+                    </v-chip>
                   </td>
                   <td class="text-right">
                     $ {{ parseFloat(item.netoUSD).toFixed(2) }}
                   </td>
                   <td class="text-right">
                     $ {{ calcularTotalItem(item, 'USD') }}
-                  </td>
-                  <td class="text-right">
-                    $ {{ calcularTotalItem(item, 'ARS') }}
                   </td>
                   <td class="text-right">
                     <v-btn 
@@ -339,8 +369,6 @@ export default {
     return {
       logoPreview: '',
       nombreClienteFinal: localStorage.getItem('nombreClienteFinal') || '',
-      vendedorSeleccionado: null,
-      vendedores: [],
       ivaSeleccionado: 21,
       opcionesIva: [
         { texto: '21%', valor: 21 },
@@ -355,7 +383,14 @@ export default {
       },
       generandoPDF: false,
       colorPrimario: [30, 30, 30],
-      colorSecundario: [212, 175, 55]
+      colorSecundario: [212, 175, 55],
+      // Mapa de IVAs por código
+      mapaIvas: {},
+      loadingIvas: false,
+      // Datos opcionales del emisor (para el PDF)
+      cuitEmisor: localStorage.getItem('cuitEmisor') || '',
+      domicilioEmisor: localStorage.getItem('domicilioEmisor') || '',
+      localidadEmisor: localStorage.getItem('localidadEmisor') || ''
     }
   },
 
@@ -382,9 +417,20 @@ export default {
       return (this.subtotalProductosUSD + this.subtotalManoObraUSD)
         .toFixed(2);
     },
+    // IVA calculado sumando el IVA individual de cada producto
+    ivaProductosUSD() {
+      return this.itemsPresupuesto.reduce((sum, item) => {
+        const ivaPercent = item.ivaPercent || 21;
+        const subtotalItem = parseFloat(item.netoUSD) * item.cantidad;
+        return sum + (subtotalItem * ivaPercent / 100);
+      }, 0);
+    },
+    ivaManoObraUSD() {
+      // Mano de obra usa el IVA seleccionado manualmente
+      return this.subtotalManoObraUSD * this.ivaSeleccionado / 100;
+    },
     ivaUSD() {
-      return (parseFloat(this.subtotalUSD) * this.ivaSeleccionado / 100)
-        .toFixed(2);
+      return (this.ivaProductosUSD + this.ivaManoObraUSD).toFixed(2);
     },
     totalUSD() {
       return (parseFloat(this.subtotalUSD) + parseFloat(this.ivaUSD))
@@ -401,20 +447,11 @@ export default {
   },
 
   async mounted() {
-    await this.cargarVendedores();
     await this.cargarDatosCliente();
+    await this.cargarMapaIvas();
   },
 
   methods: {
-    async cargarVendedores() {
-      try {
-        const response = await fetch('/api/vendedores');
-        this.vendedores = await response.json();
-      } catch (error) {
-        console.error('Error cargando vendedores:', error);
-      }
-    },
-
     async cargarDatosCliente() {
       const usuarioId = this.$store.state.usuarioId;
       if (!usuarioId || usuarioId === 0) return;
@@ -428,12 +465,45 @@ export default {
             this.extraerColoresLogo();
           });
         }
-        if (data.vendedorId) {
-          this.vendedorSeleccionado = data.vendedorId;
-        }
       } catch (error) {
         console.error('Error cargando datos cliente:', error);
       }
+    },
+
+
+    async cargarMapaIvas() {
+      this.loadingIvas = true;
+      try {
+        const response = await fetch('/api/cianbox/productos-iva');
+        const data = await response.json();
+        if (data.success && data.productos) {
+          // Crear mapa codigo -> ivaPercent
+          this.mapaIvas = {};
+          data.productos.forEach(p => {
+            this.mapaIvas[p.codigo] = p.ivaPercent;
+          });
+          // Actualizar items existentes en el presupuesto
+          this.actualizarIvasPresupuesto();
+        }
+      } catch (error) {
+        console.error('Error cargando mapa IVAs:', error);
+      }
+      this.loadingIvas = false;
+    },
+
+    actualizarIvasPresupuesto() {
+      // Actualizar el IVA de cada producto en el presupuesto
+      this.itemsPresupuesto.forEach(item => {
+        if (!item.ivaPercent && item.codigoInterno) {
+          const iva = this.mapaIvas[item.codigoInterno];
+          if (iva !== undefined) {
+            this.$store.commit('updateIvaPresupuesto', {
+              id: item.id,
+              ivaPercent: iva
+            });
+          }
+        }
+      });
     },
 
     onLogoSelected(event) {
@@ -501,22 +571,7 @@ export default {
       await this.guardarLogo('');
     },
 
-    async guardarVendedor() {
-      const usuarioId = this.$store.state.usuarioId;
-      if (!usuarioId || usuarioId === 0) return;
-
-      try {
-        await fetch(`/api/cliente/${usuarioId}/vendedor`, {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ 
-            vendedorId: this.vendedorSeleccionado 
-          })
-        });
-      } catch (error) {
-        console.error('Error guardando vendedor:', error);
-      }
-    },
+    
 
     agregarManoObra() {
       if (!this.nuevaManoObra.descripcion) return;
@@ -618,6 +673,29 @@ export default {
         doc.text(fechaHoy, pageWidth - 27.5, 35, { align: 'center' });
 
         let yPos = 70;
+
+        // Datos opcionales del emisor
+        const tieneDataEmisor = this.cuitEmisor || 
+          this.domicilioEmisor || this.localidadEmisor;
+        if (tieneDataEmisor) {
+          doc.setTextColor(80, 80, 80);
+          doc.setFontSize(9);
+          doc.setFont('helvetica', 'normal');
+          
+          if (this.cuitEmisor) {
+            doc.text(`CUIT: ${this.cuitEmisor}`, 15, yPos);
+            yPos += 5;
+          }
+          if (this.domicilioEmisor) {
+            doc.text(`Domicilio: ${this.domicilioEmisor}`, 15, yPos);
+            yPos += 5;
+          }
+          if (this.localidadEmisor) {
+            doc.text(`Localidad: ${this.localidadEmisor}`, 15, yPos);
+            yPos += 5;
+          }
+          yPos += 5;
+        }
 
         // === TABLA DE PRODUCTOS ===
         if (this.itemsPresupuesto.length > 0) {
