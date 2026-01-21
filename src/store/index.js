@@ -92,16 +92,6 @@ export default new Vuex.Store({
         );
       }
     },
-    updateIvaPresupuesto(state, { id, ivaPercent }) {
-      const item = state.itemsPresupuesto.find((i) => i.id === id);
-      if (item) {
-        item.ivaPercent = ivaPercent;
-        localStorage.setItem(
-          "itemsPresupuesto",
-          JSON.stringify(state.itemsPresupuesto)
-        );
-      }
-    },
     clearPresupuesto(state) {
       state.itemsPresupuesto = [];
       localStorage.removeItem("itemsPresupuesto");

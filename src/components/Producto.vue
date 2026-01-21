@@ -589,10 +589,9 @@ export default {
                 netoARS: item.netoARS,
                 precioUSD: item.precioUSD,
                 precioARS: item.precioARS,
-                imagen: item.imagen,
-                ivaPercent: null // Se actualizará desde Presupuestador
+                imagen: item.imagen
             });
-            this.snackbarText = `${item.producto} agregado`;
+            this.snackbarText = `${item.producto} agregado al presupuesto`;
             this.snackbar = true;
         },
     },
