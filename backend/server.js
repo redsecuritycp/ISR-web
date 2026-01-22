@@ -431,7 +431,7 @@ app.post("/api/enviar-presupuesto", async (req, res) => {
 });
 
 // === SERVIR FRONTEND ===
-const distPath = path.join(__dirname, '..', 'dist');
+const distPath = path.join(process.cwd(), 'dist');
 
 // Servir archivos estáticos del frontend
 app.use(express.static(distPath));
