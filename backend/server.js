@@ -18,7 +18,6 @@ const CIANBOX_URL = "https://cianbox.org/insumosdeseguridadrosario";
 let cianboxCookies = null;
 let cianboxLastLogin = null;
 
-// Login a Cianbox y guardar cookies
 async function cianboxLogin() {
   try {
     const user = process.env.CIANBOX_USER;
@@ -30,7 +29,6 @@ async function cianboxLogin() {
 
     const loginUrl = `${CIANBOX_URL}/login.php`;
 
-    // POST login
     const response = await axios.post(
       loginUrl,
       `usuario=${encodeURIComponent(user)}&clave=${encodeURIComponent(pass)}`,
@@ -43,7 +41,6 @@ async function cianboxLogin() {
       },
     );
 
-    // Extraer cookies de la respuesta
     const setCookies = response.headers["set-cookie"];
     if (setCookies) {
       cianboxCookies = setCookies.map((c) => c.split(";")[0]).join("; ");
@@ -59,7 +56,6 @@ async function cianboxLogin() {
   }
 }
 
-// Verificar si necesita re-login (cada 30 min)
 async function ensureCianboxLogin() {
   const THIRTY_MIN = 30 * 60 * 1000;
   if (
@@ -72,7 +68,6 @@ async function ensureCianboxLogin() {
   return true;
 }
 
-// Hacer POST autenticado a Cianbox
 async function cianboxPost(sec, extraParams = {}) {
   await ensureCianboxLogin();
 
@@ -103,12 +98,16 @@ async function cianboxPost(sec, extraParams = {}) {
   return response.data;
 }
 
+// === HEALTH CHECK (Replit necesita endpoint rápido) ===
+app.get("/health", (req, res) => {
+  res.status(200).send("OK");
+});
+
 // === ENDPOINT: Productos con IVA ===
 app.get("/api/cianbox/productos-iva", async (req, res) => {
   try {
     const html = await cianboxPost("pv_productos");
     const $ = cheerio.load(html);
-
     const productos = [];
 
     $("tr").each((i, row) => {
@@ -126,7 +125,6 @@ app.get("/api/cianbox/productos-iva", async (req, res) => {
         const finalIvaStr = textos[6];
         const netoStr = textos[7];
 
-        // Parsear precios
         const parsearPrecio = (str) => {
           if (!str) return 0;
           return (
@@ -145,7 +143,6 @@ app.get("/api/cianbox/productos-iva", async (req, res) => {
         const neto = parsearPrecio(netoStr);
         const finalIva = parsearPrecio(finalIvaStr);
 
-        // Calcular % IVA
         let ivaPercent = 0;
         if (neto > 0 && finalIva > neto) {
           ivaPercent = ((finalIva - neto) / neto) * 100;
@@ -166,17 +163,10 @@ app.get("/api/cianbox/productos-iva", async (req, res) => {
       }
     });
 
-    res.json({
-      success: true,
-      total: productos.length,
-      productos,
-    });
+    res.json({ success: true, total: productos.length, productos });
   } catch (error) {
     console.error("Error productos-iva:", error.message);
-    res.status(500).json({
-      success: false,
-      error: error.message,
-    });
+    res.status(500).json({ success: false, error: error.message });
   }
 });
 
@@ -190,7 +180,6 @@ app.get("/api/cianbox/clientes-vendedor", async (req, res) => {
       scroll: "0",
     });
     const $ = cheerio.load(html);
-
     const clientes = [];
 
     $("tr").each((i, row) => {
@@ -214,32 +203,20 @@ app.get("/api/cianbox/clientes-vendedor", async (req, res) => {
 
         if (nombre && nombre.length > 2) {
           clientes.push({
-            id,
-            nombre,
-            fantasia,
-            domicilio,
-            cuit,
-            localidad,
-            email,
-            observaciones,
-            saldo,
-            vendedor,
+            id, nombre, fantasia, domicilio, cuit,
+            localidad, email, observaciones, saldo, vendedor,
           });
         }
       }
     });
 
-    // Agrupar por vendedor
     const porVendedor = {};
     clientes.forEach((c) => {
       const v = c.vendedor || "Sin asignar";
-      if (!porVendedor[v]) {
-        porVendedor[v] = [];
-      }
+      if (!porVendedor[v]) porVendedor[v] = [];
       porVendedor[v].push(c);
     });
 
-    // Resumen de vendedores
     const resumenVendedores = Object.keys(porVendedor).map((v) => ({
       vendedor: v,
       cantidadClientes: porVendedor[v].length,
@@ -254,10 +231,7 @@ app.get("/api/cianbox/clientes-vendedor", async (req, res) => {
     });
   } catch (error) {
     console.error("Error clientes-vendedor:", error.message);
-    res.status(500).json({
-      success: false,
-      error: error.message,
-    });
+    res.status(500).json({ success: false, error: error.message });
   }
 });
 
@@ -270,16 +244,12 @@ app.get("/api/cianbox/test", async (req, res) => {
       message: ok ? "Conexión exitosa" : "Fallo el login",
     });
   } catch (error) {
-    res.status(500).json({
-      success: false,
-      error: error.message,
-    });
+    res.status(500).json({ success: false, error: error.message });
   }
 });
 
 // === ENDPOINTS EXISTENTES ===
 
-// Vendedores
 app.get("/api/vendedores", (req, res) => {
   try {
     const data = fs.readFileSync(
@@ -292,16 +262,13 @@ app.get("/api/vendedores", (req, res) => {
   }
 });
 
-// Cliente por ID
 app.get("/api/cliente/:id", (req, res) => {
   try {
     const clientesPath = path.join(DATA_DIR, "clientes.json");
     let clientes = {};
-
     if (fs.existsSync(clientesPath)) {
       clientes = JSON.parse(fs.readFileSync(clientesPath, "utf8"));
     }
-
     const cliente = clientes[req.params.id] || {};
     res.json(cliente);
   } catch (error) {
@@ -309,22 +276,15 @@ app.get("/api/cliente/:id", (req, res) => {
   }
 });
 
-// Guardar logo
 app.post("/api/cliente/:id/logo", (req, res) => {
   try {
     const clientesPath = path.join(DATA_DIR, "clientes.json");
     let clientes = {};
-
     if (fs.existsSync(clientesPath)) {
       clientes = JSON.parse(fs.readFileSync(clientesPath, "utf8"));
     }
-
-    if (!clientes[req.params.id]) {
-      clientes[req.params.id] = {};
-    }
-
+    if (!clientes[req.params.id]) clientes[req.params.id] = {};
     clientes[req.params.id].logo = req.body.logo;
-
     fs.writeFileSync(clientesPath, JSON.stringify(clientes, null, 2));
     res.json({ success: true });
   } catch (error) {
@@ -332,22 +292,15 @@ app.post("/api/cliente/:id/logo", (req, res) => {
   }
 });
 
-// Guardar vendedor asignado
 app.post("/api/cliente/:id/vendedor", (req, res) => {
   try {
     const clientesPath = path.join(DATA_DIR, "clientes.json");
     let clientes = {};
-
     if (fs.existsSync(clientesPath)) {
       clientes = JSON.parse(fs.readFileSync(clientesPath, "utf8"));
     }
-
-    if (!clientes[req.params.id]) {
-      clientes[req.params.id] = {};
-    }
-
+    if (!clientes[req.params.id]) clientes[req.params.id] = {};
     clientes[req.params.id].vendedorId = req.body.vendedorId;
-
     fs.writeFileSync(clientesPath, JSON.stringify(clientes, null, 2));
     res.json({ success: true });
   } catch (error) {
@@ -355,22 +308,15 @@ app.post("/api/cliente/:id/vendedor", (req, res) => {
   }
 });
 
-// Guardar sucursal
 app.post("/api/cliente/:id/sucursal", (req, res) => {
   try {
     const clientesPath = path.join(DATA_DIR, "clientes.json");
     let clientes = {};
-
     if (fs.existsSync(clientesPath)) {
       clientes = JSON.parse(fs.readFileSync(clientesPath, "utf8"));
     }
-
-    if (!clientes[req.params.id]) {
-      clientes[req.params.id] = {};
-    }
-
+    if (!clientes[req.params.id]) clientes[req.params.id] = {};
     clientes[req.params.id].sucursalId = req.body.sucursalId;
-
     fs.writeFileSync(clientesPath, JSON.stringify(clientes, null, 2));
     res.json({ success: true });
   } catch (error) {
@@ -378,18 +324,13 @@ app.post("/api/cliente/:id/sucursal", (req, res) => {
   }
 });
 
-// Enviar presupuesto por email
 app.post("/api/enviar-presupuesto", async (req, res) => {
   console.log('=== RECIBIDO PEDIDO EMAIL ===');
   console.log('Tamaño body:', JSON.stringify(req.body).length);
   try {
     const {
-      pdfBase64,
-      nombreCliente,
-      clienteFinal,
-      totalUSD,
-      totalARS,
-      emailDestino,
+      pdfBase64, nombreCliente, clienteFinal,
+      totalUSD, totalARS, emailDestino,
     } = req.body;
 
     const transporter = nodemailer.createTransport({
@@ -430,7 +371,14 @@ app.post("/api/enviar-presupuesto", async (req, res) => {
   }
 });
 
-const PORT = process.env.PORT || 3001;
-app.listen(PORT, () => {
-  console.log(`Backend auxiliar corriendo en puerto ${PORT}`);
+// === SERVIR FRONTEND ===
+const distPath = path.join(__dirname, '..', 'dist');
+app.use(express.static(distPath));
+app.get('*', (req, res) => {
+  res.sendFile(path.join(distPath, 'index.html'));
+});
+
+const PORT = process.env.PORT || 5000;
+app.listen(PORT, '0.0.0.0', () => {
+  console.log(`Backend corriendo en puerto ${PORT}`);
 });
