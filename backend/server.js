@@ -430,7 +430,18 @@ app.post("/api/enviar-presupuesto", async (req, res) => {
   }
 });
 
-const PORT = process.env.PORT || 3001;
+// === SERVIR FRONTEND ===
+const distPath = path.join(__dirname, '..', 'dist');
+
+// Servir archivos estáticos del frontend
+app.use(express.static(distPath));
+
+// Fallback para Vue Router - cualquier ruta que no sea API
+app.get('*', (req, res) => {
+  res.sendFile(path.join(distPath, 'index.html'));
+});
+
+const PORT = process.env.PORT || 5000;
 app.listen(PORT, () => {
   console.log(`Backend auxiliar corriendo en puerto ${PORT}`);
 });
