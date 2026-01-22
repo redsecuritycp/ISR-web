@@ -1,5 +1,4 @@
 #!/bin/bash
-
 # Instalar dependencias del frontend
 npm install
 
@@ -8,11 +7,8 @@ cd backend
 npm install
 cd ..
 
-# Iniciar backend en segundo plano
-node backend/server.js &
+# Build del frontend (genera dist)
+npm run build
 
-# Esperar que backend arranque
-sleep 3
-
-# Iniciar frontend
-npm run serve
+# Iniciar backend (sirve dist + API)
+node backend/server.js
