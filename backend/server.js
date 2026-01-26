@@ -389,10 +389,10 @@ app.post("/api/enviar-presupuesto", async (req, res) => {
 });
 
 // === SERVIR ARCHIVOS ESTÁTICOS ===
-const publicPath = path.join(__dirname, '..', 'public');
 const distPath = path.join(__dirname, '..', 'dist');
-app.use(express.static(publicPath));
+const publicPath = path.join(__dirname, '..', 'public');
 app.use(express.static(distPath));
+app.use(express.static(publicPath));
 app.get('*', (req, res) => {
   res.sendFile(path.join(distPath, 'index.html'));
 });
