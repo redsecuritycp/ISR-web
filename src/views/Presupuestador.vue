@@ -106,15 +106,33 @@
           <!-- Vendedor -->
           <v-select
             v-model="vendedorSeleccionado"
-            :items="vendedores"
-            label="Tu vendedor en IDSR"
+            :items="vendedoresFiltrados"
+            item-text="nombre"
+            item-value="nombre"
+            :label="labelVendedor"
             outlined
             dense
-            prepend-inner-icon="mdi-account-tie"
-            placeholder="Seleccioná tu vendedor"
+            :prepend-inner-icon="vendedorSeleccionado ? '' : 'mdi-account-tie'"
+            :placeholder="placeholderVendedor"
             class="mb-3"
-            clearable
-          ></v-select>
+            :clearable="!esIsenoa"
+            :disabled="esIsenoa"
+          >
+            <template v-slot:item="{ item }">
+              <v-avatar size="32" class="mr-3">
+                <v-img v-if="item.foto" :src="item.foto" />
+                <v-icon v-else>mdi-account</v-icon>
+              </v-avatar>
+              <span>{{ item.nombre }}</span>
+            </template>
+            <template v-slot:selection="{ item }">
+              <v-avatar size="24" class="mr-2">
+                <v-img v-if="item.foto" :src="item.foto" />
+                <v-icon v-else small>mdi-account</v-icon>
+              </v-avatar>
+              <span>{{ item.nombre }}</span>
+            </template>
+          </v-select>
 
           <v-text-field
             v-model.number="porcentajeGanancia"
@@ -504,6 +522,55 @@ export default {
           minimumFractionDigits: 2, 
           maximumFractionDigits: 2 
         });
+    },
+    sucursalActual() {
+      return this.$store.state.idSucursal || 2;
+    },
+    esIsenoa() {
+      return this.sucursalActual === 1;
+    },
+    vendedoresFiltrados() {
+      const mapaFotos = {
+        'Agustina Mur': '/vendedores/Agustina Mur.jpeg',
+        'Mario Facundo Szemruch': '/vendedores/Mario Szemruch.jpeg',
+        'Maximiliano Puebla': '/vendedores/Maxi.jpeg',
+        'Estefania Albisu Enseñat': '/vendedores/Estefania.jpeg',
+        'Luciano Balonchard': '/vendedores/Luciano.jpeg',
+        'Facundo Galeano': '/vendedores/Facundo.jpeg',
+        'ISENOA': '/vendedores/ventas isenoa.jpeg'
+      };
+      const permitidosIDSR = [
+        'Agustina Mur',
+        'Mario Facundo Szemruch',
+        'Maximiliano Puebla',
+        'Estefania Albisu Enseñat',
+        'Luciano Balonchard',
+        'Facundo Galeano'
+      ];
+      if (this.esIsenoa) {
+        return [{ nombre: 'ISENOA', foto: mapaFotos['ISENOA'] }];
+      }
+      return this.vendedores
+        .filter(v => {
+          return permitidosIDSR.some(p => 
+            v.toLowerCase().includes(p.split(' ')[0].toLowerCase())
+          );
+        })
+        .map(v => {
+          const fotoKey = Object.keys(mapaFotos).find(k => 
+            v.toLowerCase().includes(k.split(' ')[0].toLowerCase())
+          );
+          return {
+            nombre: v,
+            foto: fotoKey ? mapaFotos[fotoKey] : ''
+          };
+        });
+    },
+    labelVendedor() {
+      return this.esIsenoa ? 'Vendedor ISENOA' : 'Tu vendedor en IDSR';
+    },
+    placeholderVendedor() {
+      return this.esIsenoa ? 'ISENOA' : 'Seleccioná tu vendedor';
     }
   },
 
@@ -561,6 +628,10 @@ export default {
           this.vendedores = data.resumenVendedores
             .filter(v => v.vendedor !== 'Sin asignar')
             .map(v => v.vendedor);
+        }
+        // Si es ISENOA, setear vendedor por defecto
+        if (this.esIsenoa) {
+          this.vendedorSeleccionado = 'ISENOA';
         }
       } catch (error) {
         console.error('Error cargando vendedores:', error);
@@ -1235,6 +1306,12 @@ export default {
     },
     porcentajeGanancia(val) {
       localStorage.setItem('porcentajeGanancia', val || 0);
+    },
+    '$store.state.idSucursal'(newVal) {
+      if (newVal === 1) {
+        this.vendedorSeleccionado = 'ISENOA';
+      }
+      // No limpiar cuando cambia a IDSR, mantener el seleccionado
     }
   }
 }

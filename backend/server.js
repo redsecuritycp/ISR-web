@@ -16,14 +16,13 @@ const DATA_DIR = path.join(__dirname, "data");
 // === MAPA VENDEDORES -> EMAIL ===
 const VENDEDOR_EMAILS = {
   'Agustina Mur': 'ventasisrluciano@gmail.com',
-  'Maxi': 'ventasisrmaxi@gmail.com',
-  'Facundo': 'ventasisrfacundo@gmail.com',
-  'Estefania': 'ventasisrestefania@gmail.com',
-  'Estefanía': 'ventasisrestefania@gmail.com',
-  'Luciano': 'lucianobalonchard2019@gmail.com',
-  'Mario Szemruch': 'facundogruposer@gmail.com',
-  'ventas isenoa': 'info.isenoa@gmail.com',
-  'milesi': 'pansapablo@gmail.com'
+  'Maximiliano Puebla': 'ventasisrmaxi@gmail.com',
+  'Facundo Galeano': 'ventasisrfacundo@gmail.com',
+  'Estefania Albisu Enseñat': 'ventasisrestefania@gmail.com',
+  'Luciano Balonchard': 'lucianobalonchard2019@gmail.com',
+  'Mario Facundo Szemruch': 'facundogruposer@gmail.com',
+  'Isenoa': 'info.isenoa@gmail.com',
+  'ISENOA': 'info.isenoa@gmail.com'
 };
 const EMAIL_DEFAULT = 'pansapablo@gmail.com';
 
