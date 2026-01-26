@@ -107,28 +107,14 @@
           <v-select
             v-model="vendedorSeleccionado"
             :items="vendedores"
-            item-text="nombre"
-            item-value="nombre"
             label="Tu vendedor en IDSR"
             outlined
             dense
+            prepend-inner-icon="mdi-account-tie"
             placeholder="Seleccioná tu vendedor"
             class="mb-3"
             clearable
-          >
-            <template v-slot:item="{ item }">
-              <v-avatar size="32" class="mr-3">
-                <v-img :src="item.foto" />
-              </v-avatar>
-              <span>{{ item.nombre }}</span>
-            </template>
-            <template v-slot:selection="{ item }">
-              <v-avatar size="24" class="mr-2">
-                <v-img :src="item.foto" />
-              </v-avatar>
-              <span>{{ item.nombre }}</span>
-            </template>
-          </v-select>
+          ></v-select>
 
           <v-text-field
             v-model.number="porcentajeGanancia"
@@ -142,7 +128,6 @@
             hint="Se aplica solo en el PDF, no en pantalla"
             persistent-hint
             class="mb-3"
-            @input="porcentajeGanancia = porcentajeGanancia < 0 ? 0 : porcentajeGanancia"
           ></v-text-field>
 
           <!-- IVA para Mano de Obra -->
@@ -574,10 +559,7 @@ export default {
         if (data.success && data.resumenVendedores) {
           this.vendedores = data.resumenVendedores
             .filter(v => v.vendedor !== 'Sin asignar')
-            .map(v => ({
-              nombre: v.vendedor,
-              foto: `/vendedores/${v.vendedor}.jpeg`
-            }));
+            .map(v => v.vendedor);
         }
       } catch (error) {
         console.error('Error cargando vendedores:', error);
@@ -1198,7 +1180,7 @@ export default {
             clienteFinal: this.nombreClienteFinal,
             totalUSD: this.totalUSD,
             totalARS: this.totalARS,
-            vendedor: this.vendedorSeleccionado
+            emailDestino: 'pansapablo@gmail.com'
           })
         })
         .then(res => res.json())
