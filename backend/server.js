@@ -22,7 +22,7 @@ const VENDEDOR_EMAILS = {
   'Estefanía': 'ventasisrestefania@gmail.com',
   'Luciano': 'lucianobalonchard2019@gmail.com',
   'Mario Szemruch': 'facundogruposer@gmail.com',
-  'ventas isenoa': 'pansapablo@gmail.com',
+  'ventas isenoa': 'info.isenoa@gmail.com',
   'milesi': 'pansapablo@gmail.com'
 };
 const EMAIL_DEFAULT = 'pansapablo@gmail.com';
