@@ -189,7 +189,7 @@ export default {
                         numero: '5493417077180', 
                         display: '+54 9 3417 07-7180',
                         nombre: 'Agustina',
-                        foto: ''
+                        foto: '/vendedores/Agustina Mur.jpeg'
                     },
                     { 
                         numero: '5493417479394', 
@@ -207,19 +207,19 @@ export default {
                         numero: '5493413389611', 
                         display: '+54 9 341 338-9611',
                         nombre: 'Estefania',
-                        foto: ''
+                        foto: '/vendedores/Estefania.jpeg'
                     },
                     { 
                         numero: '5493415520646', 
                         display: '+54 9 341 552-0646',
                         nombre: 'Luciano Balonchar',
-                        foto: '/vendedores/Luciano.png'
+                        foto: '/vendedores/Luciano.jpeg'
                     },
                     { 
                         numero: '5493417544843', 
                         display: '+54 9 341 754-4843',
                         nombre: 'Facundo Galeano',
-                        foto: ''
+                        foto: '/vendedores/Facundo.jpeg'
                     }
                 ]
             },
@@ -238,7 +238,7 @@ export default {
                         numero: '5493813387990', 
                         display: '+54 9 3813 38-7990',
                         nombre: 'Ventas',
-                        foto: ''
+                        foto: '/vendedores/ventas isenoa.jpeg'
                     },
                     { 
                         numero: '5493816073997', 

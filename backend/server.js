@@ -13,6 +13,20 @@ app.use(express.urlencoded({ limit: "100mb", extended: true }));
 
 const DATA_DIR = path.join(__dirname, "data");
 
+// === MAPA VENDEDORES -> EMAIL ===
+const VENDEDOR_EMAILS = {
+  'Agustina Mur': 'ventasisrluciano@gmail.com',
+  'Maxi': 'ventasisrmaxi@gmail.com',
+  'Facundo': 'ventasisrfacundo@gmail.com',
+  'Estefania': 'ventasisrestefania@gmail.com',
+  'Estefanía': 'ventasisrestefania@gmail.com',
+  'Luciano': 'lucianobalonchard2019@gmail.com',
+  'Mario Szemruch': 'facundogruposer@gmail.com',
+  'ventas isenoa': 'pansapablo@gmail.com',
+  'milesi': 'pansapablo@gmail.com'
+};
+const EMAIL_DEFAULT = 'pansapablo@gmail.com';
+
 // === CIANBOX CONFIG ===
 const CIANBOX_URL = "https://cianbox.org/insumosdeseguridadrosario";
 let cianboxCookies = null;
@@ -326,12 +340,14 @@ app.post("/api/cliente/:id/sucursal", (req, res) => {
 
 app.post("/api/enviar-presupuesto", async (req, res) => {
   console.log('=== RECIBIDO PEDIDO EMAIL ===');
-  console.log('Tamaño body:', JSON.stringify(req.body).length);
   try {
     const {
       pdfBase64, nombreCliente, clienteFinal,
-      totalUSD, totalARS, emailDestino,
+      totalUSD, totalARS, vendedor
     } = req.body;
+
+    const emailDestino = VENDEDOR_EMAILS[vendedor] || EMAIL_DEFAULT;
+    console.log('Vendedor:', vendedor, '-> Email:', emailDestino);
 
     const transporter = nodemailer.createTransport({
       service: "gmail",
@@ -351,6 +367,7 @@ app.post("/api/enviar-presupuesto", async (req, res) => {
         <h2>Nuevo Presupuesto Generado</h2>
         <p><strong>Cliente:</strong> ${nombreCliente}</p>
         <p><strong>Cliente Final:</strong> ${clienteFinal || "-"}</p>
+        <p><strong>Vendedor:</strong> ${vendedor || "-"}</p>
         <p><strong>Total USD:</strong> $${totalUSD}</p>
         <p><strong>Total ARS:</strong> $${totalARS}</p>
         <p><strong>Fecha:</strong> ${fecha}</p>
@@ -364,15 +381,17 @@ app.post("/api/enviar-presupuesto", async (req, res) => {
       ],
     });
 
-    res.json({ success: true });
+    res.json({ success: true, emailEnviado: emailDestino });
   } catch (error) {
     console.error("Error enviando email:", error);
     res.status(500).json({ success: false, error: error.message });
   }
 });
 
-// === SERVIR FRONTEND ===
+// === SERVIR ARCHIVOS ESTÁTICOS ===
+const publicPath = path.join(__dirname, '..', 'public');
 const distPath = path.join(__dirname, '..', 'dist');
+app.use(express.static(publicPath));
 app.use(express.static(distPath));
 app.get('*', (req, res) => {
   res.sendFile(path.join(distPath, 'index.html'));
