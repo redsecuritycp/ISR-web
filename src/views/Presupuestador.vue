@@ -128,6 +128,7 @@
             hint="Se aplica solo en el PDF, no en pantalla"
             persistent-hint
             class="mb-3"
+            @input="porcentajeGanancia = porcentajeGanancia < 0 ? 0 : porcentajeGanancia"
           ></v-text-field>
 
           <!-- IVA para Mano de Obra -->
@@ -1180,7 +1181,7 @@ export default {
             clienteFinal: this.nombreClienteFinal,
             totalUSD: this.totalUSD,
             totalARS: this.totalARS,
-            emailDestino: 'pansapablo@gmail.com'
+            vendedor: this.vendedorSeleccionado
           })
         })
         .then(res => res.json())
