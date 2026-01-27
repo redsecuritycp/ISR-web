@@ -1,0 +1,608 @@
+ID,Nombre,Email,Teléfono,Admin,Fecha
+1,Germán Miranda,germanmiguelmiranda@hotmail.com,3416470910,Sí,2025-10-30
+2,Esequiel Martinez,esemartinez88@hotmail.com,3413388640,No,2024-08-23
+3,Facundo Galeano,galeanofacundo050@gmail.com,3415103268,No,2024-08-22
+4,Brian David Taboada,brian.taboada@hotmail.com,3413483161,Sí,2024-08-23
+5,Pablo Pansa ,pansapablo@gmail.com,3401514509,Sí,2025-10-07
+6,Técnica levy,tecnicos-mdp@hotmail.com,2236107985,No,2024-08-23
+7,Nahuel Trucco,ventasaprontar@gmail.com,3412107769,No,2024-08-23
+8,Nazareno Bruzzechesse ,bzseguridad2024@gmail.com,3401511674,No,2024-08-23
+9,Spessotti Luciano,luchospessotti@gmail.com,3402507911,No,2024-08-23
+10,ISEI Alarmas,gustavo.piombo@iseialarmas.com.ar,3415791210,No,2024-08-23
+11,Gustavo Rosales ,gusfabros@hotmail.com,3415207798,No,2024-08-30
+12,Luciano Balonchard ,lucianobalonchard2019@gmail.com,3415520646,No,2024-08-23
+13,Esteban Roncati,alarmasfilo@hotmail.com,3415314477,No,2024-12-10
+14,Vaccari Lorena,ventasisrluciano@gmail.com,3416596127,No,2024-08-23
+15,Juan Sosa,juanantoniososa.it@gmail.com,3416185775,No,2025-12-10
+16,Pedro parra,pedroparra.1@gmail.com,3417221786,No,2024-08-23
+17,German Miranda,germanmiguelmiranda@gmail.com,3416470911,No,2024-08-23
+18,Martin Farias,martin.farias@gmail.com,1156624615,No,2024-08-23
+19,Alejandro Escalante ,aleescalante882@gmail.com,3401643230,No,2024-08-26
+21,German Fenn,info@mgalarmas.com.ar,3364580131,No,2024-09-11
+22,jose luis berge,bergejose@gmail.com,3465532575,No,2026-01-26
+23,Barraza Aldo,seguridadelevctronicaalba@gmail.com,3364667470,No,2024-08-26
+24,Claudio Muñoz,claudio0523@hotmail.com,3415967152,No,2025-06-02
+25,Sergio G. Gentile - SAFTEC,info@saftec.com.ar,5493416876135,No,2024-08-27
+26,Carlos Cicconi,carlos@bytersargentina.com,3416865112,No,2025-09-03
+27,Guillermo Cesar Coronel,gcoronel77@gmail.com,3416217547,No,2024-08-27
+28,Ser SAS,rafapansa@gmail.com,3413431059,No,2025-01-28
+29,Sergio Dominguez,dominguez_sergio@yahoo.com.ar,247315508163,No,2025-06-04
+30,Jordan Acosta,jordan.acosta@hotmail.com,3401415320,No,2025-01-21
+31,Santa Cruz Marcelo ,marcelosantacruz5@gmail.com,3436404015,No,2024-08-28
+32,guillermo medina,qualityalarmas8@gmail.com,3416566648,No,2024-08-28
+33,CENTINELA CBA S.R.L.,centinelaonline@gmail.com,3513937466,No,2024-09-09
+34,Ic_informatica,icicconi@hotmail.com,3416205320,No,2025-09-11
+35,bravo federico PLUS SEGURIDAD,federico@plusseguridad.com.ar,3416043447,No,2024-10-18
+36,Javier Propezzi,jpropezzi@hotmail.com,3415024245,No,2024-09-10
+37,Jm soluciones informáticas,thejackmixer@gmail.com,3416806207,No,2025-05-28
+38,Pelloni Sistemas de Seguridad SRL,monitoreo@pellonialarmas.com.ar,3416217810,No,2024-08-30
+39,Abasto marcelo,marcelocanalla23@hotmail.com,3416769890,No,2024-08-30
+40,Ayelen Sofia Aisa Full Security One,ayelenaisa@gmail.com,3415968574,No,2025-06-03
+41,Alvaro Cordon,alvaromat.c@gmail.com,3415639786,No,2025-01-23
+42,Sebastián  Rodriguez,ps2.servicios.informaticos@gmail.com,3416874942,No,2024-09-02
+43,Rubén Yometti,rubenyometti@gmail.com,3415149450,No,2024-11-11
+44,Santiago bettig,Santiagobettig@gmail.com,3471620623,No,2024-09-02
+46,Mariano Alejandro Ruiz,m.rsecurity@hotmail.com,3413587554,No,2025-06-09
+47,Quality Systems Group S.R.L.,compras@kitexperto.com,3416279750,No,2024-12-17
+48,Ivan Novellino ,ivannovellino@hotmail.com,2473501618,No,2025-08-05
+49,Rodrigo Jesus Ybañez,Ry.surguard@gmail.com,3415692381,No,2024-09-04
+50,Ulises alvares,ulisesalvares@gmail.com,2234386492,No,2024-09-03
+51,A. TORRES DIAZ S.A.,ventas@atd-group.com.ar,2477627920,No,2024-09-04
+52,Agustin Lorenzon ,agustinlorenzon99@gmail.com,3472435962,No,2024-09-04
+53,LUCIANO MATIAS GODOY,lucho2761@hotmail.com,3434644205,No,2024-09-04
+55,Gonzalo Rufino Lorenzo,technetsoluciones.2@gmail.com,3401645898,No,2024-09-09
+56,Esteban Siri,Ingestebansiri@gmail.com,3415093275,No,2024-09-09
+57,Walter saavedra,waltersaavedra2@hotmail.com,3415970781,No,2024-09-12
+58,García Juan Carlos ,garcia-juan22@hotmail.com,3413788885,No,2024-09-09
+60,Las Rosas Cablevisión SRL,juanmanuel@lasrosascablevision.com.ar,3471681713,No,2024-09-10
+61,SegproNQN ,dpuerta43@gmail.com,2364604870,No,2025-03-06
+62,Punto Domótica S.R.L,iescobar@puntodomotica.com,3417448197,No,2024-09-12
+63,Sambuelli adrian,lepipe2004@hotmail.com,3316526411,No,2024-09-10
+64,PERGAMINO TECNO SRL,pcshoppergamino@hotmail.com,2477424322,No,2024-10-04
+65,Andrés navarro,andresnavarro1377@gmail.com,3412816022,No,2024-09-11
+66,Franco Cripezzi,francocripezzi@gmail.com,3416548501,No,2025-09-15
+67,Hernán Cardozo - Intelired SAS,hscardozo@gmail.com,3415951999,No,2024-09-11
+68,Emiliano Santalla ,emi.santalla@gmail.com,3416016000,No,2025-08-05
+69,Gabriel Caceres,servicell82@gmail.com,3416448240,No,2024-09-11
+70,José Alfredo Rey ,josealfredorey25@gmail.com,2645656414,No,2024-09-12
+71,Facundo Cordoba,facucordobaa99@gmail.com,3412731229,No,2024-09-12
+72,Nicolás Maydana ,nicomaydana19@gmail.com,3476376761,No,2024-09-12
+73,Seals SRL,ignacio_colesnic@sealssrl.com.ar,3415402147,No,2024-09-12
+74,Zarate victor José ,zaratevictorjose@gmail.com,3412626953,No,2024-09-12
+75,Gonzalo Garay,bajocontrolalarmas@gmail.com,3476341979,No,2024-09-12
+76,Ezequiel maderas ,matias.tolesano@gmail.com,2477601433,No,2024-09-12
+77,FC Comunicaciones ,fccomunicaciones1@hotmail.com,3416423232,No,2025-09-12
+78,Guillermo Caviglia,computrolseguridad@yahoo.com.ar,3464449716,No,2025-04-16
+79,Ezequiel Valente,Valenteezequiel@gmail.com,3413057819,No,2024-09-13
+80,Mariano yanz,Marianoyanz@hotmail.com,3476666302,No,2024-09-13
+81,gabriel alvarez,bicho2211@hotmail.com,3415116818,No,2024-10-30
+83,Mariano Belizan,marianobelizan@gmail.com,3416069949,No,2024-09-20
+84,Cataldo Diego Jesus,info@ccmseguridad.com,3415873305,No,2026-01-20
+85,Marcelo Viglianco,marcvigli@gmail.com,3382572187,No,2025-06-29
+86,Lupo Seguridad ,luposeguridad@gmail.com,3415044689,No,2024-09-20
+87,Oscar Gareis,roldanalarmas@gmail.com,3413268541,No,2024-09-20
+89,mariano smania tueller seguridad,marianonvr@gmail.com,3413420267,No,2024-09-20
+90,Nahuel salemme,Nahuelsalemme.97@gmail.com,3412704712,No,2024-09-20
+91,BLINDAJE SEGURIDAD SRL,lumar2156@gmail.com,3415050567,No,2024-09-23
+92,Facundo malpeli,Facundomalpeli32@gmail.com,2920607236,No,2024-09-23
+93,Celina Gagliano ,pochmarianoariel@gmail.com,3416152332,No,2024-09-24
+94,Rene Marelli,renemarelli@yahoo.com.ar,3416939237,No,2024-09-24
+95,Alejandro pizzio,alepizziocentral@gmail.com,3416240992,No,2024-09-25
+96,Natanael villordo,natavillordo2014@gmail.com,3413420472,No,2024-09-25
+97,Santiago uribe,santiagojuribe@gmail.com,2474674538,No,2024-09-25
+98,Eric acosta,Gestionesservimader@gmail.com,3364249573,No,2024-09-26
+99,Matias silenzi,matias.silenzi99@gmail.com,3402458358,No,2024-09-27
+100,Bernardo Schlaien ,bschlaien@hotmail.com,3415420751,No,2024-10-09
+101,gonzalez pablo hugo,ingenieriasn@gmail.com,3364549929,No,2025-03-20
+102,Gabriel Córdoba,fsgcordoba@hotmail.com,3416665012,No,2025-09-11
+103,Agropecuaria San Juan srl,Sebastiancesano@gmail.com,3416280387,No,2025-08-23
+104,avtech,andresventroni@gmail.com,3476533334,No,2024-10-09
+105,Eduardo Discacciati ,eduardodiscacciati@hotmail.com.ar,3415416974,No,2024-12-13
+106,Ibars Julián ,jdsistemaselectronicos@gmail.com,3464589003,No,2024-09-30
+107,Pablo Rodriguez (Turco) Gaia Seguridad Electronica,gaiaalarmas@gmail.com,3416014720,No,2024-10-18
+108,Rodolfo Garcia Acosta,garcia_fito@hotmail.com,2214383030,No,2024-11-04
+109,luis alberto sigot,albertosigot@yahoo.com.ar,3442626828,No,2025-11-16
+110,Nahuel Roldán,ssdp97@gmail.com,3364014562,No,2024-10-02
+111,Gabriel Toldo,axis@live.com.ar,3464446888,No,2024-11-07
+112,Sebastián Brillanti ,sebastianbrillanti@hotmail.com,347115612663,No,2024-10-04
+113,Luciano Gomez,info.swatsec@gmail.com,3416824380,No,2024-10-07
+114,NESTOR CANALINI,administracion@rafingenieria.com.ar,3364200776,No,2024-10-08
+115,Rodrigo Rodriguez ,rodrigo.chispa94@gmail.com,3491552294,No,2026-01-16
+116,Diego Fontana,diegofontanadrf@hotmail.com,3425362665,No,2025-07-27
+118,leynaud sebastian,sebaleynaud@gmail.com,3413252153,No,2025-02-03
+119,Marcelo López ,rmlelectricidadfederal@gmail.com,3454463722,No,2024-10-24
+120,Pablo Tebay ,pablotebay66@gmail.com,3415631181,No,2024-10-14
+121,Inst-Alar,zmirakjorge@hotmail.com,3462682851,No,2026-01-20
+122,Full Control SRL,frad@fullcontrol.com.ar,3412747378,No,2024-10-24
+123,Franco Roscino,francodamianroscino@gmail.com,3413153597,No,2024-10-15
+125,DANIEL PILLON,segurfas@gmail.com,3464510847,No,2025-07-01
+126,matias guerra,matiasnany@gmail.com,3413209455,No,2024-10-15
+127,Siles Manuel Alejandro,arion@silescomm.com,3416951913,No,2025-06-06
+128,Alarmas Maga,meugenia@alarmasmaga.com.ar,3416000505,No,2025-02-21
+129,TARsecurity,maxi.tarrats@icloud.com,3415981088,No,2024-10-16
+130,maxi puebla,maxipuebla02@gmail.com,3412698960,No,2025-08-12
+131,Marcelo Salun ,Marcelosalun@gmail.com,3416770676,No,2024-10-16
+132,Conectica IT SRL,david@conectica-it.com,1132959649,No,2024-10-16
+133,Maria Teresa Pugliese,solucionescomodin@gmail.com,3416183395,No,2024-10-22
+134,Pablo Daniel Deabate,pablodeabate@gmail.com,3416578040,No,2024-10-17
+135,plus security,carlosmorello@hotmail.es,3416679391,No,2024-10-17
+136,EMAVE,alonsom@emave.com.ar,3413505406,No,2025-03-17
+137,Mario Vázquez ,emeveseguridad@gmail.com,3416654316,No,2024-10-17
+138,Mariano Ruiz ,marianoalejandro@live.com,3512784003,No,2024-10-17
+139,Kevin Lea Place,dguardseguridad@gmail.com,3413705491,No,2025-05-08
+140,Augusto Nahuel Gimenez,confort.ahora@gmail.com,3413833999,No,2025-04-29
+141,Esteban Roncati,estux.rc@hotmail.com,3413150156,No,2024-10-17
+142,Bacigalupo Carlos Alberto,compras@cabgroupsrl.com.ar,3413968161,No,2025-05-08
+143,CIEM,sistdeseguridad@gmail.com,3471673347,No,2025-04-10
+144,Ricardo prieto,camarasdeseguridadrosario@gmail.com,3412756246,No,2024-10-22
+145,Anibal Llorden,nicolasllorden@hotmail.com,3416107422,No,2024-10-28
+146,Cubrir Servicios Empresarios S.A.,guidoromano@cubrirservicios.com,3413137145,No,2024-10-22
+147,Sekure,facusciangula@gmail.com,3416807955,No,2025-11-03
+1148,Diego Sebastian Sanchez Vavich ,comercial@galileosatelital.com,3412545261,No,2024-10-24
+1149,Daniel Patricelli ,danielgunar@hotmail.com,3416636048,No,2024-10-24
+1150,Jose Merino,jose-moe@hotmail.com,341615654,No,2024-10-25
+1152,Walter pereira,pereirawalter088@gmail.com,3413391118,No,2025-11-22
+1153,Digital insumos srl,fernanda@gprinting.com.ar,3413645610,No,2024-10-29
+1154,Andres Benitez,andresb70@gmail.com,3415494633,No,2025-01-22
+1155,shirli marina campitelli correa,marinacampitelli03@gmail.com,2920661740,No,2024-10-29
+1156,seba barone,aseba84@hotmail.com,3413159136,No,2024-10-30
+1157,RAUL HAMUD,rhamud@telectric.com.ar,3424559999,No,2024-12-19
+1159,Enrique Daniel Moreyra ,segautir@live.com,3777401733,No,2024-10-31
+1160,Osvaldo Noriega,noriegaosvaldo@gmail.com,3464441983,No,2024-10-31
+1162,Fede legaspi,kimozabeach@gmail.com,3416906980,No,2024-10-31
+1163,Gustavo Quevedo de Técnica Total,tecnicatotal@hotmail.com,3416195704,No,2024-10-31
+1164,Esne Iara Ailin,corporativo@siss.com.ar,3414473515,No,2024-10-31
+1165,Edgardo Scarponi,escarponi85@gmail.com,3415828935,No,2024-11-01
+1166,Leonel Forconi - Acesdigitals,lforconi33@hotmail.com,3402534017,No,2024-11-01
+1167,Franco Bernabé ,Berny_14_26@hotmail.com,3464558692,No,2024-11-01
+1168,Seguridad Carsat srl,guillermodbasabe@hotmail.com,3794731232,No,2024-11-01
+1170,Sotek seguridad electrónica ,sotekseguridad@gmail.com,3471615416,No,2024-11-04
+1172,Tecnotronic,melinapandis@gmail.com,3571524857,No,2024-11-05
+1173,Faisal Jalit,its.sol.informatica@gmail.com,3492660690,No,2025-08-05
+1174,GUILLERMO ANFOSSI,info@bernabeinformatica.com,3416877871,No,2024-11-05
+1175,Diego Cabrera,dcseguridad.rosario@gmail.com,3416832512,No,2024-11-06
+1176,Damián Macarrein ,macarrein@hotmail.com,3412801658,No,2025-06-22
+1177,Pablo Martínez ,pmseguridadrosario@gmail.com,3416054005,No,2024-11-06
+1179,Wilson Alberto Delbon,wili2_22@hotmail.com,3468407141,No,2025-02-18
+1181,Agustin Mugurusa ,mugurusaagustin@gmail.com,3402543711,No,2025-11-30
+1182,Agustina Mur,agustinailenmur1889@hotmail.com,3415641918,No,2024-11-11
+1183,Adrian Balbuena,integrocontrol@gmail.com,3413408467,No,2024-11-12
+1184,BEDI SEGURIDAD,diazbelu13@gmail.com,3413203554,No,2024-11-13
+1185,Zambrana Mariano Manuel,zamvisionseguridad@gmail.com,3412023927,No,2025-03-31
+1186,Prizmetech,prizmetech@gmail.com,3412273151,No,2025-05-19
+1187,spoto walter,citius@netcoop.com.ar,3413408276,No,2024-11-14
+1188,ariel meotto,arielmeotto22@gmail.com,3415826101,No,2025-04-09
+1189,Daniel Masino,dacom.tuc@gmail.com,3814633012,No,2025-03-20
+1191,German H Bongiovanni,leonescell@hotmail.com,347215508677,No,2024-11-22
+1192,Naivert leonardo,Le_fa_na@hotmail.com,3464680314,No,2024-11-19
+1193,Mariano y Noelia Stranieri,info@myn.com.ar,3414852496,No,2024-11-28
+1194,martin linares,alarmasvigilance@gmail.com,3513982333,No,2025-01-08
+1195,marcelo galeano,marcelogaleano29@yahoo.com,3415098562,No,2024-11-21
+1196,Damian Artioli ,Damiartioli@hotmail.com,3413379255,No,2024-11-22
+1197,Emiliano Calamari ,emi_calamari@hotmail.com,3462523206,No,2025-08-15
+1198,Cable Video Color SRL,jpschinner@gmail.com,3404408493,No,2025-11-26
+1199,Emiliano Leonel Calamari,calamariemiliano@gmail.com,3412295268,No,2024-11-26
+1200,Sur Group S.A,fmoreno@surguard.com.ar,3412522701,No,2024-11-25
+1205,Miguel ziraldo ,miguelziraldo@gmail.com,3471594450,No,2025-03-24
+1206,Fabio M. Ricca,fabiomricca@gmail.com,3415501207,No,2024-12-16
+1207,ELECTRONET ELECTRONICA INDUSTRIAL SRL,facundobriatore32@gmail.com,3416481980,No,2026-01-21
+1208,Lisandro Matias Galceran,lisandrogalceran@hotmail.com,3412279992,No,2024-12-05
+1209,David Bernachini,bernachinid@hotmail.com,3413141424,No,2025-10-01
+1210,Marcelo Di Ponte,marcelodiponte@gmail.com,3415041621,No,2024-12-09
+1211,Lemuel Cabral ,lemuel.cabral@gmail.com,3415954579,No,2025-02-21
+1212,Sergio Daniel Rodriguez,dserosario@gmail.com,3414020397,No,2025-07-14
+1213,Marquez Sebastian ,marquezsebastian@hotmail.com,3814014411,No,2025-03-20
+1214,gordillo gaston,cgg.alarmas@gmail.com,3412090020,No,2025-10-13
+1215,German Botta ,gersp5@hotmail.com,3416719912,No,2025-04-07
+1216,Lucas Sosa,lucas-sosaa@hotmail.com,3415050989,No,2024-12-16
+1217,Fabricio Nicolás Pérez ,Fp_electricidad@hotmail.com,3462576804,No,2024-12-25
+1218,Segrup Argentina SRL,pfelipelli@segrup.com.ar,3415487761,No,2025-06-17
+1219,Rubén Alberto Mur ,Ramurtronica-@hotmail.com,3413021083,No,2025-03-21
+1220,Mariano Folis,mfolis@gmail.com,3417410123,No,2025-12-26
+1221,Fabian Biguera,bfa08@hotmail.com,3413883188,No,2024-12-19
+1222,dario pavoni,arkhamseguridad@gmail.com,3471375466,No,2025-01-06
+1223,Nicolas rossi,nicorossi2580@gmail.com,3404509256,No,2025-02-25
+1224,Juan sa Gonzalez,juansag@live.com.ar,3417471584,No,2026-01-09
+1226,Seguridadintetegral911srl,seguridadintegral911@gmail.com,3464696665,No,2024-12-26
+1227,Nicolas Guajardo,nicoguajardo08@gmail.com,3464628845,No,2024-12-26
+1228,hernan gonzalo cabrera,hernan-wb@hotmail.com,3464511704,No,2024-12-26
+1229,Mario Facundo Szemruch,facundo.sudvision@gmail.com,1157584574,No,2025-07-07
+1231,Luis Sánchez ,sanchezluis.ls74@gmail.com,3415154295,No,2025-01-03
+2231,dario duran ,darielyduran24@hotmail.com,3456552194,No,2025-01-06
+2232,Juan Ignacio velez,juanignaciovelez235@gmail.com,3413720527,No,2026-01-19
+2233,Nicolas Velez,velezserviciosymantenimiento@gmail.com,3412801964,No,2025-08-29
+2235,Marcelo Giulietti,mmgiulietti@gmail.com,3464511588,No,2025-01-22
+2236,Horacio Cerezo,hfcerezo@gmail.com,3415882193,No,2025-01-13
+2238,Gonzalo Rinaldi,soporte@grsoluciones.com.ar,3415630655,No,2025-07-23
+2239,Cristian Casal - Caedro,cristian@casal.net.ar,543412552403,No,2026-01-16
+2240,Enrique Eugenio J. López,intecomsistemas@gmail.com,3425484007,No,2025-01-15
+2241,Cristian Chiappello,chape00@hotmail.com,3416910538,No,2025-01-16
+2243,BAER AUGUSTO PABLO,impresoras@fisherton.com,3417532524,No,2025-04-16
+2245,AVAGNINA GERMAN DARIO,allprotecseguridad@gmail.com,3413392622,No,2025-01-17
+2246,Javier Castro Videla,jcastrovidela@gmail.com,3416988299,No,2025-01-19
+2247,Miguel Adrián Paglialunga,admiluni@gmail.com,3402448123,No,2025-01-17
+2248,Gustavo Breit - Servicio Tecnico Cepeda,gustavobreit@live.com.ar,3412026868,No,2025-01-17
+2249,ALARMAS DAT,alarmasdat@hotmail.com,3415198857,No,2025-02-06
+2250,PASSWORD SRL,ventas@password.com.ar,3471200600,No,2025-01-23
+2252,LOCK Team SRL,administracion@lock.com.ar,3414498077,No,2025-01-27
+2253,Juan MAnuel Rodriguez Guerrero,administracion@join-tech.com.ar,3415311043,No,2025-01-27
+2255,Roxana,bonettoroxana@gmail.com,3415839630,No,2025-01-21
+2257,Gauna Ezequiel Alejandro,ezequiel.gauna@allsystemsnet.com.ar,3413392621,No,2025-01-22
+2258,Ivana Folmer,folmerhaberkornivana@gmail.com,3434539214,No,2025-01-23
+2259,Juan Manuel Ceballos,contacto@santafeseguridad.com.ar,3424441860,No,2025-01-23
+2262,PABLO FERNANDEZ,fpablodario@gmail.com,3413768318,No,2026-01-13
+2263,Miguel Ángel Cordoba ,cordobamiguelangel537@gmail.com,3476695387,No,2025-01-28
+2264,Nahuelr Rodriguez ,netbiossolucionesinformaticas@gmail.com,3412503444,No,2025-11-27
+2265,Leonel Bonito,info@elebe.it,3416631539,No,2025-01-28
+2266,Ricardo Montorfano,prmontorfano@gmail.com,3415007052,No,2025-01-28
+2268,Andres Zapata,andresvier07@hotmail.com,3435433225,No,2025-01-29
+2269,PFLEIDERER MAXIMILIANO EZEQUIEL Y PFLEIDERER MILTO,ivanmbongiovanni@gmail.com,3472508677,No,2025-01-30
+2270,maximo andres galarza,maxservicioseinsumos@hotmail.com,3777606151,No,2025-01-31
+2271,Seguridad Integral Rosario S.A.,rcarello@centinet.com.ar,3416011580,No,2025-02-04
+2272,Christian Enrique ,Aleenrique78@gmail.com,3436431191,No,2025-02-04
+2273,Damian Rodriguez,damian@mastecnologia.com.ar,2915739241,No,2025-02-04
+2274,Red de Seguridad SAS,seguredsas@gmail.com,3413516461,No,2025-02-05
+2275,Guillermo Bertolaccini,compras@fabricanet.com.ar,5493415068103,No,2025-02-07
+2276,Biondi Damián Ignacio,pclab.alarmas@gmail.com,3465593829,No,2025-02-06
+2277,Linares Juan,jplinares10@hotmail.com,3413074305,No,2025-10-19
+2279,leandro daniel rubey,rubey747@gmail.com,3465431269,No,2025-09-01
+2280,View Seguridad ,angelowasniger@gmail.com,3467416515,No,2025-02-17
+2281,Marcos Nicita,marcosnicita@gmail.com,3416940227,No,2025-09-29
+2282,JAVIER CHAMOSA,mei-ingenieria@hotmail.com,2477530252,No,2025-02-12
+2283,FERNANDO LAGORIO,fernandojlagorio@gmail.com,3364364796,No,2025-02-12
+2284,Joaquin Juarez,joaquin.nes@gmail.com,3815978765,No,2025-03-24
+2285,Jose Avellaneda ,joseavellan2018@gmail.com,3814647188,No,2025-02-12
+2287,FIX IT ELECTRONICA,fixitelect76@gmail.com,3816639654,No,2025-02-13
+2288,Rodrigo lostumbo,rodrigolostumbo@hotmail.com,3416967588,No,2025-02-17
+2290,flores mauro colocador de alarmar y camaras,maurof_4@hotmail.com,3471689844,No,2025-02-19
+2293,Sebastián Rentería  AllTrack,sebastian.renteria@alltrack.com.ar,1136628608,No,2025-02-25
+2294,Sebastian Salvat,sebasalvat@gmail.com,3413040366,No,2025-02-25
+2297,Olga Cintia Lorena Rigoni,lic.cristianfarias@sis-seguridad.com,347615643951,No,2025-11-25
+2299,SOLUTIONS S.R.L,info@solutionssrl.com.ar,3415615841,No,2025-02-26
+2300,Toolsoft SRL,mcrusat@toolsoft.com.ar,3412836355,No,2025-02-26
+2301,Noxis ,noxissoluciones@gmail.com,3415953927,No,2025-02-27
+2302,hernan salvagno,hernansal83@gmail.com,3416136916,No,2025-03-05
+2305,Rodrigo Valdez,solucionesinteligentesok@gmail.com,3814097277,No,2025-03-05
+2307,Roberto Roselli ,ayacuchocomputacion@gmail.com,3416200426,No,2025-03-11
+2308,Jessica Medina ,compras@hwudimax.com,1166806050,No,2025-03-11
+2310,Parolini Marco,marco.parolini@gmail.com,3416100166,No,2025-12-15
+2311,Juan Pablo Gutierrez ,juanpablogutierrez201802@gmail.com,3472431871,No,2025-03-17
+2313,Domo Seguridad Electrónica ,Diegolopezmillo85@gmail.com,3364560825,No,2025-03-12
+2315,Seguridad Universal S.R.L,administracion@seguridaduniversal.com.ar,3413291102,No,2025-03-13
+2316,Ezequiel carlomagno,ezequielcarlomagno25@gmail.com,3416946230,No,2025-03-14
+2317,De Arriba Ivan Daniel,ivandearriba@gmail.com,3624626898,No,2025-03-17
+2318,Enzo silva ,enzolosaltos@gmail.com,3834518306,No,2025-10-22
+2319,Waldemar camara ,wineredgarwaldemar@gmail.com,3794767863,No,2025-03-19
+2320,Ezequiel Majluff,ezemaj@gmail.com,2944579653,No,2025-09-30
+2321,david santaella,santaelladavidj@gmail.com,111526792685,No,2025-08-29
+2322,Martin Seimandi ,seicom_ventas@yahoo.com.ar,3434512550,No,2025-03-31
+2323,Visein Srl,dvitali@gmail.com,3416508819,No,2025-03-20
+2324,NILDA GABRIELA STEFFAN,nuli75@hotmail.com,3416686043,No,2026-01-15
+2325,Pecell Casilda,nico.newells86@gmail.com,3464599753,No,2025-03-24
+2326,Fernando Bascolo,fbinstalaciones.electricas@gmail.com,3416874534,No,2025-08-27
+2327,Gustavo Ripoll,gripoll.sis@gmail.com,3415414518,No,2025-03-24
+2328,Alarmas Bunker SRL,monitoreo@alarmasbunker.com.ar,3416754167,No,2025-03-25
+2330,Protejo sistema de seguridad ,capulloproducciones1@gmail.com,3816829688,No,2025-03-28
+2331,Juan Carlos Mura,juancarlosmura6@gmail.com,3364512521,No,2025-03-28
+2332,Julio Cesar Diaz,tecnoavellaneda@gmail.com,3482666889,No,2025-03-31
+2333,Perez Julian y Speranza Juan Manuel SH,centerseguridad@gmail.com,3400441314,No,2025-03-31
+2334,Rodriguez Esteban Matias ,Ventas@alhielec.com,3415027267,No,2025-03-31
+2336,Christian Pesoa ,protexionseguridad@gmail.com,3434161267,No,2025-09-15
+2337,Zalazar Rodrigo,inforoservicios@gmail.com,3624608022,No,2025-03-31
+2338,STRUPENI TECNOLOGIAS,info@strupeni.com.ar,3413052420,No,2025-03-31
+2339,ESTAR Seguridad,oabecasis@yahoo.com.ar,3415039006,No,2025-05-08
+2340,Javier Carrizo,Javiercarrizosgo@gmail.com,3855132251,No,2025-04-04
+2341,Ectaech,servicios@ecatech.com.ar,3415529344,No,2025-04-04
+2342,Cerrajería Santa María (Matías),Contacto@santamariarosario.com.ar,3416714912,No,2025-04-14
+2343,DANIELVELAZUQUEZ ,DANIVEL92@GMAIL.COM,3435203206,No,2025-04-08
+2344,Emmanuel Andres Aristimuño ,msolucionesparana@gmail.com,343154635803,No,2025-04-09
+2345,Jorge Osvaldo Perez,jorgeperezsantafe@gmail.com,3426107000,No,2025-04-13
+2346,Alejandro Herrera,aleuuulok@hotmail.com,3815240957,No,2025-04-09
+2347,RED SECURITY SRL,danisa_082@hotmail.com,3401490472,No,2025-04-09
+2348,Clerici Juan pablo,mezaramongabriel@gmail.com,3412428578,No,2025-09-26
+2349,Alejandro Meneguzzi ,aameneguzzi@gmail.com,3415426030,No,2025-04-09
+2350,Andres Chariano,cityinformatica@gmail.com,3416176636,No,2025-04-10
+2351,Matías Kuhn,procontrolse@gmail.com,3401645059,No,2025-04-10
+2352,Nadir J Vilchez ,nadirvdeveloper@gmail.com,3464689174,No,2025-04-10
+2353,AC INGENIERIA,carossiariel@gmail.com,3364663710,No,2025-04-11
+2354,Gino Nicolas Anfossi,ginoanfossi@gmail.com,3413272765,No,2025-04-11
+2355,LEANDRO AVAGNINA,lavagnina@gmail.com,2477492946,No,2025-04-11
+2356,Juan José miriani,juanjo.miriani@gmail.com,3476593947,No,2025-04-14
+2357,Esteban Willams Escobar,estebanw.escobar@gmail.com,3482299171,No,2025-04-14
+2358,Enzo R Mariani ,Juanmariani@hotmail.com,341184750,No,2025-04-14
+2359,Almada germa ,germanalmada34@gmail.com,3412539792,No,2025-04-14
+2360,Hernan Nieva,Hernannieva1983@gmail.com,1140987925,No,2025-04-14
+2361,Marcelo Pipolo,asalarmasrosario@gmail.com,3415810153,No,2025-04-14
+2362,Monitoreo360,monitoreook@gmail.com,3865520390,No,2025-04-15
+2363,Martín García ,Mamu90494@gmail.com,3466404144,No,2025-05-02
+2364,Ignacio David Paoli,nachodeperez@gmail.com,3413789890,No,2025-04-16
+2366,Alfredo Milano ,alfredmilano@gmail.com,3415662772,No,2025-04-17
+2367,Alejandro Barreca ,Alebarreca0@gmail.com,3416573985,No,2025-04-21
+2369,jonas cevilan,cevilanjonas1@gmail.com,3417519406,No,2025-04-22
+2370,Montenegro German,Germannob19@gmail.com,3412134693,No,2026-01-21
+2371,Noxis Soluciones,pgonzalez@noxis.com.ar,3413807681,No,2025-04-23
+2372,Carlos Muñoz,topsecurity1280@gmail.com,3413113178,No,2025-04-24
+2373,Adolfo Ramón Hernández,alarmashernandez@gmail.com,3465665235,No,2025-04-28
+2374,claudio andres santa cruz,pinolux2121@gmail.com,3471593458,No,2025-09-23
+2375,Eduardo DiPerna,eduardo.diperna@gmail.com,3471623613,No,2025-07-04
+2376,Leonardo Signorelli,panaleo2000@gmail.com,3416970228,No,2025-05-30
+2377,Gabriel calzada,gabriel.calzada84@gmail.com,3476598554,No,2025-08-27
+2378,Gonzalo Rodríguez ,gonza2418pau@gmail.com,3416370997,No,2025-05-05
+2380,Cerrajería Mendoza,info@cerrajeria-mendoza.com.ar,341156435397,No,2025-05-05
+2381,Damian Almada,damiantv@gmail.com,34165462674,No,2025-05-05
+2382,Ricardo Walter Nuñez,nunezmonitoreo@gmail.com,3416432462,No,2025-05-05
+2383,Marcelo Marcos Lamas,info@mymseguridad.com.ar,3876853443,No,2025-05-05
+2384,Fial SRL,jose.ferrer@fialdesarrollos.com,3416948955,No,2025-05-06
+2385,Santiago Pereyra Marchetti,service@tecmap.com.ar,3400663988,No,2025-05-06
+2386,Juan Marcelo brahim ,turcosinc@gmail.com,3415400132,No,2025-05-07
+2387,Santiago ledesma,Santibjled@gmail.com,3412789734,No,2025-12-22
+2388,Yoseth Falcon,yosethfalcon@gmail.com,3416117869,No,2025-05-07
+2389,Gerardo Boschele,gerardo.boschele@gmail.com,543436638500,No,2025-05-09
+2390,LORTNOC S.R.L.,daniel@grupocontrol.com.ar,3814166675,No,2025-05-12
+2391,Yamila Belen Caceres Riveros,areatecnicacreslla@gmail.com,3412413372,No,2025-05-13
+2392,Visión Seguridad ,visionseguridad.tucuman@gmail.com,3812160482,No,2025-05-13
+2393,Roberto A. Vivaldi,roberto_vivaldi@hotmail.com,3416483728,No,2025-05-15
+2394,Ivan Navarrete,inavarrete@segmonitor.com.ar,3854939683,No,2025-05-15
+2395,Gabbee  ( baracco Pedro),martingmonton@gmail.com,543416578001,No,2025-06-19
+2396,GF soluciones ,leofrettis55@gmail.com,1166127016,No,2025-12-10
+2397,Mariano Schnitzler,schnitzlerelectro@gmail.com,3416177086,No,2025-05-18
+2398,Lucas lucero,ljl.instalaciones@hotmail.com,3472433717,No,2025-05-18
+2399,Sebastian Romero Rossetti,sromero@globals.com.ar,3415791473,No,2025-05-19
+2400,Bruno Basteri,brunobasteri@hotmail.com,3406459244,No,2025-05-19
+2401,SISECO,sisecoseguridad@hotmail.com,3865265551,No,2025-05-20
+2402,Antonio Pesiri ,infodigitalsoundsf@gmail.com,3425953456,No,2025-05-21
+2403,Fernando Bovina,tecno-control@hotmail.com,3416152279,No,2025-05-22
+2404,Franco Londra,londra.franco4@gmail.com,3413127917,No,2025-05-26
+2405,Uriel Ramirez ,uriel.n.ramirez@gmail.com,3413383314,No,2025-08-14
+2406,Francisco Fasce ,effedoce@gmail.com,2477458093,No,2025-05-26
+2407,Emanuel Alvarez ,Lautialvarez1974@gmail.com,3412533780,No,2025-07-12
+2408,SERGIO DI SANTO,sddisanto@yahoo.com.ar,3413081020,No,2025-08-21
+2409,Angel Martin Caballero ,martin-749@hotmail.com,3416202099,No,2025-05-27
+2410,Dario Alejandro Sanchez ,dariosanchez1489@gmail.com,3804888615,No,2025-05-27
+2411,Ruben Vivas ,rubenleandrovivas@gmail.com,3425484024,No,2025-11-16
+2412,Agustin Bazan,bznseguridad@gmail.com,3460406172,No,2025-05-29
+2413,Acesdigitals,mforconi09@gmail.com,3402573871,No,2025-05-30
+2414,Ledesma Matías Alejandro ,conceptoroma@gmail.com,3416713246,No,2025-06-17
+2415,Diego Ochoa,odiego@hotmail.com,3462676773,No,2025-10-31
+2416,Jose Alberto Abalos ,Joseabalos1970@gmail.com,3415934250,No,2025-06-03
+2419,S.I.L.,seguridadintegrallazzarutti@gmail.com,3424224794,No,2025-06-03
+2420,Beck Herman,hajbeck@hotmail.com,3476699232,No,2025-10-15
+2421,Juan José Domínguez ,firstservicerosario@gmail.com,3416187606,No,2025-09-12
+2425,Ruben Dario Invinkelried,lse.logisticaenseguridad@gmail.com,3425203927,No,2025-06-09
+2426,Gonzalo luis quiñonez,gonlupaq@gmail.com,3464596243,No,2025-06-09
+2427,Jorge chiappero,Jorgechiappero@hotmail.com.ar,3415769896,No,2025-06-09
+2428,Sebastian Vivas,Info@f1it.com.ar,3416839907,No,2025-06-10
+2429,Gustavo Gismondi ,gustaexp@gmail.com,3465664602,No,2025-06-10
+2430,More Valeria,admin@informaticamore.com,3471560061,No,2025-06-11
+2431,Joaquin Duran,jduran@gmail.com,3413233849,No,2025-06-12
+2432,Eric Houlin,e.houlin@hotmail.com,3462666945,No,2025-06-10
+2433,Luciano Bruselario,lucianobruselario@hotmail.com,3416524763,No,2025-06-11
+2434,SIGMA SA,ventas@sigma.com.ar,3416908354,No,2025-06-11
+2435,Fernando Daniel Purco,fernando.purco@gmail.com,3402514131,No,2025-06-19
+2436,Patricio Chiacchio,info@surlink.ar,5492944898252,No,2025-06-19
+2437,EMILIANO NAHUEL FRANZOT,digitalltuc@gmail.com,3816262283,No,2025-06-19
+2438,claudio marcelo argañaraz,elmochomarcelo1@gmail.com,3816550167,No,2025-06-19
+2439,NEZ Electricidad ,Lautaro_zeolla@hotmail.com,2353416035,No,2025-06-19
+2440,APL SEGURIDAD SRL,dcarsuza@gmail.com,3413751112,No,2025-06-19
+2444,H.K. sistemas de seguridad ,hernankekez@gmail.com,3415639893,No,2025-06-25
+2445,Mx alarmas,mxalarmas@yahoo.com,3416402039,No,2025-06-26
+2446,Sergio Augello ,serdani62@hotmail.com.ar,3413220889,No,2025-07-23
+2447,PEREA SELENE LUDMILA,ventas@rocidop.com.ar,3517534830,No,2025-07-01
+2449,Juan Pablo Flores,pcbyte0101@gmail.com,3413466784,No,2025-07-02
+2450,Guillermo Fritz,guillermofritz@gmail.com,343504884,No,2025-07-02
+2452,German Cuello,gcuello53@gmail.com,3472592302,No,2025-07-04
+2454,Lucas Nuñez,lucasnunez41@gmail.com,3415497439,No,2025-07-07
+2455,Mario Facundo Szemruch,mfszemruch@gmail.com,3417479394,No,2025-07-15
+2456,FONTANA MARCELO,leandro@instalnet.com.ar,3414311100,No,2025-07-07
+2457,Orlando Sebastián Díaz,admin@customsecurity.com.ar,3415463827,No,2025-07-07
+2459,Cristian,crismalv87@gmail.com,3417189111,No,2025-07-07
+2460,Daniel Alejandro Nass ,daniel86nass@gmail.com,2326463849,No,2025-07-08
+2461,Federico Augusto Marraro,ventas@grupomar.com.ar,3415008520,No,2025-07-08
+2463,Rodriguez cesar augusto,cr.instalaciones17@gmail.com,3815892738,No,2025-07-14
+2464,Matias Daniel Franco,ventas@m3domotica.com,3415871114,No,2025-09-18
+2465,Juan Manuel zenatti,jmzenatti@hotmail.com,3416813143,No,2025-07-11
+2466,PS24 SISTEMAS DE SEGURIDAD,piscionesystem@yahoo.com.ar,3413046597,No,2025-07-14
+2468,Byb Sistemas de seguridad,josebustos_10@hotmail.com,3865507920,No,2025-07-24
+2469,Catalano Matias Nicolas,maty_125_nob@hotmail.com,3476649789,No,2025-07-16
+2470,Emil Casanova ,Emilcasanova07@gmail.com,3413416839,No,2025-07-17
+2471,leonardo balonchard,leobalon2010@hotmail.com,3415014887,No,2025-07-16
+2472,Cristian alcaraz,cristianalcaraz16@gmail.com,3465594631,No,2025-07-17
+2473,LEANDRO ALESSIO,leandro_alessio@hotmail.com,3498408271,No,2025-07-17
+2474,Conectica IT ,franco@conectica-it.com,3412127644,No,2025-08-27
+2475,Raul Guevara lopez ,soportedebtc@gmail.com,3464522021,No,2025-07-17
+2476,MARTIN RUIZ,martin@rei.com.ar,3364520484,No,2025-07-18
+2477,Antonela Iannantuoni,aiannantuoni@segrup.com.ar,3413343180,No,2025-07-21
+2478,Gonzalo valor,Valorgonzalo@gmail.com,3444415205,No,2025-07-21
+2479,daniel martinez,tlemetrix@gmail.com,3471629106,No,2025-07-21
+2480,S.A.S Sistemas.Avanzados de Seguridad,Tomisan05@hotmail.com,2996722588,No,2025-07-22
+2481,Patricio cerda,patriciocerda06@gmail.com,3471511575,No,2025-08-22
+2482,Aguirre Gustavo Alejandro,yogustavo@hotmail.com,3413491911,No,2025-07-24
+2483,MM COMUNICACIONES S.A,administracion@masregion.com.ar,3492323832,No,2025-07-24
+2484,InDomus Ingeniería & Automatismos S.R.L.,indomus@indomus.ar,5493416251718,No,2025-07-24
+2485,DIAC Distribuidora s.r.l.,compras@diac.com.ar,3414560393,No,2025-07-24
+2487,Nahuel corbera,nahuellepra74@gmail.com,3417186560,No,2025-07-28
+2489,Brian Siegfried,zoomrecords87@gmail.com,3476694519,No,2025-07-29
+2490,Marcos Tardio ,marcostardio@hotmail.com,3416940404,No,2025-07-29
+2491,Ramon Dario Castro,Serviciosentrerios2025@gmail.com,3454105374,No,2026-01-20
+2492,Adrian Serniotti,adrianserniotti@gmail.com,3413722378,No,2025-07-31
+2493,ALOE JUAN PAULO,aloejuanpaulo@gmail.com,2474445562,No,2025-07-31
+2494,Nicolás Boero,boeronicolas583@gmail.com,3476692667,No,2025-07-31
+2495,Botello ricci maria jesus ,arqbotelloricci@gmail.com,3794727545,No,2025-08-23
+2496,Alejandro David Riff,alejandroriff@gmail.com,3413228975,No,2025-08-01
+2497,Sergio German lobos,Germanlobos16@gmail.com,3731515195,No,2025-08-01
+2499,victor diez,victordiez@hotmail.com,3415969733,No,2025-08-05
+2501,Conrado bignami,conrado698@gmail.com,3413830195,No,2025-08-05
+2502,Digital rafaela,digitalrafaela@gmail.com,3492637234,No,2025-08-06
+2504,Salvatierra Liliana ,Lily-salvatierra@hotmail.com,3815464441,No,2025-08-07
+2505,Roque Pérez ,roqueexequielperez@gmail.com,3813962440,No,2025-08-07
+2506,Patricio Fabián Campagnoni ,Patocampagnoni1@gmail.com,3413664467,No,2025-08-07
+2507,Samuel Roldan,roldan.sixnx47@gmail.com,3412031580,No,2025-08-07
+2508,SERYCON SRL,otartara@serycon.com.ar,3416402759,No,2025-08-07
+2509,eibel seguridad,m.esteban87@gmail.com,3476351527,No,2025-11-22
+2510,Sosa claudio,sosaclaudiosn@hotmail.com,3364670057,No,2025-08-08
+2511,Rosario Solutions ,matiaspignani@gmail.com,34133000150,No,2025-08-11
+2512,Yahve sama informatica srl,Yahvesamainformaticasrl@gmail.com,3413940619,No,2025-08-11
+2513,EZEQUIEL LATORRE,ezequiellatorre6@gmail.com,3465404059,No,2025-08-11
+2514,Jorge Negrete,jnegrete@gmail.com,3471518665,No,2025-08-11
+2515,CyG Soluciones SRL,cinomatias@gmail.com,3804209284,No,2025-08-12
+2516,Franco Martinez ,francomartinez167@gmail.com,3416822763,No,2025-08-12
+2518,Jose Agustin Nores Pondal,agustinnores@hotmail.com,3814476878,No,2025-08-13
+2519,walter acuña,hostmitnik@hotmail.com,3413016407,No,2025-09-25
+2520,Sebastian Nicolas Braida,sebastiannbraida@gmail.com,3415635466,No,2025-08-14
+2521,José Matías Martinez ,emconstrucciones.ros@gmail.com,3415428313,No,2025-08-14
+2522,Miguelmena,djmiguelmena16@gmail.com,3858482730,No,2025-08-14
+2524,Transportadora de Interior S.A,compras@grupocoinag.com,3412649706,No,2025-08-14
+2527,JyM SRL,p1rosario.tecnica@gmail.com,4810259,No,2025-08-18
+2528,Edgardo Cammarata,edgardo.ccomp@gmail.com,3416059543,No,2025-08-19
+2529,NASA SERVICIOS,info@nasaservicios.com.ar,3471341510,No,2025-08-19
+2530,Miguel Müleck,serviciosnordeste@gmail.com,3786610633,No,2025-08-19
+2531,AGRONOMIA INTELIGENTE SRL,administracion@camaraswifi.com.ar,1125553666,No,2025-08-20
+2532,Lucas Rodriguez,pixelarelectronica@gmail.com,2664506612,No,2025-08-20
+2533,Nicolas solis,nicsolenergy@gmail.com,3404633897,No,2025-08-20
+2534,CANCIO EDUARDO HECTOR,logistica@seguridad-phoenix.com.ar,3434390900,No,2025-08-20
+2535,Alejandro Maldonado,maldonadoalejandro13@hotmail.com,3416436955,No,2025-08-21
+2537,Diego Accurso,burry45@hotmail.com,3402659906,No,2025-08-22
+2538,Juan Beltrame,juan_beltrame@hotmail.com,3415639881,No,2025-08-22
+2539,Andres de Luis,andres_de_luis@hotmail.com,3416110491,No,2025-08-25
+2541,Ascona Fidel Agustin,afidel@guiacomercialsalta.com.ar,3624769438,No,2025-08-25
+2542,Silvio Ginezi,isg@informaticasg.com.ar,3415703368,No,2025-08-25
+2543,S G C SA,gerencia@lincon.com.ar,3416356764,No,2025-08-26
+2545,Fernando R. Diaz,fdiazaudiovisuales@gmail.com,2474665857,No,2025-08-27
+2546,Achorvea alejandro,mm_aa02@hotmail.com,3401647909,No,2025-09-22
+2547,Marcos Savioli,marcossavioli@live.com.ar,3413988620,No,2025-08-27
+2548,Case Rossi Informatica SRL,martin@caserossiinformatica.com,3414680682,No,2025-09-19
+2549,Martin Daniel Apolonia,martin.apolonia@gmail.com,3413463390,No,2025-08-27
+2550,Norberto Joaquin Martine  Pasini,norwwer@hotmail.com,3413734074,No,2025-08-29
+2551,german delacroix,delacroixgerman@gmail.com,3413245353,No,2025-08-29
+2552,Enzo Venece ,evenece@gmail.com,1131807406,No,2025-09-01
+2553,Peñaloza Jorge,jap.jorge@gmail.com,3415605829,No,2026-01-10
+2554,Franco Ramuzzi,francoramuzzi@gmail.com,2355474214,No,2025-09-01
+2555,Guillermo Acevedo ,guillermo.acevedo107@gmail.com,3412809673,No,2025-09-01
+2556,Francisco José Lacota,Alarmaskontroll@hotmail.com,1140750277,No,2025-09-01
+2557,Tomas Soria Fava,ninetechs@gmail.com,3413515697,No,2025-09-02
+2558,Barrera Javier Ignacio,barrier.info@gmail.com,3834902451,No,2025-09-05
+2559,Giuliano Chiesa ,giulianochiesa@gmail.com,3412284480,No,2025-09-03
+2560,fernando simon,fernando80s@gmail.com,3471622792,No,2025-09-04
+2561,Marcos Aignasse,marcosaignasse@gmail.com,3815818916,No,2025-09-05
+2562,Pablo Busetto,pablobusetto@gmail.com,3413641067,No,2025-09-04
+2564,Martin luque,elmarto2010@gmail.com,3416175129,No,2025-09-08
+2565,Pedro Pablo Aiello,pedropaiello@gmail.com,3465657767,No,2025-09-09
+2566,Alan Bettin,Alanbettin@hotmail.com,3416717474,No,2025-09-09
+2567,Guillermo Andres Bisogni,guibis2001@yahoo.com.ar,3412026113,No,2025-09-10
+2568,Federico Carranza,federicocarranza78@hotmail.com,3464546662,No,2025-09-10
+2571,Seguimiento Global,juan.trepat@seguimientoglobal.com,3416199308,No,2025-09-12
+2574,Gustavo Bega,seguredargentina@gmail.com,3415849175,No,2025-09-17
+2575,RONALD LAMBERTI SAS,ronaldlambertiventas@gmail.com,3534117390,No,2025-09-17
+2576,Dario Bonardi,dario_bonardi@hotmail.com,3413703746,No,2025-09-17
+2580,Cristian Dodero,cgdodero@gmail.com,1156550268,No,2025-09-22
+2582,san lorenzo alarmas,lalarcon@slaalarmas.com,3413982631,No,2025-09-23
+2583,Facundo González,facundo.bariloche@gmail.com,2944643132,No,2025-09-23
+2584,Gonzalo naim Fernández garcia,gonzalonaimfernandez@gmail.com,3385680496,No,2025-09-24
+2585,Mauricio Neme,telcoalarmas@gmail.com,3416804769,No,2025-09-24
+2586,Sebastian Molina Borquez,sebastian.mobo@gmail.com,2944969320,No,2025-09-26
+2587,Andres Caporgno,caporgnoandres2@gmail.com,3491553640,No,2025-09-26
+2590,Genaro omar martins ,genaro3737@gmail.com,3471570654,No,2025-09-30
+2591,Ruben Mendez,Rubeninstalaciones1@gmail.com,3415113310,No,2025-09-30
+2593,Alejandro Podestá ,defender.s.electronica@gmail.com,3416900099,No,2025-10-02
+2594,Andrés szyszko,avs-sistemas@hotmail.com,3416157871,No,2025-10-06
+2595,Industrias Metalurgicas GEntili,info@facundovera.com,2615269832,No,2025-10-08
+2596,Manuel Rodriguez,mrtelefono08@gmail.com,3416519920,No,2025-10-08
+2597,Pablo Pansa,panspablo@gruposer.com.ar,3401480160,No,2025-10-07
+2598,EZEQUIEL PALUMBO,servicios@palumbo.com.ar,3415010243,No,2025-10-08
+2600,Agustin Velazco ,agusca792@gmail.com,3402573433,No,2025-10-13
+2601,Carlos Barreto,Barretocarlos054@gmail.com,3416503547,No,2025-10-13
+2602,Jorge Omar Valentino ,valenjorgeomar@gmail.com,3412750785,No,2025-10-13
+2603,Sinapsis,vfiameni@sinapsis.com.ar,3476526747,No,2025-10-15
+2605,EXE ROSARIO SRL,leonardo@exeargentina.com.ar,3416626676,No,2025-10-16
+2606,Lucas Di Benedetoo,adm.geosec@gmail.com,3415667428,No,2025-10-21
+2607,Juan manuel farias,juanmanuelfarias91@gmail.com,3413256294,No,2025-10-21
+2609,Emmanuel Grisetti,ventas@securityar.com.ar,3424439184,No,2025-10-22
+2610,SB Sistemas Integrales,sergiobuyatti@gmail.com,3482204558,No,2025-10-23
+2611,Nicolas Rigoni ,nicolasrigoni93@hotmail.com,3416746803,No,2025-11-19
+2613,Facundo Pagés ,facunpages@gmail.com,3854116457,No,2025-10-23
+2614,Levit Seguridad Electronica,jonylevit19@gmail.com,3815764081,No,2025-10-27
+2615,Cassandra Levit,elevitalarmas@yahoo.com.ar,3816817041,No,2025-10-31
+2616,Claudio feodorczuk ,Claudiomarcelofeodorczuk@gmail.com,3425094499,No,2025-11-04
+2617,Buen Dia.NET,alebarruffaldi@gmail.com,3415157523,No,2025-11-04
+2619,Telecomunicaciones Cape SRL,mariel.ottonello@capecom.com.ar,3413154100,No,2025-11-05
+2620,carlos matias elorza,matiaselorza@gmail.com,3764288145,No,2025-11-05
+2621,Victor escalada ,alarmas_ave@yahoo.com.ar,341698886,No,2025-12-02
+2623,Marcelo Paré ,Paremarcelo0@gmail.com,3412575899,No,2025-11-06
+2624,HALT SRL,gprezzavento@haltseguridad.com.ar,3413160220,No,2025-11-10
+2625,Federico José vellon ,federicovellon6@gmail.com,2478540543,No,2025-12-11
+2626,Suri Ingeniería y Servicios,cac@suriis.com.ar,3624614274,No,2025-11-10
+2627,Enrique Ricardo Rodríguez ,richard.arg.olav@gmail.com,2284235899,No,2025-11-10
+2628,HUGO PAILLA,SEGUSAR6@GMAIL.COM,2974332459,No,2025-11-14
+2629,Rogelio Stelzer,rogestelzer@hotmail.com,3416639155,No,2025-11-11
+2630,LUBACOM SRL,contacto@lubacom.ar,3412822391,No,2025-11-12
+2631,Alexis castañeda,Teslamaxelectricidad@gmail.com,3416116908,No,2025-11-14
+2632,Marcos Ezequiel Gonzalez ,eze.gonzalez.532@hotmail.com,3815435285,No,2025-11-25
+2633,Javier quispe martinez ,Jquispe52@gmail.com,3413816807,No,2025-11-14
+2634,Tecno Sur,tecnosurmonitoreo@gmail.com,2920661742,No,2025-11-14
+2635,Rodríguez Daniel Rene,altosystems@live.com.ar,3413229618,No,2025-12-15
+2636,Romero claudio ,Alejandror833@gmail.com,3434653384,No,2025-11-20
+2638,Mnseguridad,pichondelrojo999@gmail.com,3467445239,No,2025-11-20
+2639,Matías Nicolás Baratto ,matibaratto@gmail.com,3492672164,No,2025-11-20
+2640,Gozzi Roberto marcelo,marcelopbd@gmail.com,3415555672,No,2025-12-09
+2643,Roberto Massa,Rmassa@masbel.com.ar,3416444116,No,2025-12-02
+2644,Diego Colombo,diegocolombo_sn@hotmail.com,3364312163,No,2025-11-25
+2645,Instituto tecnico del oficio rivadavia,aanty763@hotmail.com,3416466729,No,2025-11-28
+2647,Grupo San Nicolas seguridad.com.ar,c.cabrera@gsnseguridad.com.ar,3364029441,No,2025-12-01
+2648,DJM HNOS SAS,serv.tec.inalef@gmail.com,2966314476,No,2025-12-02
+2649,Alan Van de Ploeg,vandeploegalan@hotmail.com,3416190090,No,2025-12-02
+2650,Universal Servicios S.R.L.,Universalservicios@gmail.com,3416114040,No,2025-12-02
+2652,Ezequiel Lucas Minetti ,luksminetti@gmail.com,3415958977,No,2025-12-05
+2653,Emanuel Bordón ,24emanuel93@gmail.com,3413773191,No,2026-01-05
+2654,Fabián Albarenque ,fabian.albarenque.sn@gmail.com,3364678852,No,2025-12-05
+2655,Daniel Mayo,mayotronica@gmail.com,3364306468,No,2026-01-07
+2656,juan horacio caparrós,consultora.econet@gmail.com,3814005001,No,2025-12-09
+2657,Daniel Marcelo Blazquez,DanielMBlazquez@Gmail.com,17866409008,No,2025-12-10
+2658,gino ruani,gruani@origenseguridad.com.ar,34674999368,No,2025-12-10
+2659,Electro soluciones ,emiliano_mauri@hotmail.com,1162064850,No,2025-12-11
+2660,Renzo Burna,renzoburna5@gmail.com,3456401364,No,2025-12-11
+2661,Iván Fernández,ivan6840f@gmail.com,3416206823,No,2025-12-12
+2662,Esteban Javier Polimeni,polimenijavier@gmail.com,3413502086,No,2025-12-12
+2664,Martin Zampedri,martinzampedri@gmail.com,3364670293,No,2026-01-20
+2665,Fabio Lionel rios,rios.fabio24@gmail.com,3814138831,No,2025-12-16
+2666,Marcos Gabriel Leiva ,mgleiva@tesit.com.ar,1138705760,No,2025-12-16
+2667,Alexis Arrieta,alexisarrieta89@hotmail.com.ar,3413018055,No,2025-12-17
+2668,Mauricio Bevilacqua,ingmrb@gmail.com,3416441759,No,2025-12-17
+2669,roberto luis franchini,compushopsp@compushopsp.com.ar,3644456989,No,2025-12-17
+2670,Luciano Lequio,lucianolequio@hotmail.com,3416930033,No,2025-12-17
+2673,ACOSTA CRISTIAN,Cristian_gabriel360@hotmail.com,34131571927,No,2025-12-22
+2674,Juan Carlos Peralta ,sabaseguridad@gmail.com,3546560752,No,2025-12-23
+2675,javier ,infosecurmax@gmail.com,3412211775,No,2025-12-29
+2676,Rubén Sanguedolce ,rubensangue@hotmail.com,3416192906,No,2025-12-29
+2678,Loger SRL,logersrl@gmail.com,3364257243,No,2026-01-02
+2680,Juan Pablo Cappelletti ,juanpablocappelletti@gmail.com,3412503701,No,2025-12-31
+2681,SEGURIDAD EL BUHO,marcelogpolverigiani@gmail.com,2477536774,No,2026-01-02
+2682,Mauricio Gaya,htinformatica@gmail.com,3426144619,No,2026-01-05
+2684,Marcos Cosani,marcos-79@live.com.ar,3415768487,No,2026-01-05
+2685,piazza dante ariel,solofaxtango@gmail.com,416165941,No,2026-01-05
+2686,Cristhian Marquezin ,cristhianmarquezin@gmail.com,3434289891,No,2026-01-05
+2687,Marcos Villarreal ,Villarrealmarcoss@gmail.com,3413246770,No,2026-01-26
+2688,Némesis,nemesisseguridadyconfort@gmail.com,3571552400,No,2026-01-06
+2689,Echevarria Cristian Alexis,administracion@servicioscae.com,3413200284,No,2026-01-06
+2690,Mauro tolosa,mauroetolosa@hotmail.com,3415666094,No,2026-01-06
+2691,RAMIRO ORLANDO AMAYA,ramiroamaya1495@gmail.com,3816335638,No,2026-01-06
+2692,BORIS MULLER,borismuller@live.com,3413054300,No,2026-01-06
+2693,Maximiliano Andrés Maffei,maximaffei@gmail.com,3402502497,No,2026-01-07
+2694,Osvaldo Ibargüengoytía,osvaldoibarguengoytia@gmail.com,543472550753,No,2026-01-07
+2697,Bonthuis Greta Eleonora,daniel_arganaraz@hotmail.com,3415795382,No,2026-01-12
+2699,cristian galiano,cristian975@hotmail.com,3888431032,No,2026-01-15
+2700,Orieta osvaldo,ovaorieta@hotmail.com,3816211091,No,2026-01-15
+2701,Ezequiel Trevisan,ezequieltrevisan@gmail.com,3416835090,No,2026-01-16
+2702,system seguridad electronica,systemseguridadelectronica@gmail.com,2604572980,No,2026-01-18
+2703,Delta vision,andresheinze1978@gmail.com,336154522877,No,2026-01-20
+2704,Luciani Hnos SRL,administracion@brawnius.com.ar,3407422178,No,2026-01-19
+2705,Ariel Grinman,agrinman@dfcontrols.com,3416227979,No,2026-01-20
+2706,Sebastián moreira,visiontechsolucioness@gmail.com,3625157868,No,2026-01-21
+2707,Nicolás Deibele ,disfunktion25@gmail.com,3412711841,No,2026-01-21
+2708,Lacher Lauro,lacherlauro@gmail.com,3425785848,No,2026-01-21
+2709,SIMEP INGENIERIA SRL,simepingenieriasrl@gmail.com,3424781336,No,2026-01-22
+2710,walter taborda,walter.taborda@outlook.com,3424387583,No,2026-01-22
+2711,Matias Arguelles,electrosite@hotmail.com.ar,3416352328,No,2026-01-23
+2712,Abonicio diego,diegoabonicio@gmail.com,3416359989,No,2026-01-23
+2713,Andino Pablo ,pabloandino22@gmail.com,2657696950,No,2026-01-26
+2714,LEMA BAJA TENSION SRL,gestion@lematron.com.ar,1154714176,No,2026-01-26
+2715,GABRIEL OSCAR SOSA,gabrieloscar.sosa@gmail.com,3400666126,No,2026-01-26

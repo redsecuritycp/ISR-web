@@ -135,30 +135,30 @@ export default {
 
         getIcono(categoria) {
             const iconos = {
-                'OFERTA': 'mdi-tag-multiple',
-                'ACCESORIOS': 'mdi-puzzle',
+                'OFERTA': 'mdi-percent',
+                'ACCESORIOS': 'mdi-cog',
                 'ALARMAS': 'mdi-bell-ring',
                 'ALMACENAMIENTO': 'mdi-harddisk',
-                'BATERIAS Y PILAS': 'mdi-battery-high',
-                'CABLES': 'mdi-cable-data',
+                'BATERIAS Y PILAS': 'mdi-battery',
+                'CABLES': 'mdi-ethernet-cable',
                 'CAMARAS ANALOGAS': 'mdi-camera',
-                'CAMARAS IP': 'mdi-cctv',
-                'CERCO ELECTRICO': 'mdi-flash-alert',
+                'CAMARAS IP': 'mdi-webcam',
+                'CERCO ELECTRICO': 'mdi-flash',
                 'CONECTIVIDAD': 'mdi-wifi',
-                'CONTROL DE ACCESO / ASISTENCIA': 'mdi-card-account-details',
-                'FERRETERIA': 'mdi-tools',
+                'CONTROL DE ACCESO / ASISTENCIA': 'mdi-badge-account',
+                'FERRETERIA': 'mdi-wrench',
                 'FUENTES - UPS': 'mdi-power-plug',
                 'GENERAL': 'mdi-package-variant',
-                'GESTION & LICENCIAS': 'mdi-license',
-                'GRABADORES': 'mdi-video-box',
+                'GESTION & LICENCIAS': 'mdi-certificate',
+                'GRABADORES': 'mdi-video',
                 'INCENDIO': 'mdi-fire',
-                'LICENCIAS': 'mdi-key',
-                'OUTLET': 'mdi-sale',
-                'PORTERIA': 'mdi-door',
-                'SOLUCIONES': 'mdi-lightbulb'
+                'LICENCIAS': 'mdi-key-variant',
+                'OUTLET': 'mdi-tag-outline',
+                'PORTERIA': 'mdi-doorbell',
+                'SOLUCIONES': 'mdi-lightbulb-on'
             };
             const key = categoria ? categoria.toUpperCase() : '';
-            return iconos[key] || 'mdi-folder';
+            return iconos[key] || 'mdi-folder-outline';
         },
     },
 
